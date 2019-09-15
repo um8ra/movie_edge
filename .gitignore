@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# added for latex work
+
+.gz
+.log
+.aux
+.out
+
+
