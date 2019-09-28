@@ -186,6 +186,65 @@ While our end users may be a bunch of computer scientists for the moment, handin
 \subfile{sections/costs}	
 
 \subfile{sections/projectplan}
+Progress and milestones further into the future may not have individuals assigned yet and are highly tentative. To quote Helmuth von Moltke the Elder: "No plan survives contact with the enemy."
+
+\begin{itemize}
+  \item Get the data (Due: October 11)
+    \begin{itemize}
+      \item Download Movielens data (direct download, all members, individually) 
+      \item Download OMDB data (API download, split among members equally in parallel)
+    \end{itemize}
+  \item Turn in proposal (Due: October 11)
+    \begin{itemize}
+      \item Intro: Rocko
+      \item How it is done today: Yi
+      \item Novelty: Yi, Jonathan
+      \item Who cares: Rocko
+      \item Difference & Impact: Jonathan, Yi
+      \item Risks and payoffs: Daniel
+      \item Costs: TBD
+      \item Project Plan and Milestones: Daniel
+      \item Conclusion: Rocko
+      \item Bibliography: Rocko
+    \end{itemize}
+  \item Train ML algorithms on Movielens dataset and output model (Due: October 28)
+    \begin{itemize}
+      \item Research: All (75% done, always finding new things to do)
+      \item Development: Daniel (50% done)
+      \item Polish Code: All (0% done)
+      \item Deploy to cloud for training?: All (0% done)
+    \end{itemize}
+  \item Create web API so that users can input their data (HTML/JS) and the ML model can interpret it (Python) (Due November 5)
+    \begin{itemize}
+      \item Create webpage with form to submit movie ratings
+      \item Create view to receive form submission and render output (discuss if we want to persist these in a database, difficulty++)
+      \item Reply to submission with ML output
+    \end {itemize}
+  \item Progress Report
+    \begin{itemize}
+      \item Proposed method
+      \item Design of upcoming experiments / evaluation
+      \item Plan of activities (likely Daniel)
+      \item List of innovations
+      \item Submission (nomination of submitter TBD)
+      \item Distribution of team member effort (strive for equality)
+    \end{itemize}
+  \item Vizualize interpretation (Due November 12)
+    \begin{itemize}
+      \item Solid lines for same director or actors?
+      \item Dotted line for other reason(s) TBD?
+      \item Colorize by estimated rating for the end user
+    \end{itemize}
+  \item Add filters on data based on OMDB data (this is our interactive portion) (Due November 19)
+    \begin{itemize}
+      \item Director(s)
+      \item Actor(s)
+      \item Studio? E.g. Pixar movies; Studio Ghibli;
+      \item Producer? Probably not. Producer == moneybags not creative.
+    \end{itemize}
+  \item $$$
+  \item Profit
+\end{itemize}
 
 \subfile{sections/conclusion}
 
