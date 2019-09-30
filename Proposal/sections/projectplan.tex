@@ -1,5 +1,78 @@
 \subsection{Project Plan and Milestones}
-How long will it take?   Specific roles and contributions for team members
 
-What are the midterm and final "exams" to check for success? How will progress be measured.
+Progress and milestones further into the future may not have individuals assigned yet and are highly tentative. To quote Helmuth von Moltke the Elder: "No plan survives contact with the enemy."
 
+"How long will it take" is explicitly addressable via looking at date ranges included below. Our team has hard deadlines to hit, so rather than writing "will take two weeks" we believe writing the explicit due date is more useful.
+
+Progress measurement is primarily going to be handled by checking boxes off this list. If we fall behind, it should be pretty clear.
+
+\begin{itemize}
+  \item Form project team (Done)
+  \item Get the data (October 11)
+    \begin{itemize}
+      \item Download Movielens data (direct download, all members, individually) 
+      \item Download OMDB data (API download, split among members equally in parallel): API query-er designed by Jonathan
+    \end{itemize}
+  \item Turn in proposal (October 11)
+    \begin{itemize}
+      \item Intro: Rocko
+      \item How it is done today: Yi
+      \item Novelty: Yi, Jonathan
+      \item Who cares: Rocko
+      \item Difference & Impact: Jonathan, Yi
+      \item Risks and payoffs: Daniel
+      \item Costs: TBD
+      \item Project Plan and Milestones: Daniel
+      \item Conclusion: Rocko
+      \item Bibliography: Rocko
+    \end{itemize}
+  \item Design and Turn in slides: Rocko (October 11)
+  \item Turn in video: Daniel (October 11)
+  \item Design and Train ML algorithms on Movielens dataset and output model (October 28)
+    \begin{itemize}
+      \item Research: All (75% done, always finding new things to do)
+      \item Neural Network "not-embedding" Development: Daniel (50% done)
+      \item Collaborative Filtering + Matrix Factorization: Jonathan (50% done)
+    \end{itemize}
+  \item Create web API so that users can input their data (HTML/JS) and the ML model can interpret it (Python) (November 5)
+    \begin{itemize}
+      \item Create webpage with form to submit movie ratings (Daniel?)
+      \item Create view to receive form submission and render output with data replied to in JSON form (Daniel?)
+      \item Reply to submission with ML output (Daniel?)
+    \end {itemize}
+  \item "Midterm Exam"
+    \begin{itemize}
+      \item Webpage can submit and receive data
+      \item ML provides reasonable rating output
+      \item Proposal (and slies/video) successfully submitted
+    \end{itemize}
+  \item Progress Report
+    \begin{itemize}
+      \item Proposed method
+      \item Design of upcoming experiments / evaluation
+      \item Plan of activities (likely Daniel, who did Project Plan & Milestones for the proposal)
+      \item List of innovations
+      \item Submission (nomination of submitter TBD)
+      \item Distribution of team member effort (strive for equality)
+    \end{itemize}
+  \item Vizualize interpretation (November 12)
+    \begin{itemize}
+      \item Solid lines for same director or actors?
+      \item Dotted line for other reason(s) TBD?
+      \item Colorize by estimated rating for the end user
+    \end{itemize}
+  \item Add filters on data based on OMDB data (this is our interactive portion) (November 19)
+    \begin{itemize}
+      \item Director(s)
+      \item Actor(s)
+      \item Studio? E.g. Pixar; Studio Ghibli; Laika
+      \item Producer? Probably not. Producer == moneybags not creative.
+    \end{itemize}
+  \item Stretch goal: allow for explainable ML via LIME or similar method (November 19)
+  \item Stretch goal: allow for user comparison so that after submissions, we can present a Movielens user's ratings so that our end-user can explore a similar-but-different person's taste.
+  \item Final Exam: Users can input personal movie ratings and expect reasonable outputs for recommendation. They may also visualize their recommended movies in relation to their submissions.
+  \item Poster Presentation Video (Nov 29)
+  \item Final Report (Nov 29)
+  \item ???
+  \item Profit
+\end{itemize}
