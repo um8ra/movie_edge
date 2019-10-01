@@ -110,5 +110,6 @@ venv.bak/
 *.aux
 *.out
 *.pdf
+*.bak
 
 Data/
