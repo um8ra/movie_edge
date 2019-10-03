@@ -1,7 +1,10 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: team05proposal.aux
-The style file: apalike.bst
+The style file: ACM-Reference-Format.bst
 Database file #1: sections/bibliography.bib
+Warning--page numbers missing in both pages and numpages fields in Akiba2017
 Warning--empty booktitle in Chang2017
-Warning--empty journal in @chen
-Warning--empty journal in @koren09
-(There were 3 warnings)
+Warning--empty publisher in Chang2017
+Warning--empty address in Chang2017
+Warning--page numbers missing in both pages and numpages fields in Goyal2017
+Warning--empty organization in @koren09
+(There were 6 warnings)

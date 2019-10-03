@@ -51,6 +51,8 @@
 
 \usepackage{hyperref}
 \usepackage{subfiles}
+\usepackage{url}
+\usepackage{soul}
 
 %%\citestyle{acmauthoryear}
 
@@ -103,8 +105,9 @@
 %%
 %% The abstract is a short summary of the work to be presented in the
 %% article.
+
 \begin{abstract}
-We present Movie Mood, an interactive recommendation engine which allows users to both understand why a movie is recommended and tune those recommendations for their current viewing interest.
+	We present \textbf{Movie Mood}, an interactive recommendation engine which allows users to understand why a movie is recommended and fine tune those recommendations for their current interests.
 \end{abstract}
 
 %%
@@ -175,18 +178,23 @@ We present Movie Mood, an interactive recommendation engine which allows users t
 
 \subfile{sections/difference-impact}
 
+\section{Project Details}
+
 \subfile{sections/risks-payoff}
 
 \subfile{sections/costs}	
 
 \subfile{sections/projectplan}
 
+\section{Conclusion}
+
 \subfile{sections/conclusion}
 
 
 %% the bibliography file.
-%% \bibliographystyle{ACM-Reference-Format-Journals}
-\bibliographystyle{apalike}
+%%\bibliographystyle{apalike}
+
+\bibliographystyle{ACM-Reference-Format}
 \bibliography{sections/bibliography}
 
 \end{document}

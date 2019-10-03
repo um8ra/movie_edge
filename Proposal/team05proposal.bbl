@@ -1,28 +1,105 @@
-\begin{thebibliography}{}
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\bibitem[Akiba et~al., 2017]{Akiba2017}
-Akiba, T., Suzuki, S., and Fukuda, K. (2017).
-\newblock Extremely large minibatch {SGD:} training resnet-50 on imagenet in 15
-  minutes.
-\newblock {\em CoRR}, abs/1711.04325.
+\begin{thebibliography}{4}
 
-\bibitem[Chang et~al., 2017]{Chang2017}
-Chang, C.-Y., Lee, S.-J., and Lai, C.-C. (2017).
-\newblock Weighted word2vec based on the distance of words.
-\newblock pages 563--568.
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
 
-\bibitem[Chen, 2019]{@chen}
-Chen, E. (2019).
-\newblock Winning the netflix prize: A summary.
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{#1}\fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
 
-\bibitem[Goyal et~al., 2017]{Goyal2017}
-Goyal, P., Doll{\'{a}}r, P., Girshick, R.~B., Noordhuis, P., Wesolowski, L.,
-  Kyrola, A., Tulloch, A., Jia, Y., and He, K. (2017).
-\newblock Accurate, large minibatch {SGD:} training imagenet in 1 hour.
-\newblock {\em CoRR}, abs/1706.02677.
+\bibitem[\protect\citeauthoryear{Akiba, Suzuki, and Fukuda}{Akiba
+  et~al\mbox{.}}{2017}]%
+        {Akiba2017}
+\bibfield{author}{\bibinfo{person}{Takuya Akiba}, \bibinfo{person}{Shuji
+  Suzuki}, {and} \bibinfo{person}{Keisuke Fukuda}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Extremely Large Minibatch {SGD:} Training ResNet-50
+  on ImageNet in 15 Minutes}.
+\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1711.04325}
+  (\bibinfo{year}{2017}).
+\newblock
+\showeprint[arxiv]{1711.04325}
+\urldef\tempurl%
+\url{http://arxiv.org/abs/1711.04325}
+\showURL{%
+\tempurl}
 
-\bibitem[Koren, 2009]{@koren09}
-Koren, Y. (2009).
-\newblock The bellkore solution to the netflix grand prize.
+
+\bibitem[\protect\citeauthoryear{Chang, Lee, and Lai}{Chang
+  et~al\mbox{.}}{2017}]%
+        {Chang2017}
+\bibfield{author}{\bibinfo{person}{Chia-Yang Chang}, \bibinfo{person}{Shie-Jue
+  Lee}, {and} \bibinfo{person}{Chih-Chin Lai}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Weighted word2vec based on the distance of words}.
+  \bibinfo{pages}{563--568}.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1109/ICMLC.2017.8108974}
+\showDOI{\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Goyal, Doll{\'{a}}r, Girshick, Noordhuis,
+  Wesolowski, Kyrola, Tulloch, Jia, and He}{Goyal et~al\mbox{.}}{2017}]%
+        {Goyal2017}
+\bibfield{author}{\bibinfo{person}{Priya Goyal}, \bibinfo{person}{Piotr
+  Doll{\'{a}}r}, \bibinfo{person}{Ross~B. Girshick}, \bibinfo{person}{Pieter
+  Noordhuis}, \bibinfo{person}{Lukasz Wesolowski}, \bibinfo{person}{Aapo
+  Kyrola}, \bibinfo{person}{Andrew Tulloch}, \bibinfo{person}{Yangqing Jia},
+  {and} \bibinfo{person}{Kaiming He}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Accurate, Large Minibatch {SGD:} Training ImageNet
+  in 1 Hour}.
+\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1706.02677}
+  (\bibinfo{year}{2017}).
+\newblock
+\showeprint[arxiv]{1706.02677}
+\urldef\tempurl%
+\url{http://arxiv.org/abs/1706.02677}
+\showURL{%
+\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Koren}{Koren}{2009}]%
+        {@koren09}
+\bibfield{author}{\bibinfo{person}{Yehuda Koren}.}
+  \bibinfo{year}{2009}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{The BellKore Solution to the Netflix Grand
+  Prize}}.
+\newblock
+\urldef\tempurl%
+\url{https://www.netflixprize.com/assets/GrandPrize2009_BPC_BellKor.pdf}
+\showURL{%
+Retrieved Oct 1, 2019 from \tempurl}
+
 
 \end{thebibliography}
