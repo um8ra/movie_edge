@@ -1,6 +1,7 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: team05proposal.aux
 The style file: ACM-Reference-Format.bst
 Database file #1: sections/bibliography.bib
+Warning--I didn't find a database entry for "("
 Warning--no key, author in Netflixh3:online
 Warning--no author, editor, organization, or key in Netflixh3:online
 Warning--to sort, need author or key in Netflixh3:online
@@ -19,10 +20,14 @@ Warning--empty address in koren2008factorization
 Warning--unusual to have number, but no volume, for linden2003amazon
 Warning--no number and no volume in mikolov2013efficient
 Warning--page numbers missing in both pages and numpages fields in mikolov2013efficient
+Warning--empty publisher in nobrega2019towards
+Warning--empty address in nobrega2019towards
 Warning--no number and no volume in ribeiro2016model
 Warning--page numbers missing in both pages and numpages fields in ribeiro2016model
 Warning--empty publisher in ribeiro2016should
 Warning--empty address in ribeiro2016should
 Warning--no number and no volume in rong2014word2vec
 Warning--page numbers missing in both pages and numpages fields in rong2014word2vec
-(There were 24 warnings)
+Warning--empty publisher in taijala2018movieexplorer
+Warning--empty address in taijala2018movieexplorer
+(There were 29 warnings)
