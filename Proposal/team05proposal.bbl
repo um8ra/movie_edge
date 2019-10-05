@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{2}
+\begin{thebibliography}{14}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -37,29 +37,181 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
 
-\bibitem[\protect\citeauthoryear{Chen}{Chen}{[n.d.]}]%
-        {@chen}
-\bibfield{author}{\bibinfo{person}{Edwin Chen}.}
-  \bibinfo{year}{[n.d.]}\natexlab{}.
-\newblock \bibinfo{booktitle}{\emph{Winning the Netflix Prize: A Summary}}.
+\bibitem[\protect\citeauthoryear{??}{Net}{[n.d.]}]%
+        {Netflixh3:online}
+ \bibinfo{year}{[n.d.]}\natexlab{}.
+\newblock \bibinfo{title}{Netflix has replaced its 5-star rating system with
+  'thumbs up, thumbs down' -- here's why | Business Insider}.
 \newblock
+  \bibinfo{howpublished}{\url{https://www.businessinsider.com.au/why-netflix-replaced-its-5-star-rating-system-2017-4}}.
+\newblock
+\newblock
+\shownote{(Accessed on 10/03/2019).}
+
+
+\bibitem[\protect\citeauthoryear{Akiba, Suzuki, and Fukuda}{Akiba
+  et~al\mbox{.}}{2017}]%
+        {Akiba2017}
+\bibfield{author}{\bibinfo{person}{Takuya Akiba}, \bibinfo{person}{Shuji
+  Suzuki}, {and} \bibinfo{person}{Keisuke Fukuda}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Extremely Large Minibatch {SGD:} Training ResNet-50
+  on ImageNet in 15 Minutes}.
+\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1711.04325}
+  (\bibinfo{year}{2017}).
+\newblock
+\showeprint[arxiv]{1711.04325}
 \urldef\tempurl%
-\url{https://blog.echen.me/2011/10/24/winning-the-netflix-prize-a-summary/}
+\url{http://arxiv.org/abs/1711.04325}
 \showURL{%
 \tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Chang, Lee, and Lai}{Chang
+  et~al\mbox{.}}{2017}]%
+        {chang2017weighted}
+\bibfield{author}{\bibinfo{person}{Chia-Yang Chang}, \bibinfo{person}{Shie-Jue
+  Lee}, {and} \bibinfo{person}{Chih-Chin Lai}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Weighted word2vec based on the distance of words}.
+  In \bibinfo{booktitle}{\emph{2017 International Conference on Machine
+  Learning and Cybernetics (ICMLC)}}, Vol.~\bibinfo{volume}{2}. IEEE,
+  \bibinfo{pages}{563--568}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Funk}{Funk}{2006}]%
+        {funk2006netflix}
+\bibfield{author}{\bibinfo{person}{Simon Funk}.}
+  \bibinfo{year}{2006}\natexlab{}.
+\newblock \bibinfo{title}{Netflix update: Try this at home}.
+\newblock
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Goyal, Doll{\'{a}}r, Girshick, Noordhuis,
+  Wesolowski, Kyrola, Tulloch, Jia, and He}{Goyal et~al\mbox{.}}{2017}]%
+        {Goyal2017}
+\bibfield{author}{\bibinfo{person}{Priya Goyal}, \bibinfo{person}{Piotr
+  Doll{\'{a}}r}, \bibinfo{person}{Ross~B. Girshick}, \bibinfo{person}{Pieter
+  Noordhuis}, \bibinfo{person}{Lukasz Wesolowski}, \bibinfo{person}{Aapo
+  Kyrola}, \bibinfo{person}{Andrew Tulloch}, \bibinfo{person}{Yangqing Jia},
+  {and} \bibinfo{person}{Kaiming He}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Accurate, Large Minibatch {SGD:} Training ImageNet
+  in 1 Hour}.
+\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1706.02677}
+  (\bibinfo{year}{2017}).
+\newblock
+\showeprint[arxiv]{1706.02677}
+\urldef\tempurl%
+\url{http://arxiv.org/abs/1706.02677}
+\showURL{%
+\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Koren}{Koren}{2008}]%
+        {koren2008factorization}
+\bibfield{author}{\bibinfo{person}{Yehuda Koren}.}
+  \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Factorization meets the neighborhood: a
+  multifaceted collaborative filtering model}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 14th ACM SIGKDD international
+  conference on Knowledge discovery and data mining}}. ACM,
+  \bibinfo{pages}{426--434}.
+\newblock
 
 
 \bibitem[\protect\citeauthoryear{Koren}{Koren}{2009}]%
-        {@koren09}
+        {koren2009bellkor}
 \bibfield{author}{\bibinfo{person}{Yehuda Koren}.}
   \bibinfo{year}{2009}\natexlab{}.
-\newblock \bibinfo{booktitle}{\emph{The BellKore Solution to the Netflix Grand
-  Prize}}.
+\newblock \showarticletitle{The bellkor solution to the netflix grand prize}.
+\newblock \bibinfo{journal}{\emph{Netflix prize documentation}}
+  \bibinfo{volume}{81}, \bibinfo{number}{2009} (\bibinfo{year}{2009}),
+  \bibinfo{pages}{1--10}.
 \newblock
-\urldef\tempurl%
-\url{https://www.netflixprize.com/assets/GrandPrize2009_BPC_BellKor.pdf}
-\showURL{%
-\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Linden, Smith, and York}{Linden
+  et~al\mbox{.}}{2003}]%
+        {linden2003amazon}
+\bibfield{author}{\bibinfo{person}{Greg Linden}, \bibinfo{person}{Brent Smith},
+  {and} \bibinfo{person}{Jeremy York}.} \bibinfo{year}{2003}\natexlab{}.
+\newblock \showarticletitle{Amazon. com recommendations: Item-to-item
+  collaborative filtering}.
+\newblock \bibinfo{journal}{\emph{IEEE Internet computing}} \bibinfo{number}{1}
+  (\bibinfo{year}{2003}), \bibinfo{pages}{76--80}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Mikolov, Chen, Corrado, and Dean}{Mikolov
+  et~al\mbox{.}}{2013}]%
+        {mikolov2013efficient}
+\bibfield{author}{\bibinfo{person}{Tomas Mikolov}, \bibinfo{person}{Kai Chen},
+  \bibinfo{person}{Greg Corrado}, {and} \bibinfo{person}{Jeffrey Dean}.}
+  \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Efficient estimation of word representations in
+  vector space}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1301.3781}}
+  (\bibinfo{year}{2013}).
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Rendle}{Rendle}{2012}]%
+        {rendle2012factorization}
+\bibfield{author}{\bibinfo{person}{Steffen Rendle}.}
+  \bibinfo{year}{2012}\natexlab{}.
+\newblock \showarticletitle{Factorization machines with libfm}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Intelligent Systems and
+  Technology (TIST)}} \bibinfo{volume}{3}, \bibinfo{number}{3}
+  (\bibinfo{year}{2012}), \bibinfo{pages}{57}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Ribeiro, Singh, and Guestrin}{Ribeiro
+  et~al\mbox{.}}{2016a}]%
+        {ribeiro2016model}
+\bibfield{author}{\bibinfo{person}{Marco~Tulio Ribeiro},
+  \bibinfo{person}{Sameer Singh}, {and} \bibinfo{person}{Carlos Guestrin}.}
+  \bibinfo{year}{2016}\natexlab{a}.
+\newblock \showarticletitle{Model-agnostic interpretability of machine
+  learning}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1606.05386}}
+  (\bibinfo{year}{2016}).
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Ribeiro, Singh, and Guestrin}{Ribeiro
+  et~al\mbox{.}}{2016b}]%
+        {ribeiro2016should}
+\bibfield{author}{\bibinfo{person}{Marco~Tulio Ribeiro},
+  \bibinfo{person}{Sameer Singh}, {and} \bibinfo{person}{Carlos Guestrin}.}
+  \bibinfo{year}{2016}\natexlab{b}.
+\newblock \showarticletitle{Why should i trust you?: Explaining the predictions
+  of any classifier}. In \bibinfo{booktitle}{\emph{Proceedings of the 22nd ACM
+  SIGKDD international conference on knowledge discovery and data mining}}.
+  ACM, \bibinfo{pages}{1135--1144}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Rong}{Rong}{2014}]%
+        {rong2014word2vec}
+\bibfield{author}{\bibinfo{person}{Xin Rong}.} \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{word2vec parameter learning explained}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1411.2738}}
+  (\bibinfo{year}{2014}).
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Smith and Linden}{Smith and Linden}{2017}]%
+        {smith2017two}
+\bibfield{author}{\bibinfo{person}{Brent Smith} {and} \bibinfo{person}{Greg
+  Linden}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Two decades of recommender systems at Amazon. com}.
+\newblock \bibinfo{journal}{\emph{Ieee internet computing}}
+  \bibinfo{volume}{21}, \bibinfo{number}{3} (\bibinfo{year}{2017}),
+  \bibinfo{pages}{12--18}.
+\newblock
 
 
 \end{thebibliography}

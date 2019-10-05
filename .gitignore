@@ -105,9 +105,11 @@ venv.bak/
 
 # added for latex work
 
-.gz
-.log
-.aux
-.out
+*.gz
+*.log
+*.aux
+*.out
+*.pdf
+*.bak
 
 Data/

@@ -1,7 +1,28 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: team05proposal.aux
 The style file: ACM-Reference-Format.bst
 Database file #1: sections/bibliography.bib
-Warning--empty year in @chen
-Warning--empty organization in @chen
-Warning--empty organization in @koren09
-(There were 3 warnings)
+Warning--no key, author in Netflixh3:online
+Warning--no author, editor, organization, or key in Netflixh3:online
+Warning--to sort, need author or key in Netflixh3:online
+Warning--no key, author in Netflixh3:online
+Warning--no key, author in Netflixh3:online
+Warning--no key, author in Netflixh3:online
+Warning--no author, editor, organization, or key in Netflixh3:online
+Warning--empty author in Netflixh3:online
+Warning--empty year in Netflixh3:online
+Warning--page numbers missing in both pages and numpages fields in Akiba2017
+Warning--empty publisher in chang2017weighted
+Warning--empty address in chang2017weighted
+Warning--page numbers missing in both pages and numpages fields in Goyal2017
+Warning--empty publisher in koren2008factorization
+Warning--empty address in koren2008factorization
+Warning--unusual to have number, but no volume, for linden2003amazon
+Warning--no number and no volume in mikolov2013efficient
+Warning--page numbers missing in both pages and numpages fields in mikolov2013efficient
+Warning--no number and no volume in ribeiro2016model
+Warning--page numbers missing in both pages and numpages fields in ribeiro2016model
+Warning--empty publisher in ribeiro2016should
+Warning--empty address in ribeiro2016should
+Warning--no number and no volume in rong2014word2vec
+Warning--page numbers missing in both pages and numpages fields in rong2014word2vec
+(There were 24 warnings)
