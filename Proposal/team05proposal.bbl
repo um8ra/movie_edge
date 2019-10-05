@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{14}
+\begin{thebibliography}{16}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -157,6 +157,18 @@
 \newblock
 
 
+\bibitem[\protect\citeauthoryear{N{\'o}brega and Marinho}{N{\'o}brega and
+  Marinho}{2019}]%
+        {nobrega2019towards}
+\bibfield{author}{\bibinfo{person}{Caio N{\'o}brega} {and}
+  \bibinfo{person}{Leandro Marinho}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Towards explaining recommendations through local
+  surrogate models}. In \bibinfo{booktitle}{\emph{Proceedings of the 34th
+  ACM/SIGAPP Symposium on Applied Computing}}. ACM,
+  \bibinfo{pages}{1671--1678}.
+\newblock
+
+
 \bibitem[\protect\citeauthoryear{Rendle}{Rendle}{2012}]%
         {rendle2012factorization}
 \bibfield{author}{\bibinfo{person}{Steffen Rendle}.}
@@ -211,6 +223,19 @@
 \newblock \bibinfo{journal}{\emph{Ieee internet computing}}
   \bibinfo{volume}{21}, \bibinfo{number}{3} (\bibinfo{year}{2017}),
   \bibinfo{pages}{12--18}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Taijala, Willemsen, and Konstan}{Taijala
+  et~al\mbox{.}}{2018}]%
+        {taijala2018movieexplorer}
+\bibfield{author}{\bibinfo{person}{Taavi~T Taijala}, \bibinfo{person}{Martijn~C
+  Willemsen}, {and} \bibinfo{person}{Joseph~A Konstan}.}
+  \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Movieexplorer: building an interactive exploration
+  tool from ratings and latent taste spaces}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 33rd Annual ACM Symposium on
+  Applied Computing}}. ACM, \bibinfo{pages}{1383--1392}.
 \newblock
 
 
