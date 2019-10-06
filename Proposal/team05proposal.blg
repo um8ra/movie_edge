@@ -1,10 +1,6 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: team05proposal.aux
 The style file: ACM-Reference-Format.bst
 Database file #1: sections/bibliography.bib
-Repeated entry---line 152 of file sections/bibliography.bib
- : @article{rendle2012factorization
- :                                 ,
-I'm skipping whatever remains of this entry
 Warning--no key, author in openMovieDB
 Warning--no author, editor, organization, or key in openMovieDB
 Warning--to sort, need author or key in openMovieDB
@@ -34,4 +30,4 @@ Warning--empty address in schafer2002meta
 Warning--empty address in taijala2018movieexplorer
 Warning--no number and no volume in wattenberg2016how
 Warning--page numbers missing in both pages and numpages fields in wattenberg2016how
-(There was 1 error message)
+(There were 29 warnings)
