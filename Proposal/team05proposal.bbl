@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{16}
+\begin{thebibliography}{21}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -37,47 +37,14 @@
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
 
-\bibitem[\protect\citeauthoryear{??}{Net}{[n.d.]}]%
-        {Netflixh3:online}
+\bibitem[\protect\citeauthoryear{??}{ope}{[n.d.]}]%
+        {openMovieDB}
  \bibinfo{year}{[n.d.]}\natexlab{}.
-\newblock \bibinfo{title}{Netflix has replaced its 5-star rating system with
-  'thumbs up, thumbs down' -- here's why | Business Insider}.
-\newblock
-  \bibinfo{howpublished}{\url{https://www.businessinsider.com.au/why-netflix-replaced-its-5-star-rating-system-2017-4}}.
+\newblock \bibinfo{title}{The Open Movie Database}.
+\newblock \bibinfo{howpublished}{\url{https://www.omdbapi.com/}}.
 \newblock
 \newblock
 \shownote{(Accessed on 10/03/2019).}
-
-
-\bibitem[\protect\citeauthoryear{Akiba, Suzuki, and Fukuda}{Akiba
-  et~al\mbox{.}}{2017}]%
-        {Akiba2017}
-\bibfield{author}{\bibinfo{person}{Takuya Akiba}, \bibinfo{person}{Shuji
-  Suzuki}, {and} \bibinfo{person}{Keisuke Fukuda}.}
-  \bibinfo{year}{2017}\natexlab{}.
-\newblock \showarticletitle{Extremely Large Minibatch {SGD:} Training ResNet-50
-  on ImageNet in 15 Minutes}.
-\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1711.04325}
-  (\bibinfo{year}{2017}).
-\newblock
-\showeprint[arxiv]{1711.04325}
-\urldef\tempurl%
-\url{http://arxiv.org/abs/1711.04325}
-\showURL{%
-\tempurl}
-
-
-\bibitem[\protect\citeauthoryear{Chang, Lee, and Lai}{Chang
-  et~al\mbox{.}}{2017}]%
-        {chang2017weighted}
-\bibfield{author}{\bibinfo{person}{Chia-Yang Chang}, \bibinfo{person}{Shie-Jue
-  Lee}, {and} \bibinfo{person}{Chih-Chin Lai}.}
-  \bibinfo{year}{2017}\natexlab{}.
-\newblock \showarticletitle{Weighted word2vec based on the distance of words}.
-  In \bibinfo{booktitle}{\emph{2017 International Conference on Machine
-  Learning and Cybernetics (ICMLC)}}, Vol.~\bibinfo{volume}{2}. IEEE,
-  \bibinfo{pages}{563--568}.
-\newblock
 
 
 \bibitem[\protect\citeauthoryear{Funk}{Funk}{2006}]%
@@ -87,26 +54,54 @@
 \newblock \bibinfo{title}{Netflix update: Try this at home}.
 \newblock
 \newblock
-
-
-\bibitem[\protect\citeauthoryear{Goyal, Doll{\'{a}}r, Girshick, Noordhuis,
-  Wesolowski, Kyrola, Tulloch, Jia, and He}{Goyal et~al\mbox{.}}{2017}]%
-        {Goyal2017}
-\bibfield{author}{\bibinfo{person}{Priya Goyal}, \bibinfo{person}{Piotr
-  Doll{\'{a}}r}, \bibinfo{person}{Ross~B. Girshick}, \bibinfo{person}{Pieter
-  Noordhuis}, \bibinfo{person}{Lukasz Wesolowski}, \bibinfo{person}{Aapo
-  Kyrola}, \bibinfo{person}{Andrew Tulloch}, \bibinfo{person}{Yangqing Jia},
-  {and} \bibinfo{person}{Kaiming He}.} \bibinfo{year}{2017}\natexlab{}.
-\newblock \showarticletitle{Accurate, Large Minibatch {SGD:} Training ImageNet
-  in 1 Hour}.
-\newblock \bibinfo{journal}{\emph{CoRR}}  \bibinfo{volume}{abs/1706.02677}
-  (\bibinfo{year}{2017}).
-\newblock
-\showeprint[arxiv]{1706.02677}
 \urldef\tempurl%
-\url{http://arxiv.org/abs/1706.02677}
+\url{https://sifter.org/~simon/journal/20061211.html}
 \showURL{%
 \tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Harper and Konstan}{Harper and
+  Konstan}{2016}]%
+        {harper2016movielens}
+\bibfield{author}{\bibinfo{person}{F~Maxwell Harper} {and}
+  \bibinfo{person}{Joseph~A Konstan}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{The movielens datasets: History and context}.
+\newblock \bibinfo{journal}{\emph{Acm transactions on interactive intelligent
+  systems (tiis)}} \bibinfo{volume}{5}, \bibinfo{number}{4}
+  (\bibinfo{year}{2016}), \bibinfo{pages}{19}.
+\newblock
+\urldef\tempurl%
+\url{https://grouplens.org/datasets/movielens/}
+\showURL{%
+\tempurl}
+
+
+\bibitem[\protect\citeauthoryear{Herlocker, Konstan, Borchers, and
+  Riedl}{Herlocker et~al\mbox{.}}{1999}]%
+        {herlocker1999algorithmic}
+\bibfield{author}{\bibinfo{person}{Jonathan~L Herlocker},
+  \bibinfo{person}{Joseph~A Konstan}, \bibinfo{person}{Al Borchers}, {and}
+  \bibinfo{person}{John Riedl}.} \bibinfo{year}{1999}\natexlab{}.
+\newblock \showarticletitle{An algorithmic framework for performing
+  collaborative filtering}. In \bibinfo{booktitle}{\emph{22nd Annual
+  International ACM SIGIR Conference on Research and Development in Information
+  Retrieval, SIGIR 1999}}. Association for Computing Machinery, Inc,
+  \bibinfo{pages}{230--237}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Herlocker, Konstan, Terveen, and
+  Riedl}{Herlocker et~al\mbox{.}}{2004}]%
+        {herlocker2004evaluating}
+\bibfield{author}{\bibinfo{person}{Jonathan~L Herlocker},
+  \bibinfo{person}{Joseph~A Konstan}, \bibinfo{person}{Loren~G Terveen}, {and}
+  \bibinfo{person}{John~T Riedl}.} \bibinfo{year}{2004}\natexlab{}.
+\newblock \showarticletitle{Evaluating collaborative filtering recommender
+  systems}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Information Systems
+  (TOIS)}} \bibinfo{volume}{22}, \bibinfo{number}{1} (\bibinfo{year}{2004}),
+  \bibinfo{pages}{5--53}.
+\newblock
 
 
 \bibitem[\protect\citeauthoryear{Koren}{Koren}{2008}]%
@@ -118,17 +113,6 @@
   \bibinfo{booktitle}{\emph{Proceedings of the 14th ACM SIGKDD international
   conference on Knowledge discovery and data mining}}. ACM,
   \bibinfo{pages}{426--434}.
-\newblock
-
-
-\bibitem[\protect\citeauthoryear{Koren}{Koren}{2009}]%
-        {koren2009bellkor}
-\bibfield{author}{\bibinfo{person}{Yehuda Koren}.}
-  \bibinfo{year}{2009}\natexlab{}.
-\newblock \showarticletitle{The bellkor solution to the netflix grand prize}.
-\newblock \bibinfo{journal}{\emph{Netflix prize documentation}}
-  \bibinfo{volume}{81}, \bibinfo{number}{2009} (\bibinfo{year}{2009}),
-  \bibinfo{pages}{1--10}.
 \newblock
 
 
@@ -144,12 +128,23 @@
 \newblock
 
 
+\bibitem[\protect\citeauthoryear{Maaten and Hinton}{Maaten and Hinton}{2008}]%
+        {maaten2008visualizing}
+\bibfield{author}{\bibinfo{person}{Laurens van~der Maaten} {and}
+  \bibinfo{person}{Geoffrey Hinton}.} \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Visualizing data using t-SNE}.
+\newblock \bibinfo{journal}{\emph{Journal of machine learning research}}
+  \bibinfo{volume}{9}, \bibinfo{number}{Nov} (\bibinfo{year}{2008}),
+  \bibinfo{pages}{2579--2605}.
+\newblock
+
+
 \bibitem[\protect\citeauthoryear{Mikolov, Chen, Corrado, and Dean}{Mikolov
-  et~al\mbox{.}}{2013}]%
+  et~al\mbox{.}}{2013a}]%
         {mikolov2013efficient}
 \bibfield{author}{\bibinfo{person}{Tomas Mikolov}, \bibinfo{person}{Kai Chen},
   \bibinfo{person}{Greg Corrado}, {and} \bibinfo{person}{Jeffrey Dean}.}
-  \bibinfo{year}{2013}\natexlab{}.
+  \bibinfo{year}{2013}\natexlab{a}.
 \newblock \showarticletitle{Efficient estimation of word representations in
   vector space}.
 \newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1301.3781}}
@@ -157,15 +152,37 @@
 \newblock
 
 
-\bibitem[\protect\citeauthoryear{N{\'o}brega and Marinho}{N{\'o}brega and
-  Marinho}{2019}]%
-        {nobrega2019towards}
-\bibfield{author}{\bibinfo{person}{Caio N{\'o}brega} {and}
-  \bibinfo{person}{Leandro Marinho}.} \bibinfo{year}{2019}\natexlab{}.
-\newblock \showarticletitle{Towards explaining recommendations through local
-  surrogate models}. In \bibinfo{booktitle}{\emph{Proceedings of the 34th
-  ACM/SIGAPP Symposium on Applied Computing}}. ACM,
-  \bibinfo{pages}{1671--1678}.
+\bibitem[\protect\citeauthoryear{Mikolov, Sutskever, Chen, Corrado, and
+  Dean}{Mikolov et~al\mbox{.}}{2013b}]%
+        {mikolov2013distributed}
+\bibfield{author}{\bibinfo{person}{Tomas Mikolov}, \bibinfo{person}{Ilya
+  Sutskever}, \bibinfo{person}{Kai Chen}, \bibinfo{person}{Greg~S Corrado},
+  {and} \bibinfo{person}{Jeff Dean}.} \bibinfo{year}{2013}\natexlab{b}.
+\newblock \showarticletitle{Distributed representations of words and phrases
+  and their compositionality}. In \bibinfo{booktitle}{\emph{Advances in neural
+  information processing systems}}. \bibinfo{pages}{3111--3119}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Molnar}{Molnar}{2019}]%
+        {Molnar2019interpretable}
+\bibfield{author}{\bibinfo{person}{Christoph Molnar}.}
+  \bibinfo{year}{2019}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Interpretable Machine Learning - A Guide
+  for Making Black Box Models Explainable}}.
+\newblock
+  \bibinfo{publisher}{https://christophm.github.io/interpretable-ml-book/},
+  Chapter Interpretability.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Ozsoy}{Ozsoy}{2016}]%
+        {ozsoy2016word}
+\bibfield{author}{\bibinfo{person}{Makbule~Gulcin Ozsoy}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{From word embeddings to item recommendation}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1601.01356}}
+  (\bibinfo{year}{2016}).
 \newblock
 
 
@@ -180,32 +197,6 @@
 \newblock
 
 
-\bibitem[\protect\citeauthoryear{Ribeiro, Singh, and Guestrin}{Ribeiro
-  et~al\mbox{.}}{2016a}]%
-        {ribeiro2016model}
-\bibfield{author}{\bibinfo{person}{Marco~Tulio Ribeiro},
-  \bibinfo{person}{Sameer Singh}, {and} \bibinfo{person}{Carlos Guestrin}.}
-  \bibinfo{year}{2016}\natexlab{a}.
-\newblock \showarticletitle{Model-agnostic interpretability of machine
-  learning}.
-\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1606.05386}}
-  (\bibinfo{year}{2016}).
-\newblock
-
-
-\bibitem[\protect\citeauthoryear{Ribeiro, Singh, and Guestrin}{Ribeiro
-  et~al\mbox{.}}{2016b}]%
-        {ribeiro2016should}
-\bibfield{author}{\bibinfo{person}{Marco~Tulio Ribeiro},
-  \bibinfo{person}{Sameer Singh}, {and} \bibinfo{person}{Carlos Guestrin}.}
-  \bibinfo{year}{2016}\natexlab{b}.
-\newblock \showarticletitle{Why should i trust you?: Explaining the predictions
-  of any classifier}. In \bibinfo{booktitle}{\emph{Proceedings of the 22nd ACM
-  SIGKDD international conference on knowledge discovery and data mining}}.
-  ACM, \bibinfo{pages}{1135--1144}.
-\newblock
-
-
 \bibitem[\protect\citeauthoryear{Rong}{Rong}{2014}]%
         {rong2014word2vec}
 \bibfield{author}{\bibinfo{person}{Xin Rong}.} \bibinfo{year}{2014}\natexlab{}.
@@ -213,6 +204,34 @@
 \newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1411.2738}}
   (\bibinfo{year}{2014}).
 \newblock
+
+
+\bibitem[\protect\citeauthoryear{Schafer, Konstan, and Riedl}{Schafer
+  et~al\mbox{.}}{2002}]%
+        {schafer2002meta}
+\bibfield{author}{\bibinfo{person}{J~Ben Schafer}, \bibinfo{person}{Joseph~A
+  Konstan}, {and} \bibinfo{person}{John Riedl}.}
+  \bibinfo{year}{2002}\natexlab{}.
+\newblock \showarticletitle{Meta-recommendation systems: user-controlled
+  integration of diverse recommendations}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the eleventh international
+  conference on Information and knowledge management}}. ACM,
+  \bibinfo{pages}{43--51}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Smilkov, Thorat, Nicholson, Reif, Viégas, and
+  Wattenberg}{Smilkov et~al\mbox{.}}{2016}]%
+        {smilkov2016embedding}
+\bibfield{author}{\bibinfo{person}{Daniel Smilkov}, \bibinfo{person}{Nikhil
+  Thorat}, \bibinfo{person}{Charles Nicholson}, \bibinfo{person}{Emily Reif},
+  \bibinfo{person}{Fernanda~B. Viégas}, {and} \bibinfo{person}{Martin
+  Wattenberg}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \bibinfo{title}{Embedding Projector: Interactive Visualization and
+  Interpretation of Embeddings}.
+\newblock
+\newblock
+\showeprint[arxiv]{stat.ML/1611.05469}
 
 
 \bibitem[\protect\citeauthoryear{Smith and Linden}{Smith and Linden}{2017}]%
@@ -235,8 +254,47 @@
 \newblock \showarticletitle{Movieexplorer: building an interactive exploration
   tool from ratings and latent taste spaces}. In
   \bibinfo{booktitle}{\emph{Proceedings of the 33rd Annual ACM Symposium on
-  Applied Computing}}. ACM, \bibinfo{pages}{1383--1392}.
+  Applied Computing}}. ACM, \bibinfo{publisher}{ACM},
+  \bibinfo{pages}{1383--1392}.
 \newblock
+
+
+\bibitem[\protect\citeauthoryear{Van Der~Maaten}{Van Der~Maaten}{2014}]%
+        {van2014accelerating}
+\bibfield{author}{\bibinfo{person}{Laurens Van Der~Maaten}.}
+  \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{Accelerating t-SNE using tree-based algorithms}.
+\newblock \bibinfo{journal}{\emph{The Journal of Machine Learning Research}}
+  \bibinfo{volume}{15}, \bibinfo{number}{1} (\bibinfo{year}{2014}),
+  \bibinfo{pages}{3221--3245}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Ward~Jr}{Ward~Jr}{1963}]%
+        {ward1963hierarchical}
+\bibfield{author}{\bibinfo{person}{Joe~H Ward~Jr}.}
+  \bibinfo{year}{1963}\natexlab{}.
+\newblock \showarticletitle{Hierarchical grouping to optimize an objective
+  function}.
+\newblock \bibinfo{journal}{\emph{Journal of the American statistical
+  association}} \bibinfo{volume}{58}, \bibinfo{number}{301}
+  (\bibinfo{year}{1963}), \bibinfo{pages}{236--244}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Wattenberg, Viégas, and Johnson}{Wattenberg
+  et~al\mbox{.}}{2016}]%
+        {wattenberg2016how}
+\bibfield{author}{\bibinfo{person}{Martin Wattenberg},
+  \bibinfo{person}{Fernanda Viégas}, {and} \bibinfo{person}{Ian Johnson}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{How to Use t-SNE Effectively}.
+\newblock \bibinfo{journal}{\emph{Distill}} (\bibinfo{year}{2016}).
+\newblock
+\urldef\tempurl%
+\url{http://distill.pub/2016/misread-tsne}
+\showURL{%
+\tempurl}
 
 
 \end{thebibliography}
