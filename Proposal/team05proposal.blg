@@ -1,33 +1,37 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: team05proposal.aux
 The style file: ACM-Reference-Format.bst
 Database file #1: sections/bibliography.bib
-Warning--I didn't find a database entry for "("
-Warning--no key, author in Netflixh3:online
-Warning--no author, editor, organization, or key in Netflixh3:online
-Warning--to sort, need author or key in Netflixh3:online
-Warning--no key, author in Netflixh3:online
-Warning--no key, author in Netflixh3:online
-Warning--no key, author in Netflixh3:online
-Warning--no author, editor, organization, or key in Netflixh3:online
-Warning--empty author in Netflixh3:online
-Warning--empty year in Netflixh3:online
-Warning--page numbers missing in both pages and numpages fields in Akiba2017
-Warning--empty publisher in chang2017weighted
-Warning--empty address in chang2017weighted
-Warning--page numbers missing in both pages and numpages fields in Goyal2017
+Repeated entry---line 152 of file sections/bibliography.bib
+ : @article{rendle2012factorization
+ :                                 ,
+I'm skipping whatever remains of this entry
+Warning--no key, author in openMovieDB
+Warning--no author, editor, organization, or key in openMovieDB
+Warning--to sort, need author or key in openMovieDB
+Warning--no key, author in openMovieDB
+Warning--no key, author in openMovieDB
+Warning--no key, author in openMovieDB
+Warning--no author, editor, organization, or key in openMovieDB
+Warning--empty author in openMovieDB
+Warning--empty year in openMovieDB
+Warning--empty publisher in herlocker1999algorithmic
+Warning--empty address in herlocker1999algorithmic
 Warning--empty publisher in koren2008factorization
 Warning--empty address in koren2008factorization
 Warning--unusual to have number, but no volume, for linden2003amazon
 Warning--no number and no volume in mikolov2013efficient
 Warning--page numbers missing in both pages and numpages fields in mikolov2013efficient
-Warning--empty publisher in nobrega2019towards
-Warning--empty address in nobrega2019towards
-Warning--no number and no volume in ribeiro2016model
-Warning--page numbers missing in both pages and numpages fields in ribeiro2016model
-Warning--empty publisher in ribeiro2016should
-Warning--empty address in ribeiro2016should
+Warning--empty publisher in mikolov2013distributed
+Warning--empty address in mikolov2013distributed
+Warning--empty address in Molnar2019interpretable
+Warning--page numbers missing in Molnar2019interpretable
+Warning--no number and no volume in ozsoy2016word
+Warning--page numbers missing in both pages and numpages fields in ozsoy2016word
 Warning--no number and no volume in rong2014word2vec
 Warning--page numbers missing in both pages and numpages fields in rong2014word2vec
-Warning--empty publisher in taijala2018movieexplorer
+Warning--empty publisher in schafer2002meta
+Warning--empty address in schafer2002meta
 Warning--empty address in taijala2018movieexplorer
-(There were 29 warnings)
+Warning--no number and no volume in wattenberg2016how
+Warning--page numbers missing in both pages and numpages fields in wattenberg2016how
+(There was 1 error message)

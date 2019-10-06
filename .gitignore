@@ -112,4 +112,6 @@ venv.bak/
 *.pdf
 *.bak
 
+.idea/
+
 Data/
