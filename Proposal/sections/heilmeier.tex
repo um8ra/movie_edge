@@ -1,6 +1,6 @@
 \subsection{What are you trying to do?} 
 
-MovieEdge is an accurate movie RS that allows for interactive exploration of the models’ taste space. It combines ideas from two recent systems - MovieExplorer and Embedding Projector - and will be a visual, interactive tool for users to explore the space of movies. 
+MovieEdge is an accurate movie RS that allows for interactive exploration of the models’ taste space. 
 
 \subsection{How is it done today?}
 
@@ -8,7 +8,7 @@ Commercial RS do not incorporate user feedback in an interactive way. Recent aca
 
 \subsection{What is New?}
 
-MovieEdge will combine an accurate state of the art RS, interactive exploration of the taste space, and visualization of the exploration process. MovieEdge will be successful because it will extend and combine recent advances in RS and visualization research
+MovieEdge builds upon ideas from two recent systems - MovieExplorer and Embedding Projector - and will combine an accurate state of the art RS, interactive exploration of the taste space, and visualization of the exploration process.  
 
 \subsection{Who Cares?}
 
@@ -16,7 +16,7 @@ Incorporating user feedback in RS has been shown to improve user satisfaction. P
 
 \subsection{Difference and Impact?}
 
-RS drive a large portion of eCommerce activity. Improving user satisfaction can be a competitive advantage for companies. Moreover, the visualization and interactive exploration aspect may increase serendipity, which is a desired trait of RS.  We will attempt to carry out a user satisfaction survey for MovieEdge to quantify the benefit. 
+RS drive a large portion of eCommerce activity. Improving user satisfaction can be a competitive advantage for companies. Moreover, the visualization and interactive exploration aspect may increase serendipity, which is a desired trait of RS. Time permitting, a user satisfaction survey will be administered to quantify the benefits. 
 
 \subsection{Risks and Payoffs?}
 
@@ -27,21 +27,17 @@ The payoffs is to build a better interface for users to explore and interact wit
 From a project perspective, the primary risk is scope: have we taken on too much given the time constraints?   We aim to minimize this risk through parallel, iterative development focused on delivering incremental improvements which validate our approach and assumptions.
 
 \subsection{Cost?}
-We may have to pay to pre-compute our models and host them live for any user surveys. These costs should be under \$100, depending on the length of our survey.
+We may have to pay to pre-compute and host our models. These costs should be under \$100.
 
 \subsection{How Long?}
 We plan to leverage off the shelf software libraries as much as possible, and adapt code where necessary. We believe we can build out MovieEdge by class deadlines. See “Plan of Activities” for more details.
 
-
 \subsection{Milestones?}
-We have already gathered the  necessary data to develop MovieEdge from MovieLens \cite{harper2016movielens} and the Open Movie Database \cite{openMovieDB}. Our mid-point check in is to build a working RS and implement exploration of the taste space. Our final goal is to complete the visualization and interactive elements of MovieEdge.
+We have gathered the data from MovieLens \cite{harper2016movielens} and the Open Movie Database \cite{openMovieDB}. Our mid-point check in is to build a working RS and implement exploration of the taste space. Our final goal is to complete the visualization and interactive elements of MovieEdge.
 
 \subsection{Plan of Activities}
 
-Rather than specify specific hours needed to hit the target, our team is driven by deadlines, and that is the goal of the gantt chart. A “Midterm exam” is summarized by the “Coding Work” + “Progress Report” sections; “Final exam” is the “Algorithm Polish” and “Final Report” sections in the gantt chart.
-
-The overall goal is to evaluate whether Word2vec or [Matrix Factorization -> Collaborative 
-Filtering] produces more reasonable visualizations when fed into T-SNE. TSNE yields 2D points that can be rendered and interacted with in-browser via D3.
+The work is deadline driven.  A “Midterm exam” is summarized by the “Coding Work” + “Progress Report” sections; “Final exam” is the “Algorithm Polish” and “Final Report” sections in the gantt chart.
 
 <<insert chart>>
 
