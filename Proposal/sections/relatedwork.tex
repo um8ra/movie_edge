@@ -6,7 +6,7 @@ Item-based CF methods are driven by item-to-item similarity. Amazon constructed 
 
 The Netflix Prize introduced new CF algorithms based on matrix factorization (MF) \cite{funk2006netflix}. User-item ratings are viewed as a matrix where rows represent users and columns movies: ratings are the sparse matrix entries. MF seeks to estimate unknown ratings by approximating with a low-rank decomposition. MF is highly accurate for movie rating prediction, and it remains the predominant CF technique today \cite{koren2008factorization}. 
 
-One shortcoming of MF is that only user-item ratings are taken into account. Rendle \cite{rendle2012factorization} developed Factorization Machines (FM), a supervised learning algorithm which models feature interactions with factorized parameters.  FMs can be seen as a generalization of MF which can easily incorporate side-channel features along with user-item ratings matrix for greater accuracy while reducing training time.
+One shortcoming of MF is that only user-item ratings are taken into account. Rendle \cite{rendle2012factorization} developed Factorization Machines (FM), a supervised learning algorithm that models feature interactions with factorized parameters.  FMs can be seen as a generalization of MF which can easily incorporate side-channel features along with user-item ratings matrix for greater accuracy while reducing training time.
 
 Vector representation of words is widely adopted in Natural Language Processing (NLP). Two Word2vec architectures, Continuous Bag-of-Words (CBOW) and Skim-gram models \cite{mikolov2013efficient},  \cite{mikolov2013distributed}, \cite{rong2014word2vec} were introduced to learn embeddings from words in sentences. The embeddings capture contextual similarity. This can be applied to user-item interaction data \cite{ozsoy2016word}. Training Word2vec takes advantage of one-hot-encoding (OHE). However, movie ratings are often not binary, increasing architectural complexity.
 
@@ -14,7 +14,7 @@ Vector representation of words is widely adopted in Natural Language Processing 
 
 Most RS are not interactive. MetaLens \cite{schafer2002meta}gives users session-specific control over the recommendation process, improving user satisfaction. MetaLens is limited to filtering or sorting the list of recommendations with user-specified criteria. The potential filters are hard-coded and reflect user constraints rather than content preferences. 
 
-MovieExplorer \cite{taijala2018movieexplorer}, which incorporates user feedback in the RS, is closest in similarity to MovieEdge. MovieExplorer allows the user to navigate the model's latent factor space by expressing their session-specific preferences for movies.  As the session progresses, MovieExplorer presents better recommendations. MovieExplorer’s interactive exploration paradigm increased user satisfaction. However, MovieExplorer asks users to navigate the high dimensional latent factor space without a visual reference. 
+MovieExplorer \cite{taijala2018movieexplorer}, which incorporates user feedback in the RS, is closest to MovieEdge. MovieExplorer allows the user to navigate the model's latent factor space by expressing their session-specific preferences for movies.  As the session progresses, MovieExplorer presents better recommendations. MovieExplorer’s interactive exploration paradigm increased user satisfaction. However, MovieExplorer asks users to navigate the high dimensional latent factor space without a visual reference. 
 
 \subsection{Visualization of Embedding Spaces}
 
