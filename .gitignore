@@ -111,6 +111,14 @@ venv.bak/
 *.out
 *.pdf
 *.bak
+*.bbl
+*.blg
+
+# added for Project Files
+
+*.pptx
+*.mp4
+
 
 .idea/
 
