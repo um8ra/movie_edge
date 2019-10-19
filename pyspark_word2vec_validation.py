@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession, SQLContext, Row
 # from pyspark.ml.classification import LogisticRegression
 # from pyspark.mllib.linalg import DenseVector
 # from sklearn.model_selection import ParameterGrid
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from sklearn.metrics import roc_auc_score
 
 import pickle
@@ -25,6 +25,13 @@ TIMESTAMP = 'Timestamp'
 TITLE = 'title'
 GENRE = 'genres'
 
+## Note that dot product may not actually make sense
+## cosine similarity is between -1 and 1, with 1 being more similar.
+## If we do dot product, it would have norm(vec1) and norm(vec2)
+## as magnitute multiplied on top of the cos sim.
+## The euclidean distance would be further with large norms.
+SCORE_METHOD = 0 # sklearn pairwise metric if 0, else dot product
+PAIRWISE_METRIC = cosine_similarity # euclidean_distances
 # print(os.environ.get("SPARK_HOME"))
 
 
@@ -163,7 +170,7 @@ def run_validation_metrics():
         # print(user_vectors_dict)
         # break
 
-    with open('Model/word2vec_pyspark_user_vectors_dict0.pickle0', 'wb') as f:
+    with open('Model/word2vec_pyspark_0_user_vectors_dict.pickle', 'wb') as f:
         pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
     ## --------------------------------------------------------------------
     '''
@@ -175,6 +182,7 @@ def run_validation_metrics():
     df_val = pd.read_hdf('Ratings/binarized.hdf', key='val')
     # print(df_val.head(5)) # 'movieID' is both 2nd level index and a column
     df_val = transform_df(df_val)
+    # df_val = df_val.head(10) # quick check on 10 movies
     # print(df_val.head(5))
     # print()
 
@@ -188,8 +196,18 @@ def run_validation_metrics():
     ## --------------------------------------------------------------------
     ## Retrieve user vectors from pickle file
     ## --------------------------------------------------------------------
-    with open('Model/word2vec_pyspark_user_vectors_dict0.pickle', 'rb') as f:
+    with open('Model/word2vec_pyspark_0_user_vectors_dict.pickle', 'rb') as f:
         user_vectors_dict = pickle.load(f)
+
+    ## Some simple testing on user 1 and rated terminator 1 and 2 movies
+    '''
+    terminator1_vec = movie_vectors_df.loc['589'].to_numpy().reshape(1, -1)
+    terminator2_vec = movie_vectors_df.loc['1240'].to_numpy().reshape(1, -1)
+    user1_vec = user_vectors_dict[1].reshape(1,-1)
+    print(PAIRWISE_METRIC(terminator1_vec, terminator2_vec))
+    print(PAIRWISE_METRIC(user1_vec, terminator1_vec))
+    print(PAIRWISE_METRIC(user1_vec, terminator2_vec))
+    '''
 
     ## Some simple testing of cosine similarity on user 22085
     '''
@@ -204,7 +222,7 @@ def run_validation_metrics():
     user_movie_vectors = movie_vectors_df.loc[user_movie_IDs].to_numpy()
     print(user_movie_vectors)
 
-    cos_sim = cosine_similarity(user_movie_vectors, user_vector)
+    cos_sim = PAIRWISE_METRIC(user_movie_vectors, user_vector)
     print(cos_sim)
     print(len(user_movie_IDs), len(user_movie_vectors), len(cos_sim))
     '''
@@ -229,32 +247,55 @@ def run_validation_metrics():
 
     scores = None
     user_cnt = 0
-    for _user_ID, _ in dict_groups_val.items():
+    for _user_ID, _movie_IDs in dict_groups_val.items():
         user_cnt += 1
         if user_cnt % 100 == 1:
             print("Validating for user {}".format(user_cnt))
 
-        user_vector = user_vectors_dict[_user_ID]
-        user_vector = user_vector.reshape(1,-1)  # sklearn cos_sim need 2D
+        user_vector = user_vectors_dict[_user_ID] # 1D
 
-        user_movie_IDs = dict_groups_val[_user_ID]
-        # user_movie_vectors = movie_vectors_df.loc[user_movie_IDs].to_numpy()
-        user_movie_vectors = movie_vectors_df.reindex(user_movie_IDs).to_numpy()
+        if SCORE_METHOD == 0:
+            user_vector = user_vector.reshape(1,-1) # sklearn cos_sim need 2D
+        else:
+            user_vector = user_vector.reshape(-1, 1) # for a.dot(b)
+
+        ## reindex accounts for nan's; .loc won't handle nan in the futures
+        # user_movie_vectors = movie_vectors_df.loc[_movie_IDs].to_numpy()
+        user_movie_vectors = movie_vectors_df.reindex(_movie_IDs).to_numpy()
 
         ## Need to consider movies excluded due to word2vec minCount
-        ## movie_vectors_df.loc[user_movie_IDs] keep those as NaN
-        ## Must exclude before comparing cosine_similarity
+        ## movie_vectors_df.loc[_movie_IDs] keep those as NaN
+        ## Must exclude before comparing PAIRWISE_METRIC
         cos_sim = np.empty((len(user_movie_vectors), 1))
         cos_sim[:] = np.nan
         mask_not_nan = np.logical_not(np.isnan(user_movie_vectors))
         mask_not_nan = mask_not_nan[:, 0] # only need 1D mask
-        cos_sim[mask_not_nan] = cosine_similarity(
-                                    user_movie_vectors[mask_not_nan],
+
+        if SCORE_METHOD == 0:
+            cos_sim[mask_not_nan] = PAIRWISE_METRIC(
+                                        user_movie_vectors[mask_not_nan],
+                                        user_vector)
+        else:
+            cos_sim[mask_not_nan] = user_movie_vectors[mask_not_nan].dot(
                                     user_vector)
+
         if scores is None:
             scores = cos_sim.ravel() # flatten without making a copy
         else:
-            scores = np.append(scores, cos_sim.ravel())
+            scores = np.append(scores, cos_sim.ravel()) # flatten
+
+    df_val['scores'] = scores
+
+    if SCORE_METHOD == 0:
+        df_val[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_val_{}_0.csv'.format(
+                                            PAIRWISE_METRIC.__name__))
+        with open('Model/word2vec_pyspark_0_val_{}.pickle'.format(
+                    PAIRWISE_METRIC.__name__), 'wb') as f:
+            pickle.dump(df_val, f, protocol=pickle.HIGHEST_PROTOCOL)
+    else:
+        df_val[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_val_scores_dot_0.csv')
+        with open('Model/word2vec_pyspark_0_val_dot.pickle', 'wb') as f:
+            pickle.dump(df_val, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
     truth = df_val[LIKED].to_numpy()
