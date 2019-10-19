@@ -3,6 +3,7 @@ asn1crypto==1.2.0
 attrs==19.3.0
 backcall==0.1.0
 bleach==3.1.0
+bokeh==1.3.4
 boto==2.49.0
 boto3==1.9.253
 botocore==1.12.253
@@ -39,18 +40,23 @@ more-itertools==7.2.0
 nbconvert==5.6.0
 nbformat==4.4.0
 notebook==6.0.1
+numexpr==2.7.0
 numpy==1.17.2
+olefile==0.46
+packaging==19.2
 pandas==0.25.2
 pandocfilters==1.4.2
 parso==0.5.1
 pexpect==4.7.0
 pickleshare==0.7.5
+Pillow==6.2.0
 prometheus-client==0.7.1
 prompt-toolkit==2.0.10
 ptyprocess==0.6.0
 pycparser==2.19
 Pygments==2.4.2
 pyOpenSSL==19.0.0
+pyparsing==2.4.2
 PyQt5==5.12.3
 PyQt5-sip==4.19.18
 PyQtWebEngine==5.12.1
@@ -58,6 +64,7 @@ pyrsistent==0.15.4
 PySocks==1.7.1
 python-dateutil==2.8.0
 pytz==2019.3
+PyYAML==5.1.2
 pyzmq==18.1.0
 qtconsole==4.5.5
 requests==2.22.0
@@ -67,6 +74,7 @@ scipy==1.3.1
 Send2Trash==1.5.0
 six==1.12.0
 smart-open==1.8.4
+tables==3.6.0
 terminado==0.8.2
 testpath==0.4.2
 tornado==6.0.3
