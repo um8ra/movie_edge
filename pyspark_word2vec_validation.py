@@ -32,6 +32,11 @@ GENRE = 'genres'
 ## The euclidean distance would be further with large norms.
 SCORE_METHOD = 0 # sklearn pairwise metric if 0, else dot product
 PAIRWISE_METRIC = cosine_similarity # euclidean_distances
+
+## if evaluating AUROC on trg, COMMENT out df_trg = df_trg[df_trg[LIKED] == 1]
+EVAL_DATASET = 'val' # 'trg' or 'val'
+
+
 # print(os.environ.get("SPARK_HOME"))
 
 
@@ -130,28 +135,32 @@ def run_validation_metrics():
     ## --------------------------------------------------------------------
 
 
-    ''' 
     ## ********************************************************************
     ## skip the next 2 steps if movie_vectors_df is saved to pickle
     ##
     ## --------------------------------------------------------------------
     ## Load training data
     ## --------------------------------------------------------------------
+    '''
     df_trg = pd.read_hdf('Ratings/binarized.hdf', key='trg')
-    df_trg = df_trg[df_trg[LIKED] == 1]
+    df_trg = df_trg[df_trg[LIKED] == 1] # comment out if evaluating AUROC
     # df_trg = df_trg.head(50000) # todo comment out for production
     df_trg = transform_df(df_trg)
+    # df_trg = df_trg.head(10) # quick check on 10 movies
 
     df_trg_gb = df_trg.groupby([USER_ID])
     dict_groups_trg = {k: list(v[MOVIE_ID]) for k, v in df_trg_gb}
 
     # document = sc.parallelize(dict_groups_trg.values(), partitions)
+    '''
     ## --------------------------------------------------------------------
+
 
     ## --------------------------------------------------------------------
     ## Calculate each user vector as mean of "liked" movies from trg data
     ## and save it as pickle file
     ## --------------------------------------------------------------------
+    ''' 
     user_vectors_dict = {}
     user_cnt = 0
     for _user_ID, _movie_IDs in dict_groups_trg.items():
@@ -172,8 +181,8 @@ def run_validation_metrics():
 
     with open('Model/word2vec_pyspark_0_user_vectors_dict.pickle', 'wb') as f:
         pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
-    ## --------------------------------------------------------------------
     '''
+    ## --------------------------------------------------------------------
 
 
     ## --------------------------------------------------------------------
@@ -193,6 +202,7 @@ def run_validation_metrics():
     # print()
     ## --------------------------------------------------------------------
 
+
     ## --------------------------------------------------------------------
     ## Retrieve user vectors from pickle file
     ## --------------------------------------------------------------------
@@ -201,12 +211,37 @@ def run_validation_metrics():
 
     ## Some simple testing on user 1 and rated terminator 1 and 2 movies
     '''
+    user1_vec = user_vectors_dict[1].reshape(1,-1)
     terminator1_vec = movie_vectors_df.loc['589'].to_numpy().reshape(1, -1)
     terminator2_vec = movie_vectors_df.loc['1240'].to_numpy().reshape(1, -1)
-    user1_vec = user_vectors_dict[1].reshape(1,-1)
     print(PAIRWISE_METRIC(terminator1_vec, terminator2_vec))
     print(PAIRWISE_METRIC(user1_vec, terminator1_vec))
     print(PAIRWISE_METRIC(user1_vec, terminator2_vec))
+    print()
+    # [[0.90550922]]
+    # [[0.20541165]]
+    # [[0.46076321]]
+
+    starwars1_vec = movie_vectors_df.loc['2628'].to_numpy().reshape(1, -1)
+    starwars2_vec = movie_vectors_df.loc['5378'].to_numpy().reshape(1, -1)
+    starwars3_vec = movie_vectors_df.loc['33493'].to_numpy().reshape(1, -1)
+    starwars4_vec = movie_vectors_df.loc['260'].to_numpy().reshape(1, -1)
+    starwars5_vec = movie_vectors_df.loc['1196'].to_numpy().reshape(1, -1)
+    starwars6_vec = movie_vectors_df.loc['1210'].to_numpy().reshape(1, -1)
+    print(PAIRWISE_METRIC(starwars1_vec, starwars4_vec))
+    print(PAIRWISE_METRIC(user1_vec, starwars1_vec))
+    print(PAIRWISE_METRIC(user1_vec, starwars4_vec))
+    # [[0.14618965]]
+    # [[0.94497115]]
+    # [[-0.01895357]]
+    print(PAIRWISE_METRIC(starwars1_vec, starwars2_vec))
+    print(PAIRWISE_METRIC(starwars1_vec, starwars3_vec))
+    print(PAIRWISE_METRIC(starwars4_vec, starwars5_vec))
+    print(PAIRWISE_METRIC(starwars4_vec, starwars6_vec))
+    # [[0.5414141]]
+    # [[-0.31255373]]
+    # [[0.69569991]]
+    # [[0.66382108]]
     '''
 
     ## Some simple testing of cosine similarity on user 22085
@@ -228,6 +263,7 @@ def run_validation_metrics():
     '''
     ## --------------------------------------------------------------------
 
+
     ## --------------------------------------------------------------------
     ## Evaluate AUC of trained model on validation dataset
     ## --------------------------------------------------------------------
@@ -245,9 +281,16 @@ def run_validation_metrics():
     # print(len(list(dict_groups_val.keys())))    # 138493 users
     '''
 
+    if EVAL_DATASET == 'trg':
+        df_eval = df_trg
+        dict_groups_eval = dict_groups_trg
+    else:
+        df_eval = df_val
+        dict_groups_eval = dict_groups_val
+
     scores = None
     user_cnt = 0
-    for _user_ID, _movie_IDs in dict_groups_val.items():
+    for _user_ID, _movie_IDs in dict_groups_eval.items():
         user_cnt += 1
         if user_cnt % 100 == 1:
             print("Validating for user {}".format(user_cnt))
@@ -284,21 +327,23 @@ def run_validation_metrics():
         else:
             scores = np.append(scores, cos_sim.ravel()) # flatten
 
-    df_val['scores'] = scores
+    df_eval['scores'] = scores
 
     if SCORE_METHOD == 0:
-        df_val[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_val_{}_0.csv'.format(
-                                            PAIRWISE_METRIC.__name__))
-        with open('Model/word2vec_pyspark_0_val_{}.pickle'.format(
-                    PAIRWISE_METRIC.__name__), 'wb') as f:
-            pickle.dump(df_val, f, protocol=pickle.HIGHEST_PROTOCOL)
+        df_eval[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_0_{}_{}.csv'.format(
+                                            EVAL_DATASET, PAIRWISE_METRIC.__name__))
+        with open('Model/word2vec_pyspark_0_{}_{}.pickle'.format(
+                    EVAL_DATASET, PAIRWISE_METRIC.__name__), 'wb') as f:
+            pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
     else:
-        df_val[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_val_scores_dot_0.csv')
-        with open('Model/word2vec_pyspark_0_val_dot.pickle', 'wb') as f:
-            pickle.dump(df_val, f, protocol=pickle.HIGHEST_PROTOCOL)
+        df_eval[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_0_{}_dot.csv'.format(
+                                            EVAL_DATASET))
+        with open('Model/word2vec_pyspark_0_{}_dot.pickle'.format(
+                    EVAL_DATASET), 'wb') as f:
+            pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
-    truth = df_val[LIKED].to_numpy()
+    truth = df_eval[LIKED].to_numpy()
     print(truth[mask_not_nan].min(), truth[mask_not_nan].max())
     print(scores[mask_not_nan].min(), scores[mask_not_nan].max())
     print(roc_auc_score(truth[mask_not_nan], scores[mask_not_nan]))
