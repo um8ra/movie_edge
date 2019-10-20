@@ -1,10 +1,6 @@
 import numpy as np
 import pandas as pd
-from pyspark.mllib.feature import Word2Vec, Word2VecModel
-from pyspark import SparkContext, SparkConf
-from pyspark.sql import SparkSession, SQLContext, Row
-# from pyspark.ml.classification import LogisticRegression
-# from pyspark.mllib.linalg import DenseVector
+from gensim.models import Word2Vec
 # from sklearn.model_selection import ParameterGrid
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from sklearn.metrics import roc_auc_score
@@ -33,28 +29,13 @@ GENRE = 'genres'
 SCORE_METHOD = 0 # sklearn pairwise metric if 0, else dot product
 PAIRWISE_METRIC = cosine_similarity # euclidean_distances
 
+# MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2'
+MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2'
 ## if evaluating AUROC on trg, COMMENT out df_trg = df_trg[df_trg[LIKED] == 1]
 EVAL_DATASET = 'val' # 'trg' or 'val'
 
 
-# print(os.environ.get("SPARK_HOME"))
-
-
 def run_validation_metrics():
-
-    # partitions = os.cpu_count() - 2
-    # sc = SparkContext('local[{cpus}]'.format(cpus=partitions), 'word2vec')
-
-    # sc = SparkContext('local', 'word2vec')
-
-    conf = SparkConf().setAppName('word2vec').setMaster('local')
-    sc = SparkContext(conf=conf)
-    # spark = SparkSession(sc)    # required for pyspark.rdd.RDD.toDF()
-    sqlContext = SQLContext(sc) # required for pyspark.rdd.RDD.toDF() and read.parquet()
-    # print(type(sc))         # <class 'pyspark.context.SparkContext'>
-    # print(type(spark))      # <class 'pyspark.sql.session.SparkSession'>
-    # print(type(sqlContext)) # <class 'pyspark.sql.context.SQLContext'>
-
 
     ## --------------------------------------------------------------
     ## Used helper functions for validation purpose
@@ -65,7 +46,7 @@ def run_validation_metrics():
         return _df
 
     df_movies = pd.read_csv('ml-20m/movies.csv', index_col=MOVIE_ID)
-    print('There are totally {} movies'.format(df_movies.index.size)) # 27278
+    print('There are totally {} movies'.format(df_movies.index.size)) #
     print()
     ## --------------------------------------------------------------
 
@@ -82,58 +63,71 @@ def run_validation_metrics():
                                  list(model.findSynonyms(str(mi), num_synonyms))])
         return synonym_list
 
-    def movie2vec(df_movies, model, search_str):
+
+    def show_synonyms(df_movies, model, search_str, num_synonyms, verbose=True):
+        synonym_list = list()
+        movie_index = df_movies[df_movies[TITLE].str.match(search_str)]
+        for mi in movie_index.index:
+            synonym_list.extend([(i, df_movies.loc[int(i[0])][TITLE]) for i in 
+                                 list(model.wv.most_similar(str(mi), topn=num_synonyms))])
+        cosine_similarity = pd.Series([i[0][1] for i in synonym_list])
+        mean = cosine_similarity.mean()
+        stddev = cosine_similarity.std()
+        if verbose:
+            print(movie_index)
+            print('Mean: {} \t StdDev: {}'.format(mean, stddev))
+        return synonym_list, mean, stddev
+
+    def movie2vec(df_movies, model, search_str, verbose=True):
         movie_list = list()
         movie_index = df_movies[df_movies[TITLE].str.match(search_str)]
-        print(movie_index)
+        if verbvose:
+            print(movie_index)
         for mi in movie_index.index:
-            movie_list.extend([(mi, model.transform(str(mi)))])
+            movie_list.extend([(mi, model.wv[str(mi)])])
         return movie_list
     ## --------------------------------------------------------------
 
 
     ## --------------------------------------------------------------
-    ## Load pre-trained Word2Vec Model into JavaMap dict-like object
+    ## Load pre-trained Word2Vec Model into keyedvectors object
+    ## then convert to dict and pandas.DataFrame with movie_IDs index
     ## --------------------------------------------------------------
-    '''
-    myModel = Word2VecModel.load(sc, 'Model/trained_wor2vec_pyspark.sparkmodel')
-    movie2vec_map = myModel.getVectors()
-    # print(type(movie2vec_map))    # <class 'py4j.java_collections.JavaMap'>
-    print('There are totally {} movie embeddings'.format(len(movie2vec_map))) # 16066
-    ## getMinCount is only available from ml library, not mllib version
-    # print('Movie minCount was set to {}'.format(myModel.getMinCount()))
+
+    myModel = Word2Vec.load('Model/gensim/{}.gensim'.format(MODEL_NAME))
+    movie2vec_kv = myModel.wv
+    # print(type(movie2vec_kv))     # <class 'gensim.models.keyedvectors.Word2VecKeyedVectors'>
+    # print(type(myModel.wv.vocab)) # dict, values are gensim.models.keyedvectors.Vocab object
+    # print(list(myModel.wv.vocab.keys())[0:10])    
+    # print(myModel.wv.vocab['589'])
+    # print()
+    # print(type(myModel.wv.index2word)) # list
+    # print(myModel.wv.index2word[0:10])
+
+    movie2vec_dict = dict()
+    for i, _movie_ID in enumerate(myModel.wv.vocab):
+        movie2vec_dict[_movie_ID] = myModel.wv[_movie_ID]
+
+    print('There are totally {} movie embeddings'.format(
+        # len(myModel.wv.vocab)))
+        # len(myModel.wv.index2word)))
+        len(movie2vec_dict)))
     print()
-
-    # test_movie_vectors = movie2vec(df_movies, myModel, 'Saving Private Ryan')
-    # print(test_movie_vectors)
-    # print()
-
-    # print(movie2vec_map['2028'])    # 'Saving Private Ryan'
-    # print()
-    '''
-    ## --------------------------------------------------------------
-
-
-    ## --------------------------------------------------------------------
-    ## Load pre-trained model to a Python dict, then key and df values
-    ## --------------------------------------------------------------------
-    movie2vec_df = sqlContext.read.parquet('Model/trained_wor2vec_pyspark.sparkmodel/data') \
-                                  .alias("movie2vec_df")
-    # print(type(movie2vec_df))     # <class 'pyspark.sql.dataframe.DataFrame'>
-    # movie2vec_df.printSchema()
-    movie2vec_dict = movie2vec_df.rdd.collectAsMap()
-    print('There are totally {} movie embeddings'.format(len(movie2vec_dict))) # 16066
-    # print(type(movie2vec_dict))   # dict
-
-    # print(movie2vec_dict['2028']) # 'Saving Private Ryan'
-    # print()
 
     movie_IDs = list(movie2vec_dict.keys())
     movie_vectors = np.array(list(movie2vec_dict.values()))
     movie_vectors_df = pd.DataFrame(movie_vectors, index=movie_IDs)
-    # print(movie_vectors_df.loc[['2028', '10']])   # two movies
+
+    # print(myModel.wv['589'])
+    # print(myModel.wv.get_vector('589'))
+    # print(myModel.wv.word_vec('589'))
+    # print(movie2vec_dict['589'])
+
+    # # test_movie_vectors = movie2vec(df_movies, myModel, 'Saving Private Ryan') # '2028'
+    # test_movie_vectors = movie2vec(df_movies, myModel, 'Terminator 2: Judgment Day') # '589'
+    # print(test_movie_vectors)
     # print()
-    ## --------------------------------------------------------------------
+    ## --------------------------------------------------------------
 
 
     ## ********************************************************************
@@ -142,7 +136,6 @@ def run_validation_metrics():
     ## --------------------------------------------------------------------
     ## Load training data
     ## --------------------------------------------------------------------
-    '''
     df_trg = pd.read_hdf('Ratings/binarized.hdf', key='trg')
     df_trg = df_trg[df_trg[LIKED] == 1] # comment out if evaluating AUROC
     # df_trg = df_trg.head(50000) # todo comment out for production
@@ -151,9 +144,6 @@ def run_validation_metrics():
 
     df_trg_gb = df_trg.groupby([USER_ID])
     dict_groups_trg = {k: list(v[MOVIE_ID]) for k, v in df_trg_gb}
-
-    # document = sc.parallelize(dict_groups_trg.values(), partitions)
-    '''
     ## --------------------------------------------------------------------
 
 
@@ -161,7 +151,6 @@ def run_validation_metrics():
     ## Calculate each user vector as mean of "liked" movies from trg data
     ## and save it as pickle file
     ## --------------------------------------------------------------------
-    ''' 
     user_vectors_dict = {}
     user_cnt = 0
     for _user_ID, _movie_IDs in dict_groups_trg.items():
@@ -180,9 +169,8 @@ def run_validation_metrics():
         # print(user_vectors_dict)
         # break
 
-    with open('Model/word2vec_pyspark_0_user_vectors_dict.pickle', 'wb') as f:
+    with open('Model/gensim/users/{}_user_vectors_dict.pickle'.format(MODEL_NAME), 'wb') as f:
         pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
-    '''
     ## --------------------------------------------------------------------
 
 
@@ -207,7 +195,7 @@ def run_validation_metrics():
     ## --------------------------------------------------------------------
     ## Retrieve user vectors from pickle file
     ## --------------------------------------------------------------------
-    with open('Model/word2vec_pyspark_0_user_vectors_dict.pickle', 'rb') as f:
+    with open('Model/gensim/users/{}_user_vectors_dict.pickle'.format(MODEL_NAME), 'rb') as f:
         user_vectors_dict = pickle.load(f)
 
     ## Some simple testing on user 1 and rated terminator 1 and 2 movies
@@ -219,9 +207,9 @@ def run_validation_metrics():
     print(PAIRWISE_METRIC(user1_vec, terminator1_vec))
     print(PAIRWISE_METRIC(user1_vec, terminator2_vec))
     print()
-    # [[0.90550922]]
-    # [[0.20541165]]
-    # [[0.46076321]]
+    # [[0.9180718]]
+    # [[0.8272728]]
+    # [[0.9124394]]
 
     starwars1_vec = movie_vectors_df.loc['2628'].to_numpy().reshape(1, -1)
     starwars2_vec = movie_vectors_df.loc['5378'].to_numpy().reshape(1, -1)
@@ -232,36 +220,43 @@ def run_validation_metrics():
     print(PAIRWISE_METRIC(starwars1_vec, starwars4_vec))
     print(PAIRWISE_METRIC(user1_vec, starwars1_vec))
     print(PAIRWISE_METRIC(user1_vec, starwars4_vec))
-    # [[0.14618965]]
-    # [[0.94497115]]
-    # [[-0.01895357]]
+    # [[0.80287135]]
+    # [[0.8336077]]
+    # [[0.8185677]]
     print(PAIRWISE_METRIC(starwars1_vec, starwars2_vec))
     print(PAIRWISE_METRIC(starwars1_vec, starwars3_vec))
     print(PAIRWISE_METRIC(starwars4_vec, starwars5_vec))
     print(PAIRWISE_METRIC(starwars4_vec, starwars6_vec))
-    # [[0.5414141]]
-    # [[-0.31255373]]
-    # [[0.69569991]]
-    # [[0.66382108]]
+    # [[0.8580897]]
+    # [[0.76029795]]
+    # [[0.96574926]]
+    # [[0.9652451]]
     '''
 
     ## Some simple testing of cosine similarity on user 22085
-    '''
-    user_vector = user_vectors_dict[22085]
-    user_vector = user_vector.reshape(1,-1)  # sklearn cos_sim need 2D
-    print(user_vector)
+    # user_vector = user_vectors_dict[22085]
+    # user_vector = user_vector.reshape(1,-1)  # sklearn cos_sim need 2D
+    # print(user_vector)
 
-    user_movie_IDs = dict_groups_trg[22085]
-    # user_movie_IDs = dict_groups_val[22085]
-    print(user_movie_IDs)
+    # # user_movie_IDs = dict_groups_trg[22085]
+    # user_movie_IDs = dict_groups_val[22085][:10]
+    # print(user_movie_IDs)
 
-    user_movie_vectors = movie_vectors_df.loc[user_movie_IDs].to_numpy()
-    print(user_movie_vectors)
+    # user_movie_vectors = movie_vectors_df.loc[user_movie_IDs].to_numpy()
+    # print(user_movie_vectors)
 
-    cos_sim = PAIRWISE_METRIC(user_movie_vectors, user_vector)
-    print(cos_sim)
-    print(len(user_movie_IDs), len(user_movie_vectors), len(cos_sim))
-    '''
+    # cos_sim = PAIRWISE_METRIC(user_movie_vectors, user_vector)
+    # print(cos_sim)
+    # print(len(user_movie_IDs), len(user_movie_vectors), len(cos_sim))
+
+
+    ## Alternative method using gensim's KeyVectors.distances
+    ## vs sklearn.metrics.pairwise.cosine_similarity.
+    ## Result is generally very close, with some rounding diffs
+    # user_vector = user_vectors_dict[22085]
+    # user_movie_IDs = dict_groups_val[22085]#[:10]
+    # cos_sim = 1 - myModel.wv.distances(user_vector, user_movie_IDs)
+    # print(cos_sim)
     ## --------------------------------------------------------------------
 
 
@@ -331,16 +326,16 @@ def run_validation_metrics():
     df_eval['scores'] = scores
 
     if SCORE_METHOD == 0:
-        df_eval[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_0_{}_{}.csv'.format(
-                                            EVAL_DATASET, PAIRWISE_METRIC.__name__))
-        with open('Model/word2vec_pyspark_0_{}_{}.pickle'.format(
-                    EVAL_DATASET, PAIRWISE_METRIC.__name__), 'wb') as f:
+        df_eval[[LIKED, 'scores']].to_csv('Model/gensim/eval/{}_{}_{}.csv'.format(
+                                            MODEL_NAME, EVAL_DATASET, PAIRWISE_METRIC.__name__))
+        with open('Model/gensim/eval/{}_{}_{}.pickle'.format(
+                    MODEL_NAME, EVAL_DATASET, PAIRWISE_METRIC.__name__), 'wb') as f:
             pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
     else:
-        df_eval[[LIKED, 'scores']].to_csv('Model/word2vec_pyspark_0_{}_dot.csv'.format(
-                                            EVAL_DATASET))
-        with open('Model/word2vec_pyspark_0_{}_dot.pickle'.format(
-                    EVAL_DATASET), 'wb') as f:
+        df_eval[[LIKED, 'scores']].to_csv('Model/gensim/eval/{}_{}_dot.csv'.format(
+                                            MODEL_NAME, EVAL_DATASET))
+        with open('Model/gensim/eval/{}_{}_dot.pickle'.format(
+                    MODEL_NAME, EVAL_DATASET), 'wb') as f:
             pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
@@ -350,29 +345,6 @@ def run_validation_metrics():
     print(roc_auc_score(truth[mask_not_nan], scores[mask_not_nan]))
     ## --------------------------------------------------------------------
 
-
-
-    '''
-    ## some pyspark testing...
-
-    nums_RDD0 = sc.parallelize([1,2,3,4])   # <class 'pyspark.rdd.RDD'>
-    nums_RDD1 = nums_RDD0.map(lambda x: x*x)# <class 'pyspark.rdd.PipelinedRDD'>
-    nums_list = nums_RDD1.collect()         # <class 'list'>
-    print(type(nums_RDD0), type(nums_RDD1), type(nums_list))
-    print(nums_RDD0.take(10))
-    print(nums_RDD1)
-    print(nums_list)
-
-
-    row = Row("val") # Or some other column name
-    nums_DF0 = nums_RDD0.map(row).toDF()     # <class 'pyspark.sql.dataframe.DataFrame'>
-    nums_DF1 = nums_RDD1.map(row).toDF()     # <class 'pyspark.sql.dataframe.DataFrame'>
-    print(type(nums_DF0), type(num_DF1))
-    nums_DF0.show()
-    nums_DF1.show()
-    '''
-
-    # sc.stop()
 
 
 if __name__ == '__main__':
