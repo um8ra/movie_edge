@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentiment Form</title>
+</head>
+<body>
+<form action="{% url 'movie_edge:query_recommendations' gensim_model_str='w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim' %}" method="GET">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>
