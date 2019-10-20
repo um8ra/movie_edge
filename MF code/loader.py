@@ -18,7 +18,7 @@ with open('metadata.pkl','rb') as f:
     metadata = pickle.load(f)
 
 modelfile = 'SVD frozen k20 r0.0001.pkl.bz2'
-modelfile = 'SVDpp frozen k20 r0.0.pkl.bz2'
+#modelfile = 'SVDpp frozen k20 r0.0.pkl.bz2'
 
 with bz2.open(modelfile) as f:
     model=pickle.load(f)
@@ -41,16 +41,17 @@ for i,iid in enumerate(metadata.keys()):
 
 # %%
         
-query = 260
-targets = [1196, 1210,  2628, 5378, 33493]
+query = 2571 #260
+#targets = [1196, 1210,  2628, 5378, 33493]
+targets = [6365, 6934,  27660]
 
 print(f'Query id={query}, movie={metadata[query]["Title"]}, Movielens Genre ={metadata[query]["MovieLensGenres"]}')
 for t in targets:
     sim = 1-cosine(movieVectors[query],movieVectors[t])
     print(f'Similarity={sim}, id={t}, movie={metadata[t]["Title"]}, Movielens Genre ={metadata[t]["MovieLensGenres"]}')
-
-print('Top 5 matches')
-nn = neigh.NearestNeighbors(n_neighbors=6,metric='cosine')
+n=10
+print(f'Top {n} matches')
+nn = neigh.NearestNeighbors(n_neighbors=n+1,metric='cosine')
 nn.fit(movieVectors)
 queryV = movieVectors[query].reshape(1,-1)
 dist, ind = nn.kneighbors(queryV)
