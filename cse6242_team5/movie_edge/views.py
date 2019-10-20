@@ -10,12 +10,11 @@ print(BASE_DIR)
 
 
 dict_gensim_models = dict()
-current_path = Path('.')
 base_path = Path(BASE_DIR)
 print(base_path)
 
 # You will probably need to update this
-gensim_path = current_path / '..' / 'gensim_models2'
+gensim_path = base_path / '..' / 'gensim_models2'
 
 def index(request):
     return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
