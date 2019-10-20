@@ -5,5 +5,5 @@ app_name = 'movie_edge'
 urlpatterns = [
     path('', views.index, name='index'),
     path('sentiment_form/', views.sentiment_form, name='sentiment_form'),
-    path('query_recommendations/<str:gensim_model_str>/', views.query_recommendations, name='query_recommendations'),
+    path('query_recommendations/', views.query_recommendations, name='query_recommendations'),
 ]
