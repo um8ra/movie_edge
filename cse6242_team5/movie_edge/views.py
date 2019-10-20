@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest
 from django.http import JsonResponse
 from pathlib import Path
+from gensim.models import Word2Vec
 
-gensim_models = dict()
+dict_gensim_models = dict()
 current_path = Path('.')
 
 # You will probably need to update this
@@ -19,8 +20,15 @@ def query_recommendations(request: HttpRequest,
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
 
     gensim_model_path = gensim_path / gensim_model_str
-    if not gensim_model_path.exists():
+    if not gensim_model_path.is_file():
         raise FileNotFoundError
+
+    print(gensim_model_path)
+    if gensim_model_str in dict_gensim_models.keys():
+        model = dict_gensim_models[gensim_model_str]
+    else:
+        model = Word2Vec.load(str(gensim_model_path))
+        dict_gensim_models[gensim_model_str] = model
 
 
     return HttpResponse('I have some recommendations for you!')
