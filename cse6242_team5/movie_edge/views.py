@@ -36,8 +36,8 @@ def query_recommendations(request: HttpRequest) -> HttpResponse:
         if form.is_valid():
             print(form.cleaned_data)
             gensim_model_str = form.cleaned_data['gensim_model']
-
-
+            movies_liked = form.cleaned_data['likes']
+            movies_disliked = form.cleaned_data['dislikes']
 
             gensim_model_path = gensim_path / gensim_model_str
             if not gensim_model_path.is_file():
@@ -49,6 +49,7 @@ def query_recommendations(request: HttpRequest) -> HttpResponse:
             else:
                 model = Word2Vec.load(str(gensim_model_path))
                 dict_gensim_models[gensim_model_str] = model
+
 
 
     return HttpResponse('I have some recommendations for you!')
