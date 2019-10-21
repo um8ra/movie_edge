@@ -5,6 +5,13 @@
     <title>Movie Edge</title>
 </head>
 <body>
-
+{{ table_data|safe }}
 </body>
+<script>
+    // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
+    var tableDataString = '{{ table_data|safe }}';
+    console.log(tableDataString);
+    var tableData = JSON.parse(tableDataString);
+    console.log(tableData);
+</script>
 </html>

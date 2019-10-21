@@ -45,8 +45,9 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     data_json = json.JSONEncoder().encode(data)
-    print('hello')
-    return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
+    print(data_json)
+    return render(request, 'movie_edge/visualization.html',
+                  {'table_data': data_json})
 
 
 def sentiment_form(request: HttpRequest) -> HttpResponse:
