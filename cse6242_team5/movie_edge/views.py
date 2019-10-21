@@ -6,16 +6,21 @@ from pathlib import Path
 from gensim.models import Word2Vec
 from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
-print(BASE_DIR)
+import pandas as pd
 
+MOVIE_ID = 'movieId'
+TITLE = 'title'
+GENRES = 'genres'
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
 
 # You will probably need to update this
 gensim_path = base_path / '..' / 'gensim_models2'
+movie_df_path = base_path / '..' / 'ml-20m' / 'movies.csv'
 
-
+df_movies = pd.read_csv(str(movie_df_path), index_col=MOVIE_ID, dtype=str)
+print(df_movies.dtypes)
 def index(request: HttpRequest) -> HttpResponse:
     return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
 
@@ -35,10 +40,15 @@ def query_recommendations(request: HttpRequest, topn=5) -> HttpResponse:
         if form.is_valid():
             print(form.cleaned_data)
             gensim_model_str = form.cleaned_data['gensim_model']
-            movies_liked = form.cleaned_data['likes'].split(',')
-            movies_disliked = form.cleaned_data['dislikes'].split(',')
+            movies_liked = form.cleaned_data['likes'].replace(' ', '').split(',')
+            movies_liked_int = [int(i) for i in movies_liked]
+            movies_disliked = form.cleaned_data['dislikes'].replace(' ', '').split(',')
+            movies_disliked_int = [int(i) for i in movies_disliked]
             print(movies_liked)
-            print(movies_disliked)
+            print('Likes:')
+            print(df_movies.loc[movies_liked_int])
+            print('Dislikes:')
+            print(df_movies.loc[movies_disliked_int])
 
             gensim_model_path = gensim_path / gensim_model_str
             if not gensim_model_path.is_file():
@@ -53,6 +63,9 @@ def query_recommendations(request: HttpRequest, topn=5) -> HttpResponse:
             movies_similar = model.most_similar(positive=movies_liked,
                                                 negative=movies_disliked,
                                                 topn=topn)
+
+            print('Similar: ')
+            print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
 
     return HttpResponse('I have some recommendations for you!')
