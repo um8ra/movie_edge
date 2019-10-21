@@ -30,7 +30,19 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
     movies = Movie.objects.filter(embedder=embedder)
-    movies_max = movies.aggregate(Max('x'))
+    movies_x_min = movies.aggregate(Min(X))
+    movies_x_max = movies.aggregate(Max(X))
+    movies_y_min = movies.aggregate(Min(Y))
+    movies_y_max = movies.aggregate(Max(Y))
+
+    data = {
+        'data': movies,
+        'x_min': movies_x_min,
+        'x_max': movies_x_max,
+        'y_min': movies_y_min,
+        'y_max': movies_y_max,
+    }
+
     return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
 
 
