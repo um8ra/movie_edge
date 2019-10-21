@@ -6,11 +6,15 @@ from pathlib import Path
 from gensim.models import Word2Vec
 from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
+from .models import Movie
+from django.db.models import Max, Min
 import pandas as pd
 
-MOVIE_ID = 'movieId'
+MOVIE_ID = 'movie_id'
 TITLE = 'title'
 GENRES = 'genres'
+X = 'x'
+Y = 'y'
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
@@ -19,9 +23,14 @@ base_path = Path(BASE_DIR)
 gensim_path = base_path / '..' / 'gensim_models2'
 movie_df_path = base_path / '..' / 'ml-20m' / 'movies.csv'
 
-df_movies = pd.read_csv(str(movie_df_path), index_col=MOVIE_ID, dtype=str)
-print(df_movies.dtypes)
+df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
+df_movies.index.rename(MOVIE_ID, inplace=True)
+
+
 def index(request: HttpRequest) -> HttpResponse:
+    embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
+    movies = Movie.objects.filter(embedder=embedder)
+    movies_max = movies.aggregate(Max('x'))
     return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
 
 
