@@ -9,6 +9,7 @@ from cse6242_team5.settings import BASE_DIR
 from .models import Movie
 from django.db.models import Max, Min
 import pandas as pd
+import json
 
 MOVIE_ID = 'movie_id'
 TITLE = 'title'
@@ -29,20 +30,22 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder)
+    movies = Movie.objects.filter(embedder=embedder).values()
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))
     movies_y_max = movies.aggregate(Max(Y))
 
     data = {
-        'data': movies,
+        'data': list(movies),
         'x_min': movies_x_min,
         'x_max': movies_x_max,
         'y_min': movies_y_min,
         'y_max': movies_y_max,
     }
 
+    data_json = json.JSONEncoder().encode(data)
+    print('hello')
     return HttpResponse('You may be looking for query_recommendations/<str:gensim_model>/')
 
 
