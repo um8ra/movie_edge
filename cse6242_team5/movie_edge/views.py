@@ -11,6 +11,7 @@ from django.db.models import Max, Min, Value
 from django.db.models.functions import Replace
 import pandas as pd
 import json
+import urllib.parse
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -32,33 +33,24 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values()
-    movie_list = list()
+    movies = Movie.objects.filter(embedder=embedder).values()[50:70]
     for movie in movies:
-        movie = dict(movie)
-        movie_title = movie[MOVIE_TITLE]
-        # print(movie[MOVIE_TITLE])
-        movie_title = movie_title.replace("'", "").replace('"', '')
-        # print(movie_title)
-        movie[MOVIE_TITLE] = movie_title
-        # movie[MOVIE_TITLE] = movie[MOVIE_TITLE].replace("'", "\\'")
-        # print(movie)
-        movie_list.append(movie)
-    print(movies)
+        # This is done since quotes and other junk in the title screws up JSON parsing
+        movie[MOVIE_TITLE] = urllib.parse.quote_plus(movie[MOVIE_TITLE])
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))
     movies_y_max = movies.aggregate(Max(Y))
 
     data = {
-        'data': list(movie_list),
+        'data': list(movies),
         'x_min': movies_x_min,
         'x_max': movies_x_max,
         'y_min': movies_y_min,
         'y_max': movies_y_max,
     }
 
-    data_json = json.JSONEncoder().encode(data)
+    data_json = json.dumps(data)
     print(data_json)
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
