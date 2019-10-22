@@ -17,6 +17,7 @@ MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
 TITLE = 'title'
 GENRES = 'genres'
+CLUSTER = 'cluster'
 X = 'x'
 Y = 'y'
 
@@ -33,10 +34,11 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values()
+    movies = Movie.objects.filter(embedder=embedder).values(MOVIE_ID, MOVIE_TITLE, X, Y, GENRES, CLUSTER)
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
+
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))
@@ -44,14 +46,13 @@ def index(request: HttpRequest) -> HttpResponse:
 
     data = {
         'data': list(movies),
-        'x_min': movies_x_min,
-        'x_max': movies_x_max,
-        'y_min': movies_y_min,
-        'y_max': movies_y_max,
+        **movies_x_min,
+        **movies_x_max,
+        **movies_y_min,
+        **movies_y_max,
     }
 
     data_json = json.dumps(data)
-    print(data_json)
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
 
@@ -97,6 +98,5 @@ def query_recommendations(request: HttpRequest, topn=5) -> HttpResponse:
 
             print('Similar: ')
             print(df_movies.loc[[int(i[0]) for i in movies_similar]])
-
 
     return HttpResponse('I have some recommendations for you!')

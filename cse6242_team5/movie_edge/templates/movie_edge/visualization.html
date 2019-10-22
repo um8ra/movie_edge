@@ -3,22 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Movie Edge</title>
+    {% load static %}
+    <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
+    <style>
+        circle {
+            fill: black;
+        }
+    </style>
 </head>
 <body>
-{#{{ table_data|safe }}#}
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
     const tableData = JSON.parse('{{ table_data|safe }}');
-    const x_min = tableData['x_min'];
-    const x_max = tableData['x_max'];
-    const y_min = tableData['y_min'];
-    const y_max = tableData['y_max'];
+    console.log(tableData);
+    const x_min = parseFloat(tableData['x__min']);
+    const x_max = parseFloat(tableData['x__max']);
+    const y_min = parseFloat(tableData['y__min']);
+    const y_max = parseFloat(tableData['y__max']);
+    const width = 1024;
+    const height = 1024;
+    const padding = 32;
+    const MOVIE_ID = 'movie_id';
+    const MOVIE_TITLE = 'movie_title';
+    const TITLE = 'title';
+    const GENRES = 'genres';
+    const CLUSTER = 'cluster';
+    const X = 'x';
+    const Y = 'y';
+
     const data = tableData['data'].map(function(r) {
         r['movie_title'] = decodeURIComponent(r['movie_title']);
         return r
         }
     );
-    console.log(data);
+
+    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([padding, width - padding]);
+    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([padding, height - padding]);
+
+    const svg = d3.select('body').append('svg');
+    svg.attr('width', 1024).attr('height', 1024);
+
+    svg.selectAll('.circle').data(data).enter()
+        .append('circle')
+        .attr('cx', function(d) {
+            return xScale(d[X]);
+        })
+        .attr('cy', function(d) {
+            return yScale(d[Y]);
+        })
+        .attr('r', 2);
+
+
 </script>
 </html>
