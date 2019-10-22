@@ -9,9 +9,16 @@
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
-    var tableDataString = '{{ table_data|safe }}';
-    {#console.log(tableDataString);#}
-    var tableData = JSON.parse(tableDataString);
-    console.log(tableData);
+    const tableData = JSON.parse('{{ table_data|safe }}');
+    const x_min = tableData['x_min'];
+    const x_max = tableData['x_max'];
+    const y_min = tableData['y_min'];
+    const y_max = tableData['y_max'];
+    const data = tableData['data'].map(function(r) {
+        r['movie_title'] = decodeURIComponent(r['movie_title']);
+        return r
+        }
+    );
+    console.log(data);
 </script>
 </html>

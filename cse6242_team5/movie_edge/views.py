@@ -33,10 +33,10 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values()[50:70]
+    movies = Movie.objects.filter(embedder=embedder).values()
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
-        movie[MOVIE_TITLE] = urllib.parse.quote_plus(movie[MOVIE_TITLE])
+        movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))
