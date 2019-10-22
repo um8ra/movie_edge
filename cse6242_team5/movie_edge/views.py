@@ -7,11 +7,13 @@ from gensim.models import Word2Vec
 from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Value
+from django.db.models.functions import Replace
 import pandas as pd
 import json
 
 MOVIE_ID = 'movie_id'
+MOVIE_TITLE = 'movie_title'
 TITLE = 'title'
 GENRES = 'genres'
 X = 'x'
@@ -30,14 +32,26 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values()
+    movies = Movie.objects.filter(embedder=embedder).values()[7000:7500]
+    movie_list = list()
+    for movie in movies:
+        movie = dict(movie)
+        movie_title = movie[MOVIE_TITLE]
+        print(movie[MOVIE_TITLE])
+        movie_title = movie_title.replace("'", "")
+        print(movie_title)
+        movie[MOVIE_TITLE] = movie_title
+        # movie[MOVIE_TITLE] = movie[MOVIE_TITLE].replace("'", "\\'")
+        # print(movie)
+        movie_list.append(movie)
+    print(movies)
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))
     movies_y_max = movies.aggregate(Max(Y))
 
     data = {
-        'data': list(movies),
+        'data': list(movie_list),
         'x_min': movies_x_min,
         'x_max': movies_x_max,
         'y_min': movies_y_min,
