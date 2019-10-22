@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
 # from sklearn.model_selection import ParameterGrid
+from sklearn.linear_model import RidgeCV
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from sklearn.metrics import roc_auc_score
 
@@ -26,59 +27,67 @@ GENRE = 'genres'
 ## If we do dot product, it would have norm(vec1) and norm(vec2)
 ## as magnitute multiplied on top of the cos sim.
 ## The euclidean distance would be further with large norms.
-SCORE_METHOD = 1 # 0: sklearn pairwise metric
-                 # 1: gensim myModel.vw.most_similar(pos,neg)
+SCORE_METHOD = 1 # 0: user vector = mean of movies; sklearn pairwise metric
+                 # 1: user vector = ridgecv; sklearn pairwise metric
+                 # 2: gensim myModel.vw.most_similar(pos,neg)
                  # else: dot product
+## Regularization of ridgeCV (linear least sq with L2) for SCORE_METHOD == 1
+# ALPHA = [1e-2]
+# ALPHA = [10]
+# ALPHA = [1e-1, 1e-2, 1e-3]
+# ALPHAS = [[10.]]
+ALPHAS = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+
 PAIRWISE_METRIC = cosine_similarity # euclidean_distances
 
 # MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2'
 # MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2'
 MODEL_NAMES = [
                'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2', # not found
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_16_ng_2', # not found
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_0', # not found
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_32_ng_2', # not found
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_0', # not found
-               'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
-               'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_0', # not found
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
-               'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
+               # 'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
+               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
+               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
+               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
+               # 'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2', # added
+               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
+               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_16_ng_2', # added
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_0', # added
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
+               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
+               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_32_ng_2', # added
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_0', # added
+               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
+               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_0', # added
+               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
+               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
+               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
                # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2'
                ]
 
@@ -86,7 +95,7 @@ MODEL_NAMES = [
 EVAL_DATASET = 'val' # 'trg' or 'val'
 
 
-def run_validation_metrics(model_name):
+def run_validation_metrics(model_name, ALPHA=1e-2):
 
     ## --------------------------------------------------------------
     ## Used helper functions for validation purpose
@@ -155,8 +164,7 @@ def run_validation_metrics(model_name):
     # print(type(myModel.wv.index2word)) # list
     # print(myModel.wv.index2word[0:10])
 
-    if SCORE_METHOD == 1:
-        vocab = list(myModel.wv.vocab.keys())
+    vocab = list(myModel.wv.vocab.keys())
 
     movie2vec_dict = dict()
     for i, _movie_ID in enumerate(myModel.wv.vocab):
@@ -193,39 +201,39 @@ def run_validation_metrics(model_name):
     ## filter out movies that are not in the trained vocab
     idx_in_vocab = [i for i, w in enumerate(negative) if w in vocab]
     negative = [negative[i] for i in idx_in_vocab]
-    cos_sim = myModel.wv.most_similar(positive=positive, # user1 LIKED
+    _score = myModel.wv.most_similar(positive=positive, # user1 LIKED
                                       negative=negative, # user1 not LIKED
                                       # topn=5, # returns (movie_ID, score)
                                       # topn=len(vocab),  # similarity for all words
                                       topn=None, # similarity for all words
                                       restrict_vocab=None,
                                       indexer=None)
-    # cos_sim = myModel.wv.most_similar_cosmul(positive=positive, # user1 LIKED
+    # _score = myModel.wv.most_similar_cosmul(positive=positive, # user1 LIKED
     #                                          negative=negative, # user1 not LIKED
     #                                          topn=None)  # similarity for all words
 
-    print(len(cos_sim))
-    print(cos_sim[:10])
+    print(len(_score))
+    print(_score[:10])
 
-    cos_sim_dict = {k: v for k, v in zip(vocab, cos_sim)}
-    print(cos_sim_dict['589'])
-    print(cos_sim_dict['1240'])
-    print(cos_sim_dict['2571'])
-    print(cos_sim_dict['6365'])
-    print(cos_sim_dict['6934'])
-    print(cos_sim_dict['2628'])
-    print(cos_sim_dict['5378'])
-    print(cos_sim_dict['33493'])
-    print(cos_sim_dict['260'])
-    print(cos_sim_dict['1196'])
-    print(cos_sim_dict['1210'])
+    _score_dict = {k: v for k, v in zip(vocab, _score)}
+    print(_score_dict['589'])
+    print(_score_dict['1240'])
+    print(_score_dict['2571'])
+    print(_score_dict['6365'])
+    print(_score_dict['6934'])
+    print(_score_dict['2628'])
+    print(_score_dict['5378'])
+    print(_score_dict['33493'])
+    print(_score_dict['260'])
+    print(_score_dict['1196'])
+    print(_score_dict['1210'])
     print()
     val_movie_IDs = ['50', '112', '260', '589', '1136', '1198', '1200', '1208',
                      '1222', '1240', '1278', '1350', '1358', '1370', '1848',
                      '1997', '2194', '2288', '2761', '2804', '3037', '3479',
                      '4027', '5040', '7454', '8507']
     for _movie_ID in val_movie_IDs:
-        print(_movie_ID, cos_sim_dict[_movie_ID])
+        print(_movie_ID, _score_dict[_movie_ID])
     print()
     '''
 
@@ -297,17 +305,23 @@ def run_validation_metrics(model_name):
     ## --------------------------------------------------------------------
     df_trg_all = pd.read_hdf('Ratings/binarized.hdf', key='trg')
     df_trg = df_trg_all[df_trg_all[LIKED] == 1] # comment out if evaluating AUROC
-    # df_trg = df_trg.head(50000) # todo comment out for production
     df_trg = transform_df(df_trg)
-    # df_trg = df_trg.head(10) # quick check on 10 movies
+    # df_trg = df_trg.head(200) # quick check on 10 movies
 
     df_trg_gb = df_trg.groupby([USER_ID])
     dict_groups_trg = {k: list(v[MOVIE_ID]) for k, v in df_trg_gb}
 
     if SCORE_METHOD == 1:
+        df_trg_all = transform_df(df_trg_all)
+        # df_trg_all = df_trg_all.head(200) # quick check on 10 movies
+        df_trg_all_gb = df_trg_all.groupby([USER_ID])
+        dict_groups_trg_all = {k: {MOVIE_ID: list(v[MOVIE_ID]),
+                                   LIKED: v[LIKED].to_numpy()}
+                                for k, v in df_trg_all_gb}
+    elif SCORE_METHOD == 2:
         df_trg0 = df_trg_all[df_trg_all[LIKED] == 0]
         df_trg0 = transform_df(df_trg0)
-        # df_trg0 = df_trg0.head(10) # quick check on 10 movies
+        # df_trg0 = df_trg0.head(200) # quick check on 10 movies
         df_trg0_gb = df_trg0.groupby([USER_ID])
         dict_groups_trg0 = {k: list(v[MOVIE_ID]) for k, v in df_trg0_gb}
     ## --------------------------------------------------------------------
@@ -319,7 +333,34 @@ def run_validation_metrics(model_name):
     ## Calculate each user vector as mean of "liked" movies from trg data
     ## and save it as pickle file
     ## --------------------------------------------------------------------
-    if SCORE_METHOD != 1:
+    if SCORE_METHOD == 1:
+        user_vectors_dict = {}
+        user_cnt = 0
+        for _user_ID, _value in dict_groups_trg_all.items():
+            _movie_IDs = _value[MOVIE_ID]
+            _liked = _value[LIKED]
+
+            user_cnt += 1
+            if user_cnt % 100 == 1:
+                print("Calculating user vector for user {}".format(user_cnt))
+
+            idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
+            _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
+            _movie_vectors = movie_vectors_df.loc[_movie_IDs_in_vocab]
+            _movie_liked = _liked[idx_in_vocab]
+
+            clf = RidgeCV(alphas=ALPHA).fit(_movie_vectors, _movie_liked)
+            user_vectors_dict[_user_ID] = clf
+
+        output_dir = 'Model/gensim/users/ridge_a{}'.format(ALPHA)
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
+                    output_dir, model_name, ALPHA), 'wb') as f:
+            pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+    elif SCORE_METHOD == 2:
+        pass
+    else:
         user_vectors_dict = {}
         user_cnt = 0
         for _user_ID, _movie_IDs in dict_groups_trg.items():
@@ -338,7 +379,11 @@ def run_validation_metrics(model_name):
             # print(user_vectors_dict)
             # break
 
-        with open('Model/gensim/users/{}_user_vectors_dict.pickle'.format(model_name), 'wb') as f:
+        output_dir = 'Model/gensim/users/mean_movies'
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
+                    output_dir, model_name), 'wb') as f:
             pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
     ## --------------------------------------------------------------------
 
@@ -349,7 +394,7 @@ def run_validation_metrics(model_name):
     df_val = pd.read_hdf('Ratings/binarized.hdf', key='val')
     # print(df_val.head(5)) # 'movieID' is both 2nd level index and a column
     df_val = transform_df(df_val)
-    # df_val = df_val.head(10) # quick check on 10 movies
+    # df_val = df_val.head(50) # quick check on 10 movies
     # print(df_val.head(5))
     # print()
 
@@ -364,8 +409,21 @@ def run_validation_metrics(model_name):
     ## --------------------------------------------------------------------
     ## Retrieve user vectors from pickle file
     ## --------------------------------------------------------------------
-    if SCORE_METHOD != 1:
-        with open('Model/gensim/users/{}_user_vectors_dict.pickle'.format(model_name), 'rb') as f:
+    if SCORE_METHOD == 1:
+        output_dir = 'Model/gensim/users/ridge_a{}'.format(ALPHA)
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
+                    output_dir, model_name, ALPHA), 'rb') as f:
+            user_vectors_dict = pickle.load(f)    
+    elif SCORE_METHOD == 2:
+        pass
+    else:
+        output_dir = 'Model/gensim/users/mean_movies'
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
+                    output_dir, model_name), 'rb') as f:
             user_vectors_dict = pickle.load(f)
 
     ## Some simple testing on user 1 and terminator / star wars
@@ -411,7 +469,7 @@ def run_validation_metrics(model_name):
 
     ## Some simple testing of cosine similarity on user 22085
     # user_vector = user_vectors_dict[22085]
-    # user_vector = user_vector.reshape(1,-1)  # sklearn cos_sim need 2D
+    # user_vector = user_vector.reshape(1,-1)  # sklearn cos sim need 2D
     # print(user_vector)
 
     # # user_movie_IDs = dict_groups_trg[22085]
@@ -421,9 +479,9 @@ def run_validation_metrics(model_name):
     # user_movie_vectors = movie_vectors_df.loc[user_movie_IDs].to_numpy()
     # print(user_movie_vectors)
 
-    # cos_sim = PAIRWISE_METRIC(user_movie_vectors, user_vector)
-    # print(cos_sim)
-    # print(len(user_movie_IDs), len(user_movie_vectors), len(cos_sim))
+    # _score = PAIRWISE_METRIC(user_movie_vectors, user_vector)
+    # print(_score)
+    # print(len(user_movie_IDs), len(user_movie_vectors), len(_score))
 
 
     ## Alternative method using gensim's KeyVectors.distances
@@ -431,8 +489,8 @@ def run_validation_metrics(model_name):
     ## Result is generally very close, with some rounding diffs
     # user_vector = user_vectors_dict[22085]
     # user_movie_IDs = dict_groups_val[22085]#[:10]
-    # cos_sim = 1 - myModel.wv.distances(user_vector, user_movie_IDs)
-    # print(cos_sim)
+    # _score = 1 - myModel.wv.distances(user_vector, user_movie_IDs)
+    # print(_score)
     '''
     ## --------------------------------------------------------------------
 
@@ -468,10 +526,13 @@ def run_validation_metrics(model_name):
         if user_cnt % 100 == 1:
             print("Validating for user {}".format(user_cnt))
 
+        ## load objects related to users
         if SCORE_METHOD == 0:
             user_vector = user_vectors_dict[_user_ID] # 1D
-            user_vector = user_vector.reshape(1,-1) # sklearn cos_sim need 2D
+            user_vector = user_vector.reshape(1,-1) # sklearn cos sim need 2D
         elif SCORE_METHOD == 1:
+            clf = user_vectors_dict[_user_ID]
+        elif SCORE_METHOD == 2:
             positive = dict_groups_trg[1]
             negative =  dict_groups_trg0[1]
             ## filter out movies that are not in the trained vocab
@@ -484,12 +545,11 @@ def run_validation_metrics(model_name):
         ## Need to consider movies excluded due to word2vec minCount
         ## or movies in validation set not trained in training set
         ## Must exclude before comparing with similarity metrics
-        # cos_sim = np.empty((len(user_movie_vectors), 1))
-        cos_sim = np.empty((len(_movie_IDs), 1))
-        user_movie_vectors = movie_vectors_df.reindex(_movie_IDs).to_numpy()
-        cos_sim[:] = np.nan
+        # _score = np.empty((len(user_movie_vectors), 1))
+        _score = np.empty((len(_movie_IDs), 1))
+        _score[:] = np.nan
 
-        if SCORE_METHOD != 1:
+        if SCORE_METHOD not in (1, 2):
             ## reindex accounts for nan's; .loc won't handle nan in the futures
             # user_movie_vectors = movie_vectors_df.loc[_movie_IDs].to_numpy()
             user_movie_vectors = movie_vectors_df.reindex(_movie_IDs).to_numpy()
@@ -498,11 +558,17 @@ def run_validation_metrics(model_name):
             mask_not_nan = mask_not_nan[:, 0] # only need 1D mask
 
         if SCORE_METHOD == 0:
-            cos_sim[mask_not_nan] = PAIRWISE_METRIC(
+            _score[mask_not_nan] = PAIRWISE_METRIC(
                                         user_movie_vectors[mask_not_nan],
                                         user_vector)
         elif SCORE_METHOD == 1:
-            cos_sim_aux = myModel.wv.most_similar(
+            ## filter out movies that are not in the trained vocab
+            idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
+            _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
+            _score[idx_in_vocab, 0] = \
+                 clf.predict(movie_vectors_df.loc[_movie_IDs_in_vocab].to_numpy()).clip(0,1)
+        elif SCORE_METHOD == 2:
+            _score_aux = myModel.wv.most_similar(
                                     positive=positive, # user1 LIKED
                                     negative=negative, # user1 not LIKED
                                     # topn=5, # returns (movie_ID, score)
@@ -511,32 +577,40 @@ def run_validation_metrics(model_name):
                                     restrict_vocab=None,
                                     indexer=None)
             ## when topn=None above, only a 1D array is returned without index
-            cos_sim_dict = {k: v for k, v in zip(vocab, cos_sim_aux)}
+            _score_dict = {k: v for k, v in zip(vocab, _score_aux)}
             idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
-            cos_sim_aux = [cos_sim_dict[_movie_IDs[i]] for i in idx_in_vocab]
-            cos_sim[idx_in_vocab, 0] = cos_sim_aux
+            _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
+            _score_aux = [_score_dict[i] for i in _movie_IDs_in_vocab]
+            # _score_aux = [_score_dict[_movie_IDs[i]] for i in idx_in_vocab]
+            _score[idx_in_vocab, 0] = _score_aux
         else:
-            cos_sim[mask_not_nan] = user_movie_vectors[mask_not_nan].dot(
+            _score[mask_not_nan] = user_movie_vectors[mask_not_nan].dot(
                                     user_vector)
 
         if scores is None:
-            scores = cos_sim.ravel() # flatten without making a copy
+            scores = _score.ravel() # flatten without making a copy
         else:
-            scores = np.append(scores, cos_sim.ravel()) # flatten
+            scores = np.append(scores, _score.ravel()) # flatten
 
     df_eval['scores'] = scores
 
     if SCORE_METHOD == 0:
-        subdir = PAIRWISE_METRIC.__name__
+        subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
     elif SCORE_METHOD == 1:
+        subdir = 'ridge_a{}_'.format(ALPHA) + PAIRWISE_METRIC.__name__
+    elif SCORE_METHOD == 2:
         subdir = 'most_similar'
     else:
         subdir = 'dot'
 
-    df_eval[[LIKED, 'scores']].to_csv('Model/gensim/eval/{}/{}_{}_{}.csv'.format(
-                                        subdir, model_name, EVAL_DATASET, subdir))
-    with open('Model/gensim/eval/{}/{}_{}_{}.pickle'.format(
-                subdir, model_name, EVAL_DATASET, subdir), 'wb') as f:
+    output_dir = 'Model/gensim/eval/{}'.format(subdir)
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+
+    df_eval[[LIKED, 'scores']].to_csv('{}/{}_{}_{}.csv'.format(
+                output_dir, model_name, EVAL_DATASET, subdir))
+    with open('{}/{}_{}_{}.pickle'.format(
+                output_dir, model_name, EVAL_DATASET, subdir), 'wb') as f:
         pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
@@ -551,8 +625,9 @@ def run_validation_metrics(model_name):
     print(score_min, score_max)
     print(auc)
 
-    with open('Model/gensim/eval/{}/{}_{}_{}_AUC.txt'.format(
-                subdir, model_name, EVAL_DATASET, subdir), 'w') as f:
+    with open('{}/{}_{}_{}_AUC.txt'.format(
+                output_dir, model_name, EVAL_DATASET, subdir), 'w') as f:
+        f.write('Word2Vec model: {}\n'.format(model_name))
         f.write('Truth min: {}, max: {}\n'.format(truth_min, truth_max))
         f.write('Scores min: {}, max: {}\n'.format(score_min, score_max))
         f.write('AUC: {}\n'.format(auc))
@@ -563,36 +638,33 @@ def run_validation_metrics(model_name):
 if __name__ == '__main__':
     start_time = datetime.now()
 
-    check_dirs = ['Model/gensim/users',
-                  'Model/gensim/eval',
-                  'Model/gensim/eval/cosine_similarity',
-                  'Model/gensim/eval/most_similar',
-                  'Model/gensim/eval/dot']
-    for output_dir in check_dirs:
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-
     for model_name in MODEL_NAMES:
-        start_time1 = datetime.now()
 
-        run_validation_metrics(model_name)
+        for ALPHA in ALPHAS:
 
-        end_time1 = datetime.now()
-        run_time1 = end_time1 - start_time1
-        print('1x Model Run Time: {}'.format(run_time1))
+            start_time1 = datetime.now()
 
-        if SCORE_METHOD == 0:
-            subdir = PAIRWISE_METRIC.__name__
-        elif SCORE_METHOD == 1:
-            subdir = 'most_similar'
-        else:
-            subdir = 'dot'
+            run_validation_metrics(model_name, ALPHA)
 
-        with open('Model/gensim/eval/{}/{}_{}_{}_AUC.txt'.format(
-                subdir, model_name, EVAL_DATASET, subdir), 'a+') as f:
-            f.write('Run time: {}\n'.format(run_time1))
+            end_time1 = datetime.now()
+            run_time1 = end_time1 - start_time1
+            print('1x Model Run Time: {}'.format(run_time1))
 
-        print()
+            if SCORE_METHOD == 0:
+                subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
+            elif SCORE_METHOD == 1:
+                subdir = 'ridge_a{}_'.format(ALPHA) + PAIRWISE_METRIC.__name__
+            elif SCORE_METHOD == 2:
+                subdir = 'most_similar'
+            else:
+                subdir = 'dot'
+
+            output_dir = 'Model/gensim/eval/{}'.format(subdir)
+            with open('{}/{}_{}_{}_AUC.txt'.format(
+                    output_dir, model_name, EVAL_DATASET, subdir), 'a+') as f:
+                f.write('Run time: {}\n'.format(run_time1))
+
+            print()
 
     end_time = datetime.now()
     run_time = end_time - start_time
