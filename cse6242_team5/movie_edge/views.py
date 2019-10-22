@@ -1,23 +1,22 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest
-from django.template import loader
-from django.http import JsonResponse
 from pathlib import Path
 from gensim.models import Word2Vec
 from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie
-from django.db.models import Max, Min, Value
-from django.db.models.functions import Replace
+from django.db.models import Max, Min
 import pandas as pd
 import json
 import urllib.parse
+from bokeh import palettes
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
 TITLE = 'title'
 GENRES = 'genres'
 CLUSTER = 'cluster'
+COLOR = 'color'
 X = 'x'
 Y = 'y'
 
@@ -35,10 +34,11 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
     movies = Movie.objects.filter(embedder=embedder).values(MOVIE_ID, MOVIE_TITLE, X, Y, GENRES, CLUSTER)
+    palette = palettes.Category20_20
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
-
+        movie[COLOR] = palette[movie[CLUSTER]]
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
     movies_y_min = movies.aggregate(Min(Y))

@@ -7,7 +7,7 @@
     <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
     <style>
         circle {
-            fill: black;
+            {#fill: black;#}
         }
     </style>
 </head>
@@ -29,6 +29,7 @@
     const TITLE = 'title';
     const GENRES = 'genres';
     const CLUSTER = 'cluster';
+    const COLOR = 'color';
     const X = 'x';
     const Y = 'y';
 
@@ -52,7 +53,10 @@
         .attr('cy', function(d) {
             return yScale(d[Y]);
         })
-        .attr('r', 2);
+        .attr('r', 2)
+        .attr('fill', function (d) {
+            return d[COLOR];
+        });
 
 
 </script>
