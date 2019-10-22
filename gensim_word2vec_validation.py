@@ -10,6 +10,7 @@ import pickle
 # import h5py
 import os
 import sys
+import glob
 from datetime import datetime
 # import logging
 # import shutil
@@ -22,6 +23,9 @@ TIMESTAMP = 'Timestamp'
 TITLE = 'title'
 GENRE = 'genres'
 
+SAVED_MODEL_DIR = 'Model/gensim_models'
+MODEL_PERF_DIR = 'Model/gensim_perf'
+
 ## Note that dot product may not actually make sense
 ## cosine similarity is between -1 and 1, with 1 being more similar.
 ## If we do dot product, it would have norm(vec1) and norm(vec2)
@@ -31,68 +35,20 @@ SCORE_METHOD = 1 # 0: user vector = mean of movies; sklearn pairwise metric
                  # 1: user vector = ridgecv; sklearn pairwise metric
                  # 2: gensim myModel.vw.most_similar(pos,neg)
                  # else: dot product
+
 ## Regularization of ridgeCV (linear least sq with L2) for SCORE_METHOD == 1
-# ALPHA = [1e-2]
-# ALPHA = [10]
-# ALPHA = [1e-1, 1e-2, 1e-3]
 # ALPHAS = [[10.]]
 ALPHAS = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+# ALPHAS = [[50.], [40.], [30.], [20.]]
+# ALPHAS = [[100.], [50.], [40.], [30.], [20.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+ALPHAS.reverse()
 
-PAIRWISE_METRIC = cosine_similarity # euclidean_distances
-
-# MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2'
-# MODEL_NAME = 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2'
-MODEL_NAMES = [
-               'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_64_sg_0_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_64_sg_0_hs_0_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_128_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               # 'w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               # 'w2v_vs_64_sg_1_hs_0_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2', # added
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_0',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_16_ng_2', # added
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_0', # added
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_0',
-               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
-               # 'w2v_vs_32_sg_1_hs_1_mc_5_it_1_wn_32_ng_2', # added
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_0', # added
-               # 'w2v_vs_32_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
-               # 'w2v_vs_24_sg_1_hs_1_mc_1_it_1_wn_32_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_0', # added
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_5774_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_16_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_16_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_5774_ng_0',
-               # 'w2v_vs_16_sg_1_hs_1_mc_5_it_1_wn_32_ng_2',
-               # 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2'
-               ]
+PAIRWISE_METRIC = cosine_similarity # if SCORE_METHOD == 0
+# PAIRWISE_METRIC = euclidean_distances  # if SCORE_METHOD == 0
 
 ## if evaluating AUROC on trg, COMMENT out df_trg = df_trg[df_trg[LIKED] == 1]
 EVAL_DATASET = 'val' # 'trg' or 'val'
+
 
 
 def run_validation_metrics(model_name, ALPHA=1e-2):
@@ -154,7 +110,8 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## then convert to dict and pandas.DataFrame with movie_IDs index
     ## --------------------------------------------------------------
 
-    myModel = Word2Vec.load('Model/gensim/{}.gensim'.format(model_name))
+    myModel = Word2Vec.load('{}/{}'.format(
+                SAVED_MODEL_DIR, model_name))
     movie2vec_kv = myModel.wv
     # print(type(movie2vec_kv))     # <class 'gensim.models.keyedvectors.Word2VecKeyedVectors'>
     # print(type(myModel.wv.vocab)) # dict, values are gensim.models.keyedvectors.Vocab object
@@ -352,7 +309,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
             clf = RidgeCV(alphas=ALPHA).fit(_movie_vectors, _movie_liked)
             user_vectors_dict[_user_ID] = clf
 
-        output_dir = 'Model/gensim/users/ridge_a{}'.format(ALPHA)
+        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
@@ -379,7 +336,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
             # print(user_vectors_dict)
             # break
 
-        output_dir = 'Model/gensim/users/mean_movies'
+        output_dir = '{}/users/mean_movies'.format(MODEL_PERF_DIR)
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
@@ -410,7 +367,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## Retrieve user vectors from pickle file
     ## --------------------------------------------------------------------
     if SCORE_METHOD == 1:
-        output_dir = 'Model/gensim/users/ridge_a{}'.format(ALPHA)
+        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
@@ -419,7 +376,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     elif SCORE_METHOD == 2:
         pass
     else:
-        output_dir = 'Model/gensim/users/mean_movies'
+        output_dir = '{}/users/mean_movies'.format(MODEL_PERF_DIR)
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
@@ -603,7 +560,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     else:
         subdir = 'dot'
 
-    output_dir = 'Model/gensim/eval/{}'.format(subdir)
+    output_dir = '{}/eval/{}'.format(MODEL_PERF_DIR, subdir)
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
@@ -625,12 +582,24 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     print(score_min, score_max)
     print(auc)
 
+    ## Write some quick summaries into a txt file for each model
     with open('{}/{}_{}_{}_AUC.txt'.format(
                 output_dir, model_name, EVAL_DATASET, subdir), 'w') as f:
         f.write('Word2Vec model: {}\n'.format(model_name))
         f.write('Truth min: {}, max: {}\n'.format(truth_min, truth_max))
         f.write('Scores min: {}, max: {}\n'.format(score_min, score_max))
         f.write('AUC: {}\n'.format(auc))
+
+    ## Append each model's AUC summary to a line in a csv file
+    output_fname = '{}/eval/{}_AUC_comparisons.csv'.format(
+                        MODEL_PERF_DIR, EVAL_DATASET)
+    print(output_fname)
+    if os.path.exists(output_fname):
+        open_mode = 'a' # append if already exists
+    else:
+        open_mode = 'w' # make a new file if not
+    with open(output_fname, open_mode) as f:
+        f.write(model_name + ',' + str(ALPHA) + ',' + str(auc) + '\n')
     ## --------------------------------------------------------------------
 
 
@@ -638,7 +607,18 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
 if __name__ == '__main__':
     start_time = datetime.now()
 
-    for model_name in MODEL_NAMES:
+    model_names = []
+    for root, dirs, files in os.walk(SAVED_MODEL_DIR):
+        for file in files:
+            if '.gensim' in file and '128' not in file: # exclude 128 for now
+                model_names.append(file)
+    # print(len(model_names))   # 83 models excluding '128'
+    # for m in model_names:
+    #     print(m)
+
+    model_names = ['w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim']
+
+    for model_name in model_names:
 
         for ALPHA in ALPHAS:
 
@@ -659,9 +639,10 @@ if __name__ == '__main__':
             else:
                 subdir = 'dot'
 
-            output_dir = 'Model/gensim/eval/{}'.format(subdir)
+            ## Append run time stats to a txt file for each model
+            output_dir = '{}/eval/{}'.format(MODEL_PERF_DIR, subdir)
             with open('{}/{}_{}_{}_AUC.txt'.format(
-                    output_dir, model_name, EVAL_DATASET, subdir), 'a+') as f:
+                    output_dir, model_name, EVAL_DATASET, subdir), 'a') as f:
                 f.write('Run time: {}\n'.format(run_time1))
 
             print()
