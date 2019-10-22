@@ -32,14 +32,14 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values()[7000:7500]
+    movies = Movie.objects.filter(embedder=embedder).values()
     movie_list = list()
     for movie in movies:
         movie = dict(movie)
         movie_title = movie[MOVIE_TITLE]
-        print(movie[MOVIE_TITLE])
-        movie_title = movie_title.replace("'", "")
-        print(movie_title)
+        # print(movie[MOVIE_TITLE])
+        movie_title = movie_title.replace("'", "").replace('"', '')
+        # print(movie_title)
         movie[MOVIE_TITLE] = movie_title
         # movie[MOVIE_TITLE] = movie[MOVIE_TITLE].replace("'", "\\'")
         # print(movie)
