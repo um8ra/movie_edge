@@ -38,10 +38,13 @@ SCORE_METHOD = 1 # 0: user vector = mean of movies; sklearn pairwise metric
 
 ## Regularization of ridgeCV (linear least sq with L2) for SCORE_METHOD == 1
 # ALPHAS = [[10.]]
-ALPHAS = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+# ALPHAS = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
 # ALPHAS = [[50.], [40.], [30.], [20.]]
-# ALPHAS = [[100.], [50.], [40.], [30.], [20.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
-ALPHAS.reverse()
+# ALPHAS = [[5.], [15.]]
+# ALPHAS = [[4.], [6.]]
+# ALPHAS = [[2.], [3.]]
+ALPHAS = [[4.]]
+# ALPHAS.reverse()
 
 PAIRWISE_METRIC = cosine_similarity # if SCORE_METHOD == 0
 # PAIRWISE_METRIC = euclidean_distances  # if SCORE_METHOD == 0
@@ -610,13 +613,15 @@ if __name__ == '__main__':
     model_names = []
     for root, dirs, files in os.walk(SAVED_MODEL_DIR):
         for file in files:
-            if '.gensim' in file and '128' not in file: # exclude 128 for now
+            # exclude 'vs_128' and 'hs_0' for now
+            if '.gensim' in file and 'vs_128' not in file \
+            and 'hs_0' not in file:
                 model_names.append(file)
-    # print(len(model_names))   # 83 models excluding '128'
-    # for m in model_names:
-    #     print(m)
+    print(len(model_names))   # 83 models excluding '128'
+    for m in model_names:
+        print(m)
 
-    model_names = ['w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim']
+    # model_names = ['w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim']
 
     for model_name in model_names:
 
