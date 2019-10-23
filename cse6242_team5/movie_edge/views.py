@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, JsonResponse
 from pathlib import Path
 from gensim.models import Word2Vec
 from .forms import SentimentForm
@@ -54,7 +54,8 @@ def index(request: HttpRequest) -> HttpResponse:
 
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
-                  {'table_data': data_json})
+                  {'table_data': data_json,
+                   'form': SentimentForm})
 
 
 def sentiment_form(request: HttpRequest) -> HttpResponse:
@@ -62,12 +63,12 @@ def sentiment_form(request: HttpRequest) -> HttpResponse:
                   {'form': SentimentForm()})
 
 
-def query_recommendations(request: HttpRequest, topn=5) -> HttpResponse:
+def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
-
-    if request.method == 'GET':
-        form = SentimentForm(request.GET)
+    print('Hello there, General Kenobi!')
+    if request.method == 'POST':
+        form = SentimentForm(request.POST)
 
         if form.is_valid():
             print(form.cleaned_data)
@@ -99,4 +100,4 @@ def query_recommendations(request: HttpRequest, topn=5) -> HttpResponse:
             print('Similar: ')
             print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
-    return HttpResponse('I have some recommendations for you!')
+    return JsonResponse({'mytext': 'I have some recommendations for you!'})

@@ -12,6 +12,14 @@
     </style>
 </head>
 <body>
+<form action="{% url 'movie_edge:query_recommendations' %}" method="POST" id="sentimentForm">
+    {% csrf_token %}
+    {% for field in form %}
+        <b>{{ field.label_tag }}</b> - {{ field }}
+        <br>
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
@@ -63,6 +71,24 @@
             return d[COLOR];
         });
 
+    document.forms['sentimentForm'].addEventListener('submit', (event) => {
+        //https://stackoverflow.com/questions/374644/how-do-i-capture-response-of-form-submit
+        event.preventDefault();
+        fetch(event.target.action, {
+            method: 'POST',
+            body: new URLSearchParams(new FormData(event.target))
+        }).then((resp) => {
+            resp.json().then(function(j) {
+                alert(j);
+                console.log(j);
+            });
+        }).then((body) => {
+            // doesn't seem necessary
+        }).catch((error) => {
+            console.log('Had Error!');
+            console.log(error);
+        });
+    });
 
 </script>
 </html>
