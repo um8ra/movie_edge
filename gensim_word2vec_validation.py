@@ -574,7 +574,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
         pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
-    truth = df_eval[LIKED].to_numpy()
+    truth = df_eval[LIKED].to_numpy()   # LIKED is the column 'Liked' (1 or 0)
     truth_min = truth[mask_not_nan].min()
     truth_max = truth[mask_not_nan].max()
     score_min = scores[mask_not_nan].min()
