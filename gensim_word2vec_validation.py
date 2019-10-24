@@ -25,6 +25,7 @@ GENRE = 'genres'
 
 SAVED_MODEL_DIR = 'Model/gensim_models'
 MODEL_PERF_DIR = 'Model/gensim_perf'
+OVERRIDE = False
 
 ## Note that dot product may not actually make sense
 ## cosine similarity is between -1 and 1, with 1 being more similar.
@@ -294,57 +295,71 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## and save it as pickle file
     ## --------------------------------------------------------------------
     if SCORE_METHOD == 1:
-        user_vectors_dict = {}
-        user_cnt = 0
-        for _user_ID, _value in dict_groups_trg_all.items():
-            _movie_IDs = _value[MOVIE_ID]
-            _liked = _value[LIKED]
-
-            user_cnt += 1
-            if user_cnt % 100 == 1:
-                print("Calculating user vector for user {}".format(user_cnt))
-
-            idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
-            _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
-            _movie_vectors = movie_vectors_df.loc[_movie_IDs_in_vocab]
-            _movie_liked = _liked[idx_in_vocab]
-
-            clf = RidgeCV(alphas=ALPHA).fit(_movie_vectors, _movie_liked)
-            user_vectors_dict[_user_ID] = clf
-
         output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
-                    output_dir, model_name, ALPHA), 'wb') as f:
-            pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+        output_fname = '{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
+                            output_dir, model_name, ALPHA)
+
+        if os.path.exists(output_fname) and OVERRIDE == False:
+            with open(output_fname, 'rb') as f:
+                user_vectors_dict = pickle.load(f)
+        else:
+            user_vectors_dict = {}
+            user_cnt = 0
+            for _user_ID, _value in dict_groups_trg_all.items():
+                _movie_IDs = _value[MOVIE_ID]
+                _liked = _value[LIKED]
+
+                user_cnt += 1
+                if user_cnt % 100 == 1:
+                    print("Calculating user vector for user {}".format(user_cnt))
+
+                idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
+                _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
+                _movie_vectors = movie_vectors_df.loc[_movie_IDs_in_vocab]
+                _movie_liked = _liked[idx_in_vocab]
+
+                clf = RidgeCV(alphas=ALPHA).fit(_movie_vectors, _movie_liked)
+                user_vectors_dict[_user_ID] = clf
+
+            if not os.path.isdir(output_dir):
+                os.makedirs(output_dir)
+            with open(output_fname, 'wb') as f:
+                pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+
     elif SCORE_METHOD == 2:
         pass
+
     else:
-        user_vectors_dict = {}
-        user_cnt = 0
-        for _user_ID, _movie_IDs in dict_groups_trg.items():
-            user_cnt += 1
-            if user_cnt % 100 == 1:
-                print("Calculating user vector for user {}".format(user_cnt))
-
-            # user_movie_vectors = movie_vectors_df.loc[_movie_IDs] # pd.Series
-            # user_movie_vectors = movie_vectors_df.reindex(_movie_IDs)
-            # print(user_movie_vectors)
-            # print()
-
-            # user_vector = movie_vectors_df.loc[_movie_IDs].mean(axis=0).to_numpy()
-            user_vector = movie_vectors_df.reindex(_movie_IDs).mean(axis=0).to_numpy()
-            user_vectors_dict[_user_ID] = user_vector
-            # print(user_vectors_dict)
-            # break
-
         output_dir = '{}/users/mean_movies'.format(MODEL_PERF_DIR)
-        if not os.path.isdir(output_dir):
-            os.makedirs(output_dir)
-        with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
-                    output_dir, model_name), 'wb') as f:
-            pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+        output_fname = '{}/{}_mean_movies_user_vectors_dict.pickle'.format(
+                            output_dir, model_name)
+
+        if os.path.exists(output_fname) and OVERRIDE == False:
+            with open(output_fname, 'rb') as f:
+                user_vectors_dict = pickle.load(f)
+        else:
+            user_vectors_dict = {}
+            user_cnt = 0
+            for _user_ID, _movie_IDs in dict_groups_trg.items():
+                user_cnt += 1
+                if user_cnt % 100 == 1:
+                    print("Calculating user vector for user {}".format(user_cnt))
+
+                # user_movie_vectors = movie_vectors_df.loc[_movie_IDs] # pd.Series
+                # user_movie_vectors = movie_vectors_df.reindex(_movie_IDs)
+                # print(user_movie_vectors)
+                # print()
+
+                # user_vector = movie_vectors_df.loc[_movie_IDs].mean(axis=0).to_numpy()
+                user_vector = movie_vectors_df.reindex(_movie_IDs).mean(axis=0).to_numpy()
+                user_vectors_dict[_user_ID] = user_vector
+                # print(user_vectors_dict)
+                # break
+
+            if not os.path.isdir(output_dir):
+                os.makedirs(output_dir)
+            with open(output_fname, 'wb') as f:
+                pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
     ## --------------------------------------------------------------------
 
 
@@ -368,7 +383,10 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
 
     ## --------------------------------------------------------------------
     ## Retrieve user vectors from pickle file
+    ## These are moved into the "calculating user vector" steps
+    ## A file check is done; load existing pickle if file exists
     ## --------------------------------------------------------------------
+    '''
     if SCORE_METHOD == 1:
         output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
         if not os.path.isdir(output_dir):
@@ -385,6 +403,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
         with open('{}/{}_mean_movies_user_vectors_dict.pickle'.format(
                     output_dir, model_name), 'rb') as f:
             user_vectors_dict = pickle.load(f)
+    '''
 
     ## Some simple testing on user 1 and terminator / star wars
     '''
@@ -557,7 +576,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     if SCORE_METHOD == 0:
         subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
     elif SCORE_METHOD == 1:
-        subdir = 'ridge_a{}_'.format(ALPHA) + PAIRWISE_METRIC.__name__
+        subdir = 'ridge_a{}'.format(ALPHA)
     elif SCORE_METHOD == 2:
         subdir = 'most_similar'
     else:
@@ -614,7 +633,8 @@ if __name__ == '__main__':
     for root, dirs, files in os.walk(SAVED_MODEL_DIR):
         for file in files:
             # exclude 'vs_128' and 'hs_0' for now
-            if '.gensim' in file and 'vs_128' not in file \
+            # if '.gensim' in file and 'vs_128' not in file \
+            if '.gensim' in file and 'vs_128' in file \
             and 'hs_0' not in file:
                 model_names.append(file)
     print(len(model_names))   # 83 models excluding '128'
@@ -638,7 +658,7 @@ if __name__ == '__main__':
             if SCORE_METHOD == 0:
                 subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
             elif SCORE_METHOD == 1:
-                subdir = 'ridge_a{}_'.format(ALPHA) + PAIRWISE_METRIC.__name__
+                subdir = 'ridge_a{}'.format(ALPHA)
             elif SCORE_METHOD == 2:
                 subdir = 'most_similar'
             else:
