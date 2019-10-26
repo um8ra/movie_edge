@@ -110,7 +110,7 @@ var makeChart = function([coarse,medium,fine]){
 			 .attr("r",r)
 			 
 			 .ease(d3.easeLinear)
-			 .duration(1000) ;
+			 .duration(5000) ;
 		}
 	  }
 }
