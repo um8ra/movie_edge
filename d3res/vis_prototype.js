@@ -69,7 +69,7 @@ var makeChart = function([coarse,medium,fine]){
 		.data(coarse)
 		.enter()
 		.append("circle")
-		.attr("r",5)
+		.attr("r",10)
 		.attr("cx",function(d) {return xScale(d.x)})
 		.attr("cy",function(d) {return yScale(d.y)})
 		.attr("class","scatter");
@@ -84,15 +84,19 @@ var makeChart = function([coarse,medium,fine]){
 		k = d3.event.transform.k;
 		var newZoom = zoomLevel(k)
 		var data;
+		var r;
 		if (newZoom  != currentZoom){
 			if (newZoom == 1) {
 				data = coarse;
+				r = 10;
 			}
 			if (newZoom == 2) {
 				data = medium;
+				r=5;
 			}
 			if (newZoom == 3) {
 				data = fine;
+				r = 2;
 			}
 		
 			console.log('Setting new zoom level ' + newZoom + ' ' +k)
@@ -103,6 +107,7 @@ var makeChart = function([coarse,medium,fine]){
 			 .transition()
 			 .attr("cx",function(d) {return xScale(d.x)})
 			 .attr("cy",function(d) {return yScale(d.y)})
+			 .attr("r",r)
 			 
 			 .ease(d3.easeLinear)
 			 .duration(1000) ;
