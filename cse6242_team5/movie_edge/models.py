@@ -8,6 +8,9 @@ class Movie(models.Model):
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     cluster = models.IntegerField(null=False)  # Agglomerative clustering pre-t-SNE
+    mean = models.FloatField(null=False)
+    std = models.FloatField(null=True)  # nullable in case only one rating
+    count = models.IntegerField(null=False)
 
     class Meta:
         constraints = [
