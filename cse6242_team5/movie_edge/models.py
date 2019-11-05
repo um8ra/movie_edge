@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Movie(models.Model):
     embedder = models.CharField(max_length=128, db_index=True, null=False)  # The model that ran this data
     movie_id = models.IntegerField(null=False)  # Movie ID based on movielens data
@@ -11,6 +12,13 @@ class Movie(models.Model):
     mean = models.FloatField(null=False)
     std = models.FloatField(null=True)  # nullable in case only one rating
     count = models.IntegerField(null=False)
+    poster_url = models.CharField(max_length=256, null=False)
+    runtime = models.IntegerField(null=True)
+    director = models.CharField(max_length=256, null=False)
+    actors = models.CharField(max_length=512, null=False)
+    metascore = models.IntegerField(null=True)
+    imdb_rating = models.FloatField(null=True)
+    imdb_votes = models.IntegerField(null=True)
 
     class Meta:
         constraints = [
