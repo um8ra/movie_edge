@@ -13,12 +13,25 @@ from bokeh import palettes
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
-TITLE = 'title'
+TITLE = 'movie_title'
 GENRES = 'genres'
-CLUSTER = 'cluster'
-COLOR = 'color'
 X = 'x'
 Y = 'y'
+MEAN = 'mean'
+COUNT = 'count'
+STDDEV = 'std'
+CLUSTER = 'cluster'
+COLOR = 'color'
+POSTER_URL = 'poster_url'
+RUNTIME = 'runtime'
+DIRECTOR = 'director'
+ACTORS = 'actors'
+METASCORE = 'metascore'
+IMDB_RATING = 'imdb_rating'
+IMDB_VOTES = 'imdb_votes'
+
+db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, X, Y, MEAN, COUNT, STDDEV, CLUSTER, POSTER_URL, RUNTIME, DIRECTOR,
+           ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
@@ -33,11 +46,13 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def index(request: HttpRequest) -> HttpResponse:
     embedder = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values(MOVIE_ID, MOVIE_TITLE, X, Y, GENRES, CLUSTER)
+    movies = Movie.objects.filter(embedder=embedder).values(*db_cols)
     palette = palettes.Category20_20
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
+        movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
+        movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
         movie[COLOR] = palette[movie[CLUSTER]]
     movies_x_min = movies.aggregate(Min(X))
     movies_x_max = movies.aggregate(Max(X))
