@@ -32,7 +32,7 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    embedder = 'w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim'  # The only one I've run so far
+    embedder = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'  # The only one I've run so far
     movies = Movie.objects.filter(embedder=embedder).values(MOVIE_ID, MOVIE_TITLE, X, Y, GENRES, CLUSTER)
     palette = palettes.Category20_20
     for movie in movies:
