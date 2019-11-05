@@ -12,7 +12,7 @@ class Movie(models.Model):
     mean = models.FloatField(null=False)
     std = models.FloatField(null=True)  # nullable in case only one rating
     count = models.IntegerField(null=False)
-    poster_url = models.CharField(max_length=256, null=False)
+    poster_url = models.CharField(max_length=256, null=True)
     runtime = models.IntegerField(null=True)
     director = models.CharField(max_length=256, null=False)
     actors = models.CharField(max_length=512, null=False)
