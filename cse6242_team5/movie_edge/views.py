@@ -61,6 +61,8 @@ def index(request: HttpRequest) -> HttpResponse:
 
     data = {
         'data': list(movies),
+        # Since D3 likes to operate on arrays, this decodes movie-id to array position
+        'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
