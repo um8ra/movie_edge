@@ -70,12 +70,18 @@
 
     function buttonClickLike(data) {
         const movieId = data.target.value;
+        if (moviesDisliked.has(movieId)) {
+            moviesDisliked.delete(movieId);
+        }
         moviesLiked.add(movieId);
         console.log(moviesLiked);
     }
 
     function buttonClickDislike(data) {
         const movieId = data.target.value;
+        if (moviesLiked.has(movieId)) {
+            moviesLiked.delete(movieId);
+        }
         moviesDisliked.add(movieId);
         console.log(moviesDisliked);
     }
