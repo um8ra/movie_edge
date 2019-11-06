@@ -60,17 +60,10 @@ def index(request: HttpRequest) -> HttpResponse:
     movies_y_min = movies.aggregate(Min(Y))
     movies_y_max = movies.aggregate(Max(Y))
 
-    frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
-    len_movies = len(frequently_rated_movies)
-    randoms = [random.randint(0, len_movies - 1) for _ in range(9)]
-    serendipity_movies = [frequently_rated_movies[i] for i in randoms]
-
-    print(serendipity_movies)
     data = {
         'data': list(movies),
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        'grid': serendipity_movies,
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
