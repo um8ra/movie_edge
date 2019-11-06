@@ -68,6 +68,10 @@
         }
     );
 
+    function buttonClick(data) {
+        console.log(data);
+    }
+
     function gridNine(movieidList) {
         // Delete current grid and redraw with new *choices*
         // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
@@ -76,15 +80,19 @@
             grid.removeChild(grid.firstChild);
         }
         // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
-        movieidList.forEach(function (movieid) {
-                dataIndex = decoder[movieid];
+        movieidList.forEach(function (movieId) {
+                const dataIndex = decoder[movieId];
                 console.log(dataIndex);
-                divNode = document.createElement('div');
-                imgNode = document.createElement('img');
-                buttonLike = document.createElement('BUTTON');
-                buttonLike.innerHTML = 'Like';
-                buttonDislike = document.createElement('BUTTON');
-                buttonDislike.innerHTML = 'Dislike';
+                const divNode = document.createElement('div');
+                const imgNode = document.createElement('img');
+                const buttonLike = document.createElement('BUTTON');
+                buttonLike.innerText = 'Like';
+                buttonLike.onclick = buttonClick;
+                buttonLike.value = movieId;
+                const buttonDislike = document.createElement('BUTTON');
+                buttonDislike.innerText = 'Dislike';
+                buttonDislike.onclick = buttonClick;
+                buttonDislike.value = movieId;
                 imgNode.src = data[dataIndex][POSTER_URL];
                 imgNode.height = POSTER_HEIGHT;
                 imgNode.width = POSTER_WIDTH;
@@ -92,7 +100,7 @@
                 divNode.appendChild(imgNode);
                 divNode.appendChild(buttonLike);
                 divNode.appendChild(buttonDislike);
-                console.log(movieid);
+                console.log(movieId);
             }
         )
     }
