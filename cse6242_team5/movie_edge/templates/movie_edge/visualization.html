@@ -5,9 +5,15 @@
     <title>Movie Edge</title>
     {% load static %}
     <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
+
     <style>
-        circle {
-        {#fill: black;#}
+        .wrapper {
+            width: 1000px;
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat(3, 200px);
+            grid-template-rows: repeat(3, 200px);
+            grid-auto-flow: column;
         }
     </style>
 </head>
@@ -20,6 +26,9 @@
     {% endfor %}
     <input type="submit" value="Submit">
 </form>
+<!--https://gridbyexample.com/examples/code/example18.html-->
+<div class="wrapper" id="grid">
+</div>
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
@@ -29,6 +38,7 @@
     const x_max = parseFloat(tableData['x__max']);
     const y_min = parseFloat(tableData['y__min']);
     const y_max = parseFloat(tableData['y__max']);
+    let nineChoices = tableData['random_nine'];
     const width = 1024;
     const height = 1024;
     const padding = 32;
@@ -40,6 +50,7 @@
     const COLOR = 'color';
     const X = 'x';
     const Y = 'y';
+    const gridID = 'grid';
 
     const data = tableData['data'].map(function (r) {
             r['movie_title'] = decodeURIComponent(r['movie_title']);
@@ -47,6 +58,21 @@
         }
     );
 
+    function gridNine(choices) {
+        // Delete current grid and redraw with new *choices*
+        // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+        const grid = document.getElementById(gridID);
+        while (grid.firstChild) {
+            grid.removeChild(grid.firstChild);
+        }
+        choices.forEach(function (element) {
+                textnode = document.createTextNode(element);
+                grid.appendChild(textnode);
+                console.log(element);
+            }
+        )
+    }
+    gridNine(nineChoices);
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([padding, width - padding]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([padding, height - padding]);
 
@@ -78,7 +104,7 @@
             method: 'POST',
             body: new URLSearchParams(new FormData(event.target))
         }).then((resp) => {
-            resp.json().then(function(j) {
+            resp.json().then(function (j) {
                 alert(j);
                 console.log(j);
             });
