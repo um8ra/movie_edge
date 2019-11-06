@@ -123,3 +123,8 @@ venv.bak/
 .idea/
 
 Data/
+ml-20m/
+
+FIt-SNE/
+
+*.gensim
