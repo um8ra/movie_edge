@@ -51,6 +51,7 @@
     const GENRES = 'genres';
     const CLUSTER = 'cluster';
     const COLOR = 'color';
+    const POSTER_URL = 'poster_url';
     const X = 'x';
     const Y = 'y';
     const gridID = 'grid';
@@ -69,15 +70,18 @@
         while (grid.firstChild) {
             grid.removeChild(grid.firstChild);
         }
+        // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
         movieidList.forEach(function (movieid) {
                 dataIndex = decoder[movieid];
                 console.log(dataIndex);
-                textnode = document.createTextNode(movieid);
-                grid.appendChild(textnode);
+                imgNode = document.createElement('img');
+                imgNode.src = data[dataIndex][POSTER_URL];
+                grid.appendChild(imgNode);
                 console.log(movieid);
             }
         )
     }
+
     gridNine(nineChoices);
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([padding, width - padding]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([padding, height - padding]);
