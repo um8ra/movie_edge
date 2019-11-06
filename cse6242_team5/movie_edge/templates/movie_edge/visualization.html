@@ -54,8 +54,8 @@
     const POSTER_URL = 'poster_url';
     const X = 'x';
     const Y = 'y';
-    const moviesLiked = Array();
-    const moviesDisliked = Array();
+    const moviesLiked = new Set(); // using set since it will do deduplication
+    const moviesDisliked = new Set(); // using set since it will do deduplication
     const POSTER_HEIGHT = 300;
     const POSTER_WIDTH = 200;
 
@@ -68,8 +68,16 @@
         }
     );
 
-    function buttonClick(data) {
-        console.log(data);
+    function buttonClickLike(data) {
+        const movieId = data.target.value;
+        moviesLiked.add(movieId);
+        console.log(moviesLiked);
+    }
+
+    function buttonClickDislike(data) {
+        const movieId = data.target.value;
+        moviesDisliked.add(movieId);
+        console.log(moviesDisliked);
     }
 
     function gridNine(movieidList) {
@@ -87,11 +95,11 @@
                 const imgNode = document.createElement('img');
                 const buttonLike = document.createElement('BUTTON');
                 buttonLike.innerText = 'Like';
-                buttonLike.onclick = buttonClick;
+                buttonLike.onclick = buttonClickLike;
                 buttonLike.value = movieId;
                 const buttonDislike = document.createElement('BUTTON');
                 buttonDislike.innerText = 'Dislike';
-                buttonDislike.onclick = buttonClick;
+                buttonDislike.onclick = buttonClickDislike;
                 buttonDislike.value = movieId;
                 imgNode.src = data[dataIndex][POSTER_URL];
                 imgNode.height = POSTER_HEIGHT;
