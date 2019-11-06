@@ -79,11 +79,19 @@
         movieidList.forEach(function (movieid) {
                 dataIndex = decoder[movieid];
                 console.log(dataIndex);
+                divNode = document.createElement('div');
                 imgNode = document.createElement('img');
+                buttonLike = document.createElement('BUTTON');
+                buttonLike.innerHTML = 'Like';
+                buttonDislike = document.createElement('BUTTON');
+                buttonDislike.innerHTML = 'Dislike';
                 imgNode.src = data[dataIndex][POSTER_URL];
                 imgNode.height = POSTER_HEIGHT;
                 imgNode.width = POSTER_WIDTH;
-                grid.appendChild(imgNode);
+                grid.appendChild(divNode);
+                divNode.appendChild(imgNode);
+                divNode.appendChild(buttonLike);
+                divNode.appendChild(buttonDislike);
                 console.log(movieid);
             }
         )
