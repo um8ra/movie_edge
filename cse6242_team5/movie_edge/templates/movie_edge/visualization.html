@@ -12,7 +12,7 @@
             display: grid;
             grid-gap: 10px;
             grid-template-columns: repeat(3, 200px);
-            grid-template-rows: repeat(3, 200px);
+            grid-template-rows: repeat(3, 350px);
             grid-auto-flow: column;
         }
     </style>
@@ -54,6 +54,11 @@
     const POSTER_URL = 'poster_url';
     const X = 'x';
     const Y = 'y';
+    const moviesLiked = Array();
+    const moviesDisliked = Array();
+    const POSTER_HEIGHT = 300;
+    const POSTER_WIDTH = 200;
+
     const gridID = 'grid';
     const data = tableData['data'].map(function (r) {
             r[MOVIE_TITLE] = decodeURIComponent(r[MOVIE_TITLE]);
@@ -76,6 +81,8 @@
                 console.log(dataIndex);
                 imgNode = document.createElement('img');
                 imgNode.src = data[dataIndex][POSTER_URL];
+                imgNode.height = POSTER_HEIGHT;
+                imgNode.width = POSTER_WIDTH;
                 grid.appendChild(imgNode);
                 console.log(movieid);
             }
