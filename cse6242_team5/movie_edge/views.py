@@ -31,6 +31,8 @@ METASCORE = 'metascore'
 IMDB_RATING = 'imdb_rating'
 IMDB_VOTES = 'imdb_votes'
 
+EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
+
 db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, X, Y, MEAN, COUNT, STDDEV, CLUSTER, POSTER_URL, RUNTIME, DIRECTOR,
            ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
 
@@ -46,8 +48,7 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    embedder = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'  # The only one I've run so far
-    movies = Movie.objects.filter(embedder=embedder).values(*db_cols)
+    movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
     palette = palettes.Category20_20
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
@@ -96,7 +97,8 @@ def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
 
         if form.is_valid():
             print(form.cleaned_data)
-            gensim_model_str = form.cleaned_data['gensim_model']
+            # gensim_model_str = form.cleaned_data['gensim_model']
+            gensim_model_str = EMBEDDER
             movies_liked = form.cleaned_data['likes'].replace(' ', '').split(',')
             movies_liked_int = [int(i) for i in movies_liked]
             movies_disliked = form.cleaned_data['dislikes'].replace(' ', '').split(',')
