@@ -147,6 +147,9 @@
     document.forms['sentimentForm'].addEventListener('submit', (event) => {
         //https://stackoverflow.com/questions/374644/how-do-i-capture-response-of-form-submit
         event.preventDefault();
+        console.log(event);
+        event.target.elements.likes.value='9,8';
+        event.target.elements.dislikes.value='7,6';
         fetch(event.target.action, {
             method: 'POST',
             body: new URLSearchParams(new FormData(event.target))
