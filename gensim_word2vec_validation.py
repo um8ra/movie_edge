@@ -27,35 +27,25 @@ SAVED_MODEL_DIR = 'Model/gensim_models'
 MODEL_PERF_DIR = 'Model/gensim_perf'
 OVERRIDE = False
 
-## Note that dot product may not actually make sense
-## cosine similarity is between -1 and 1, with 1 being more similar.
-## If we do dot product, it would have norm(vec1) and norm(vec2)
-## as magnitute multiplied on top of the cos sim.
-## The euclidean distance would be further with large norms.
-SCORE_METHOD = 1 # 0: user vector = mean of movies; sklearn pairwise metric
-                 # 1: user vector = ridgecv; sklearn pairwise metric
-                 # 2: gensim myModel.vw.most_similar(pos,neg)
-                 # else: dot product
 
-## Regularization of ridgeCV (linear least sq with L2) for SCORE_METHOD == 1
-# ALPHAS = [[10.]]
-# ALPHAS = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
-# ALPHAS = [[50.], [40.], [30.], [20.]]
-# ALPHAS = [[5.], [15.]]
-# ALPHAS = [[4.], [6.]]
-# ALPHAS = [[2.], [3.]]
-ALPHAS = [[4.]]
-# ALPHAS.reverse()
+# alphas = [[100, 10., 5., 1., 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]]
+# alphas.reverse()
 
-PAIRWISE_METRIC = cosine_similarity # if SCORE_METHOD == 0
-# PAIRWISE_METRIC = euclidean_distances  # if SCORE_METHOD == 0
-
-## if evaluating AUROC on trg, COMMENT out df_trg = df_trg[df_trg[LIKED] == 1]
-EVAL_DATASET = 'val' # 'trg' or 'val'
+PAIRWISE_METRIC = cosine_similarity # if score_method == 0
+# PAIRWISE_METRIC = euclidean_distances  # if score_method == 0
 
 
 
-def run_validation_metrics(model_name, ALPHA=1e-2):
+
+def run_validation_metrics(eval_dataset, model_name, score_method=1, alpha=1e-2):
+
+    loaded_trg_all = False
+
+    print('Evaluating on {} set'.format(eval_dataset))
+    print('Word2Vec model: ', model_name)
+    print('score method :', score_method)
+    print('alpha: ', alpha)
+    print()
 
     ## --------------------------------------------------------------
     ## Used helper functions for validation purpose
@@ -265,21 +255,39 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## Load training data
     ## --------------------------------------------------------------------
     df_trg_all = pd.read_hdf('Ratings/binarized.hdf', key='trg')
-    df_trg = df_trg_all[df_trg_all[LIKED] == 1] # comment out if evaluating AUROC
+    df_trg = df_trg_all[df_trg_all[LIKED] == 1]
     df_trg = transform_df(df_trg)
     # df_trg = df_trg.head(200) # quick check on 10 movies
 
     df_trg_gb = df_trg.groupby([USER_ID])
     dict_groups_trg = {k: list(v[MOVIE_ID]) for k, v in df_trg_gb}
 
-    if SCORE_METHOD == 1:
+    if score_method == 1:
+        ## To train a RidgeCV model for each user
+
+        loaded_trg_all = True
+
         df_trg_all = transform_df(df_trg_all)
         # df_trg_all = df_trg_all.head(200) # quick check on 10 movies
+
+        if eval_dataset in ['trg+val', 'tst']:
+            ## RidgeCV to train user on trg+val set
+            ## then later evaluate on trg+val or tst set
+            df_val = pd.read_hdf('Ratings/binarized.hdf', key='val')
+            df_val = transform_df(df_val)
+            # df_val = df_val.head(50) # quick check on 10 movies
+            df_trg_all = pd.concat([df_trg_all, df_val])
+            ## the same user is in 2 different parts of df after concat
+            ## must sort so merged user-movie predicitons from each user
+            ## in dict_groups_trg_eval are in the same order of df_trg_all
+            df_trg_all.sort_index(inplace=True)
+
         df_trg_all_gb = df_trg_all.groupby([USER_ID])
         dict_groups_trg_all = {k: {MOVIE_ID: list(v[MOVIE_ID]),
                                    LIKED: v[LIKED].to_numpy()}
                                 for k, v in df_trg_all_gb}
-    elif SCORE_METHOD == 2:
+
+    if score_method == 2:
         df_trg0 = df_trg_all[df_trg_all[LIKED] == 0]
         df_trg0 = transform_df(df_trg0)
         # df_trg0 = df_trg0.head(200) # quick check on 10 movies
@@ -294,10 +302,10 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## Calculate each user vector as mean of "liked" movies from trg data
     ## and save it as pickle file
     ## --------------------------------------------------------------------
-    if SCORE_METHOD == 1:
-        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
+    if score_method == 1:
+        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, alpha)
         output_fname = '{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
-                            output_dir, model_name, ALPHA)
+                            output_dir, model_name, alpha)
 
         if os.path.exists(output_fname) and OVERRIDE == False:
             with open(output_fname, 'rb') as f:
@@ -318,7 +326,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
                 _movie_vectors = movie_vectors_df.loc[_movie_IDs_in_vocab]
                 _movie_liked = _liked[idx_in_vocab]
 
-                clf = RidgeCV(alphas=ALPHA).fit(_movie_vectors, _movie_liked)
+                clf = RidgeCV(alphas=alpha).fit(_movie_vectors, _movie_liked)
                 user_vectors_dict[_user_ID] = clf
 
             if not os.path.isdir(output_dir):
@@ -326,7 +334,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
             with open(output_fname, 'wb') as f:
                 pickle.dump(user_vectors_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    elif SCORE_METHOD == 2:
+    elif score_method == 2:
         pass
 
     else:
@@ -366,18 +374,63 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## --------------------------------------------------------------------
     ## Load validation data
     ## --------------------------------------------------------------------
-    df_val = pd.read_hdf('Ratings/binarized.hdf', key='val')
-    # print(df_val.head(5)) # 'movieID' is both 2nd level index and a column
-    df_val = transform_df(df_val)
-    # df_val = df_val.head(50) # quick check on 10 movies
-    # print(df_val.head(5))
-    # print()
+    if eval_dataset in ['trg', 'trg+val']:
+        ## partially prepared during training set prep earlier
+        ## note that dict_groups_trg_eval has a different dict structure
+        ## compared to dict_groups_trg_all. The latter contain sub key-value
+        ## 'movieID' and 'Liked' ratings to train RidgeCV. The former just
+        ## have all the movie_IDs per user_ID key value for evaluation.
+        ## Predicted validation scores are appended then compared to df_trg_all. 
+        if not loaded_trg_all:
+            df_trg_all = pd.read_hdf('Ratings/binarized.hdf', key='trg')
+            df_trg_all = transform_df(df_trg_all)
+            # df_trg_all = df_trg_all.head(200) # quick check on 10 movies
 
-    df_val_gb = df_val.groupby([USER_ID])
-    # print(df_val_gb) # <pandas.core.groupby.generic.DataFrameGroupBy object>
-    dict_groups_val = {k: list(v[MOVIE_ID]) for k, v in df_val_gb}
-    # print(dict_groups_val[22085])
-    # print()
+            if eval_dataset == 'trg+val':
+                df_val = pd.read_hdf('Ratings/binarized.hdf', key='val')
+                df_val = transform_df(df_val)
+                # df_val = df_val.head(50) # quick check on 10 movies
+                df_trg_all = pd.concat([df_trg_all, df_val])
+                ## the same user is in 2 different parts of df after concat
+                ## must sort so merged user-movie predicitons from each user
+                ## in dict_groups_trg_eval are in the same order of df_trg_all
+                df_trg_all.sort_index(inplace=True)
+
+            df_trg_all_gb = df_trg_all.groupby([USER_ID])
+        dict_groups_trg_eval = {k: list(v[MOVIE_ID]) for k, v in df_trg_all_gb}
+
+    elif eval_dataset == 'val':
+        df_val = pd.read_hdf('Ratings/binarized.hdf', key=eval_dataset)
+        # print(df_val.head(5)) # 'movieID' is both 2nd level index and a column
+        df_val = transform_df(df_val)
+        # df_val = df_val.head(50) # quick check on 10 movies
+        # print(df_val.head(5))
+        # print()
+
+        df_val_gb = df_val.groupby([USER_ID])
+        # print(df_val_gb) # <pandas.core.groupby.generic.DataFrameGroupBy object>
+        dict_groups_val = {k: list(v[MOVIE_ID]) for k, v in df_val_gb}
+        # print(dict_groups_val[22085])
+        # print()
+
+    elif eval_dataset == 'tst':
+        df_tst = pd.read_hdf('Ratings/binarized.hdf', key=eval_dataset)
+        # print(df_tst.head(5)) # 'movieID' is both 2nd level index and a column
+        df_tst = transform_df(df_tst)
+        # df_tst = df_tst.head(50) # quick check on 10 movies
+        # print(df_tst.head(5))
+        # print()
+
+        df_tst_gb = df_tst.groupby([USER_ID])
+        # print(df_tst_gb) # <pandas.core.groupby.generic.DataFrameGroupBy object>
+        dict_groups_tst = {k: list(v[MOVIE_ID]) for k, v in df_tst_gb}
+        # print(dict_groups_val[22085])
+        # print()
+
+    else:
+        ## should not happen
+        pass
+
     ## --------------------------------------------------------------------
 
 
@@ -387,14 +440,14 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     ## A file check is done; load existing pickle if file exists
     ## --------------------------------------------------------------------
     '''
-    if SCORE_METHOD == 1:
-        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, ALPHA)
+    if score_method == 1:
+        output_dir = '{}/users/ridge_a{}'.format(MODEL_PERF_DIR, alpha)
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         with open('{}/{}_ridge_a{}_user_vectors_dict.pickle'.format(
-                    output_dir, model_name, ALPHA), 'rb') as f:
+                    output_dir, model_name, alpha), 'rb') as f:
             user_vectors_dict = pickle.load(f)    
-    elif SCORE_METHOD == 2:
+    elif score_method == 2:
         pass
     else:
         output_dir = '{}/users/mean_movies'.format(MODEL_PERF_DIR)
@@ -491,12 +544,17 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
     # print(len(list(dict_groups_val.keys())))    # 138493 users
     '''
 
-    if EVAL_DATASET == 'trg':
-        df_eval = df_trg
-        dict_groups_eval = dict_groups_trg
-    else:
+    if eval_dataset in ['trg', 'trg+val']:
+        df_eval = df_trg_all
+        dict_groups_eval = dict_groups_trg_eval
+    elif eval_dataset == 'val':
         df_eval = df_val
         dict_groups_eval = dict_groups_val
+    elif eval_dataset == 'tst':
+        df_eval = df_tst
+        dict_groups_eval = dict_groups_tst
+    else:
+        pass
 
     scores = None
     user_cnt = 0
@@ -506,12 +564,12 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
             print("Validating for user {}".format(user_cnt))
 
         ## load objects related to users
-        if SCORE_METHOD == 0:
+        if score_method == 0:
             user_vector = user_vectors_dict[_user_ID] # 1D
             user_vector = user_vector.reshape(1,-1) # sklearn cos sim need 2D
-        elif SCORE_METHOD == 1:
+        elif score_method == 1:
             clf = user_vectors_dict[_user_ID]
-        elif SCORE_METHOD == 2:
+        elif score_method == 2:
             positive = dict_groups_trg[1]
             negative =  dict_groups_trg0[1]
             ## filter out movies that are not in the trained vocab
@@ -528,7 +586,7 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
         _score = np.empty((len(_movie_IDs), 1))
         _score[:] = np.nan
 
-        if SCORE_METHOD not in (1, 2):
+        if score_method not in (1, 2):
             ## reindex accounts for nan's; .loc won't handle nan in the futures
             # user_movie_vectors = movie_vectors_df.loc[_movie_IDs].to_numpy()
             user_movie_vectors = movie_vectors_df.reindex(_movie_IDs).to_numpy()
@@ -536,17 +594,17 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
             mask_not_nan = np.logical_not(np.isnan(user_movie_vectors))
             mask_not_nan = mask_not_nan[:, 0] # only need 1D mask
 
-        if SCORE_METHOD == 0:
+        if score_method == 0:
             _score[mask_not_nan] = PAIRWISE_METRIC(
                                         user_movie_vectors[mask_not_nan],
                                         user_vector)
-        elif SCORE_METHOD == 1:
+        elif score_method == 1:
             ## filter out movies that are not in the trained vocab
             idx_in_vocab = [i for i, w in enumerate(_movie_IDs) if w in vocab]
             _movie_IDs_in_vocab = [_movie_IDs[i] for i in idx_in_vocab]
             _score[idx_in_vocab, 0] = \
                  clf.predict(movie_vectors_df.loc[_movie_IDs_in_vocab].to_numpy()).clip(0,1)
-        elif SCORE_METHOD == 2:
+        elif score_method == 2:
             _score_aux = myModel.wv.most_similar(
                                     positive=positive, # user1 LIKED
                                     negative=negative, # user1 not LIKED
@@ -573,23 +631,23 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
 
     df_eval['scores'] = scores
 
-    if SCORE_METHOD == 0:
+    if score_method == 0:
         subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
-    elif SCORE_METHOD == 1:
-        subdir = 'ridge_a{}'.format(ALPHA)
-    elif SCORE_METHOD == 2:
+    elif score_method == 1:
+        subdir = 'ridge_a{}'.format(alpha)
+    elif score_method == 2:
         subdir = 'most_similar'
     else:
         subdir = 'dot'
 
-    output_dir = '{}/eval/{}'.format(MODEL_PERF_DIR, subdir)
+    output_dir = '{}/eval/{}/{}'.format(MODEL_PERF_DIR, eval_dataset, subdir)
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
     df_eval[[LIKED, 'scores']].to_csv('{}/{}_{}_{}.csv'.format(
-                output_dir, model_name, EVAL_DATASET, subdir))
+                output_dir, model_name, eval_dataset, subdir))
     with open('{}/{}_{}_{}.pickle'.format(
-                output_dir, model_name, EVAL_DATASET, subdir), 'wb') as f:
+                output_dir, model_name, eval_dataset, subdir), 'wb') as f:
         pickle.dump(df_eval, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     mask_not_nan = np.logical_not(np.isnan(scores)) # ~ may also work
@@ -606,22 +664,29 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
 
     ## Write some quick summaries into a txt file for each model
     with open('{}/{}_{}_{}_AUC.txt'.format(
-                output_dir, model_name, EVAL_DATASET, subdir), 'w') as f:
+                output_dir, model_name, eval_dataset, subdir), 'w') as f:
         f.write('Word2Vec model: {}\n'.format(model_name))
         f.write('Truth min: {}, max: {}\n'.format(truth_min, truth_max))
         f.write('Scores min: {}, max: {}\n'.format(score_min, score_max))
         f.write('AUC: {}\n'.format(auc))
 
     ## Append each model's AUC summary to a line in a csv file
-    output_fname = '{}/eval/{}_AUC_comparisons.csv'.format(
-                        MODEL_PERF_DIR, EVAL_DATASET)
+    output_fname = '{}/eval/{}/{}_AUC_comparisons.csv'.format(
+                        MODEL_PERF_DIR, eval_dataset, eval_dataset)
     print(output_fname)
     if os.path.exists(output_fname):
         open_mode = 'a' # append if already exists
     else:
         open_mode = 'w' # make a new file if not
     with open(output_fname, open_mode) as f:
-        f.write(model_name + ',' + str(ALPHA) + ',' + str(auc) + '\n')
+        if score_method == 0:
+            f.write(model_name + ',' + 'mean_user' + ',' + str(auc) + '\n')
+        elif score_method == 1:
+            f.write(model_name + ',' + str(alpha) + ',' + str(auc) + '\n')
+        elif score_method == 2:
+            f.write(model_name + ',' + 'most_similar' + ',' + str(auc) + '\n')
+        else:
+            f.write(model_name + ',' + 'dot_product' + ',' + str(auc) + '\n')
     ## --------------------------------------------------------------------
 
 
@@ -629,48 +694,89 @@ def run_validation_metrics(model_name, ALPHA=1e-2):
 if __name__ == '__main__':
     start_time = datetime.now()
 
-    model_names = []
-    for root, dirs, files in os.walk(SAVED_MODEL_DIR):
-        for file in files:
-            # exclude 'vs_128' and 'hs_0' for now
-            # if '.gensim' in file and 'vs_128' not in file \
-            if '.gensim' in file and 'vs_128' in file \
-            and 'hs_0' not in file:
-                model_names.append(file)
-    print(len(model_names))   # 83 models excluding '128'
-    for m in model_names:
-        print(m)
+    ## Note that dot product may not actually make sense
+    ## cosine similarity is between -1 and 1, with 1 being more similar.
+    ## If we do dot product, it would have norm(vec1) and norm(vec2)
+    ## as magnitute multiplied on top of the cos sim.
+    ## The euclidean distance would be further with large norms.
+    # score_method = 0 # 0: user vector = mean of movies; sklearn pairwise metric
+    #                  # 1: user vector = ridgecv; sklearn pairwise metric
+    #                  # 2: gensim myModel.vw.most_similar(pos,neg)
+    #                  # else: dot product
+    score_methods = [1, 0]
+
+    ## Regularization of ridgeCV (linear least sq with L2) for score_method == 1
+    # alphas = [[10.]]
+    # alphas = [[100.], [10.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+    # alphas = [[50.], [40.], [30.], [20.]]
+    # alphas = [[5.], [15.]]
+    # alphas = [[4.], [6.]]
+    # alphas = [[2.], [3.]]
+    # alphas = [[4.]]
+    # alphas = [[10.], [4.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+    # alphas = [[100.], [20.], [1.], [1e-1], [1e-2], [1e-3], [1e-4], [1e-5]]
+    # alphas = [[10.], [8.], [6.], [4.], [2.], [1.]]
+    alphas = [[8.]]
+
+    # eval_dataset = 'trg' # 'trg' or 'val'
+    # eval_dataset = 'val' # 'trg' or 'val'
+    # eval_dataset = 'tst' # 'trg' or 'val'
+    # eval_dataset = 'trg+val' # 'trg' or 'val'
+    eval_datasets = ['trg+val', 'tst']
+    # eval_datasets = ['trg+val']
+
+    # model_names = []
+    # for root, dirs, files in os.walk(SAVED_MODEL_DIR):
+    #     for file in files:
+    #         # exclude 'vs_128' and 'hs_0' for now
+    #         # if '.gensim' in file and 'vs_128' not in file \
+    #         if '.gensim' in file and 'vs_128' in file \
+    #         and 'hs_0' not in file:
+    #             model_names.append(file)
 
     # model_names = ['w2v_vs_16_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim']
+    # model_names = ['w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim']
 
-    for model_name in model_names:
+    # model_names = ['w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2.gensim']
+    model_names = ['w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val.gensim']
+    # model_names = ['w2v_vs_64_sg_1_hs_1_mc_1_it_1_wn_32_ng_2.gensim',
+    #                'w2v_vs_64_sg_1_hs_1_mc_1_it_2_wn_32_ng_2.gensim',
+    #                'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2.gensim']
 
-        for ALPHA in ALPHAS:
+    print('Number of models to evaluate: ', len(model_names))   # 83 models excluding '128'
+    for m in model_names:
+        print(m)
+    print()
 
-            start_time1 = datetime.now()
+    for score_method in score_methods:
+        for eval_dataset in eval_datasets:
+            for model_name in model_names:
+                for alpha in alphas:
 
-            run_validation_metrics(model_name, ALPHA)
+                    start_time1 = datetime.now()
 
-            end_time1 = datetime.now()
-            run_time1 = end_time1 - start_time1
-            print('1x Model Run Time: {}'.format(run_time1))
+                    run_validation_metrics(eval_dataset, model_name, score_method, alpha)
 
-            if SCORE_METHOD == 0:
-                subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
-            elif SCORE_METHOD == 1:
-                subdir = 'ridge_a{}'.format(ALPHA)
-            elif SCORE_METHOD == 2:
-                subdir = 'most_similar'
-            else:
-                subdir = 'dot'
+                    end_time1 = datetime.now()
+                    run_time1 = end_time1 - start_time1
+                    print('1x Model Run Time: {}'.format(run_time1))
 
-            ## Append run time stats to a txt file for each model
-            output_dir = '{}/eval/{}'.format(MODEL_PERF_DIR, subdir)
-            with open('{}/{}_{}_{}_AUC.txt'.format(
-                    output_dir, model_name, EVAL_DATASET, subdir), 'a') as f:
-                f.write('Run time: {}\n'.format(run_time1))
+                    if score_method == 0:
+                        subdir = 'mean_movies_' + PAIRWISE_METRIC.__name__
+                    elif score_method == 1:
+                        subdir = 'ridge_a{}'.format(alpha)
+                    elif score_method == 2:
+                        subdir = 'most_similar'
+                    else:
+                        subdir = 'dot'
 
-            print()
+                    ## Append run time stats to a txt file for each model
+                    output_dir = '{}/eval/{}/{}'.format(MODEL_PERF_DIR, eval_dataset, subdir)
+                    with open('{}/{}_{}_{}_AUC.txt'.format(
+                            output_dir, model_name, eval_dataset, subdir), 'a') as f:
+                        f.write('Run time: {}\n'.format(run_time1))
+
+                    print()
 
     end_time = datetime.now()
     run_time = end_time - start_time
