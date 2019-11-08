@@ -54,6 +54,7 @@
     const CLUSTER = 'cluster';
     const COLOR = 'color';
     const POSTER_URL = 'poster_url';
+    const MOVIE_CHOICES = 'movie_choices';
     const X = 'x';
     const Y = 'y';
     const moviesLiked = new Set(); // using set since it will do deduplication
@@ -108,6 +109,9 @@
             .then((response) => response.json())
             .then(function (data) {
                 console.log(data);
+                movieChoices = data[MOVIE_CHOICES];
+                console.log(movieChoices);
+                gridNine(movieChoices);
             })
     }
 

@@ -11,6 +11,7 @@ import json
 import urllib.parse
 from bokeh import palettes
 import random
+from typing import List
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -30,6 +31,7 @@ ACTORS = 'actors'
 METASCORE = 'metascore'
 IMDB_RATING = 'imdb_rating'
 IMDB_VOTES = 'imdb_votes'
+MOVIE_CHOICES = 'movie_choices'
 
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
@@ -46,6 +48,15 @@ movie_df_path = base_path / '..' / 'ml-20m' / 'movies.csv'
 df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
 df_movies.index.rename(MOVIE_ID, inplace=True)
 
+
+def random_movie_ids(n: int) -> List[int]:
+    # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
+    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER).values_list('id', flat=True)
+    random_movies = random.sample(list(all_movie_ids), n)
+    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
+    print('Random Movies!')
+    print(return_val)
+    return list(return_val)
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
@@ -95,6 +106,9 @@ def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
     if request.method == 'POST':
         form = SentimentForm(request.POST)
 
+        # This isn't used since the form validation fails on the fetch() request in the JS
+        # However, Yi, this is good scaffolding for you to use.
+        # I need this function to return 9 movie recommendations
         if form.is_valid():
             print(form.cleaned_data)
             # gensim_model_str = form.cleaned_data['gensim_model']
@@ -126,7 +140,4 @@ def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
             print('Similar: ')
             print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
-    # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
-    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER).values_list('id', flat=True)
-    random_movies = random.sample(list(all_movie_ids), 9)
-    return JsonResponse({'movieChoices': random_movies})
+    return JsonResponse({MOVIE_CHOICES: random_movie_ids(9)})
