@@ -126,4 +126,7 @@ def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
             print('Similar: ')
             print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
-    return JsonResponse({'mytext': 'I have some recommendations for you!'})
+    # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
+    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER).values_list('id', flat=True)
+    random_movies = random.sample(list(all_movie_ids), 9)
+    return JsonResponse({'movieChoices': random_movies})
