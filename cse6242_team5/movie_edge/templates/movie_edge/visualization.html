@@ -55,6 +55,8 @@
     const COLOR = 'color';
     const POSTER_URL = 'poster_url';
     const MOVIE_CHOICES = 'movie_choices';
+    const LIKE = 'movies_liked';
+    const DISLIKE = 'movies_disliked';
     const X = 'x';
     const Y = 'y';
     const moviesLiked = new Set(); // using set since it will do deduplication
@@ -91,15 +93,18 @@
     function buttonClickSubmit() {
         console.log('Button Clicked');
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+        fetchPayload = Object();
+        fetchPayload[LIKE] = Array.from(moviesLiked);
+        fetchPayload[DISLIKE] = Array.from(moviesDisliked);
         fetchURL = "{% url 'movie_edge:query_recommendations' %}";
         fetchParams = {
             method: 'POST',
             headers: {
                 "X-CSRFToken": getCookie("csrftoken"),
-                //'Content-Type': 'application/json' // Might end up using this and commenting out the next line
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
+                {#'Content-Type': 'application/x-www-form-urlencoded'#}
             },
-            body: '1,2,3,4', // this will be replaced with the likes/dislike arrays as JSON probably
+            body: JSON.stringify(fetchPayload),
             credentials: 'same-origin'
         };
         console.log(fetchParams);

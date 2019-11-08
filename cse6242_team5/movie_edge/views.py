@@ -32,6 +32,8 @@ METASCORE = 'metascore'
 IMDB_RATING = 'imdb_rating'
 IMDB_VOTES = 'imdb_votes'
 MOVIE_CHOICES = 'movie_choices'
+LIKE = 'movies_liked'
+DISLIKE = 'movies_disliked'
 
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
@@ -102,42 +104,34 @@ def sentiment_form(request: HttpRequest) -> HttpResponse:
 def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
-    print('Hello there, General Kenobi!')
-    if request.method == 'POST':
-        form = SentimentForm(request.POST)
+    request_data = json.loads(request.body)
+    movies_liked = request_data[LIKE]
+    movies_liked_int = [int(i) for i in movies_liked]
+    movies_disliked = request_data[DISLIKE]
+    movies_disliked_int = [int(i) for i in movies_disliked]
 
-        # This isn't used since the form validation fails on the fetch() request in the JS
-        # However, Yi, this is good scaffolding for you to use.
-        # I need this function to return 9 movie recommendations
-        if form.is_valid():
-            print(form.cleaned_data)
-            # gensim_model_str = form.cleaned_data['gensim_model']
-            gensim_model_str = EMBEDDER
-            movies_liked = form.cleaned_data['likes'].replace(' ', '').split(',')
-            movies_liked_int = [int(i) for i in movies_liked]
-            movies_disliked = form.cleaned_data['dislikes'].replace(' ', '').split(',')
-            movies_disliked_int = [int(i) for i in movies_disliked]
-            print(movies_liked)
-            print('Likes:')
-            print(df_movies.loc[movies_liked_int])
-            print('Dislikes:')
-            print(df_movies.loc[movies_disliked_int])
+    gensim_model_str = EMBEDDER
+    print(movies_liked)
+    print('Likes:')
+    print(df_movies.loc[movies_liked_int])
+    print('Dislikes:')
+    print(df_movies.loc[movies_disliked_int])
 
-            gensim_model_path = gensim_path / gensim_model_str
-            if not gensim_model_path.is_file():
-                raise FileNotFoundError
+    gensim_model_path = gensim_path / gensim_model_str
+    if not gensim_model_path.is_file():
+        raise FileNotFoundError
 
-            if gensim_model_str in dict_gensim_models.keys():
-                model = dict_gensim_models[gensim_model_str]
-            else:
-                model = Word2Vec.load(str(gensim_model_path))
-                dict_gensim_models[gensim_model_str] = model
+    if gensim_model_str in dict_gensim_models.keys():
+        model = dict_gensim_models[gensim_model_str]
+    else:
+        model = Word2Vec.load(str(gensim_model_path))
+        dict_gensim_models[gensim_model_str] = model
 
-            movies_similar = model.most_similar(positive=movies_liked,
-                                                negative=movies_disliked,
-                                                topn=topn)
+    movies_similar = model.most_similar(positive=movies_liked,
+                                        negative=movies_disliked,
+                                        topn=topn)
 
-            print('Similar: ')
-            print(df_movies.loc[[int(i[0]) for i in movies_similar]])
+    print('Similar: ')
+    print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
     return JsonResponse({MOVIE_CHOICES: random_movie_ids(9)})
