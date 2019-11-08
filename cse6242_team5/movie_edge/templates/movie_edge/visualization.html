@@ -99,7 +99,11 @@
             credentials: 'same-origin'
         };
         console.log(fetchParams);
-        const response = fetch(fetchURL, fetchParams);
+        fetch(fetchURL, fetchParams)
+            .then((response) => response.json())
+            .then(function (data) {
+                console.log(data);
+            })
     }
 
     function buttonClickLike(data) {
