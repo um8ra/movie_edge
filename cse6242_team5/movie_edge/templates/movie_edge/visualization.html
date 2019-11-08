@@ -26,6 +26,8 @@
     {% endfor %}
     <input type="submit" value="Submit">
 </form>
+<button type="submit" formaction="{% url 'movie_edge:query_recommendations' %}" onclick="buttonClickSubmit()">Click me
+</button>
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="wrapper" id="grid">
 </div>
@@ -67,6 +69,38 @@
             return r
         }
     );
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function buttonClickSubmit() {
+        console.log('Button Clicked');
+        fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+        fetchParams = {
+            method: 'POST',
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: '1,2,3,4', // this will be replaced with the likes/dislike arrays as JSON probably
+            credentials: 'same-origin'
+        };
+        console.log(fetchParams);
+        const response = fetch(fetchURL, fetchParams);
+    }
 
     function buttonClickLike(data) {
         const movieId = data.target.value;
@@ -148,8 +182,8 @@
         //https://stackoverflow.com/questions/374644/how-do-i-capture-response-of-form-submit
         event.preventDefault();
         console.log(event);
-        event.target.elements.likes.value=Array.from(moviesLiked.values()).join(',');
-        event.target.elements.dislikes.value=Array.from(moviesDisliked.values()).join(',');
+        event.target.elements.likes.value = Array.from(moviesLiked.values()).join(',');
+        event.target.elements.dislikes.value = Array.from(moviesDisliked.values()).join(',');
         fetch(event.target.action, {
             method: 'POST',
             body: new URLSearchParams(new FormData(event.target))
