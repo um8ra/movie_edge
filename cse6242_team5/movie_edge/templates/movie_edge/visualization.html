@@ -16,15 +16,24 @@
             grid-auto-flow: column;
         }
 
-        .buttonRecommend {
-            height: 32px;
+        .buttonSubmit {
+            height: 64px;
             width: 128px;
         }
+
+        .buttonGetRandom {
+            height: 64px;
+            width: 128px;
+        }
+
     </style>
 </head>
 <body>
-<button class="buttonRecommend" type="button" onclick="buttonClickSubmit()">
+<button class="buttonSubmit" type="button" onclick="buttonClickSubmit()">
     Click me for movie recommendations!
+</button>
+<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom()">
+    Click on me for some more randomness!
 </button>
 <br>
 <br>
@@ -90,13 +99,9 @@
         return cookieValue;
     }
 
-    function buttonClickSubmit() {
+    function buttonClick(fetchPayload, fetchURL) {
         console.log('Button Clicked');
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-        const fetchPayload = Object();
-        fetchPayload[LIKE] = Array.from(moviesLiked);
-        fetchPayload[DISLIKE] = Array.from(moviesDisliked);
-        const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
         const fetchParams = {
             method: 'POST',
             headers: {
@@ -118,6 +123,22 @@
                 console.log(movieChoices);
                 gridNine(movieChoices);
             })
+    }
+
+    function buttonClickGetRandom() {
+        const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+        const fetchPayload = Object();
+        fetchPayload[LIKE] = Array();
+        fetchPayload[DISLIKE] = Array();
+        buttonClick(fetchPayload, fetchURL);
+    }
+
+    function buttonClickSubmit() {
+        const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+        const fetchPayload = Object();
+        fetchPayload[LIKE] = Array.from(moviesLiked);
+        fetchPayload[DISLIKE] = Array.from(moviesDisliked);
+        buttonClick(fetchPayload, fetchURL);
     }
 
     function buttonClickLike(data) {
