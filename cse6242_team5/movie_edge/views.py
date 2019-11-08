@@ -93,8 +93,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
-                  {'table_data': data_json,
-                   'form': SentimentForm})
+                  {'table_data': data_json})
 
 
 def sentiment_form(request: HttpRequest) -> HttpResponse:

@@ -15,19 +15,20 @@
             grid-template-rows: repeat(3, 350px);
             grid-auto-flow: column;
         }
+
+        .buttonRecommend {
+            height: 32px;
+            width: 128px;
+        }
     </style>
 </head>
 <body>
-<form action="{% url 'movie_edge:query_recommendations' %}" method="POST" id="sentimentForm">
-    {% csrf_token %}
-    {% for field in form %}
-        <b>{{ field.label_tag }}</b> - {{ field }}
-        <br>
-    {% endfor %}
-    <input type="submit" value="Submit">
-</form>
-<button type="submit" formaction="{% url 'movie_edge:query_recommendations' %}" onclick="buttonClickSubmit()">Click me
+<button class="buttonRecommend" type="submit" formaction="{% url 'movie_edge:query_recommendations' %}"
+        onclick="buttonClickSubmit()">
+    Click me for movie recommendations!
 </button>
+<br>
+<br>
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="wrapper" id="grid">
 </div>
@@ -195,28 +196,5 @@
         .attr('fill', function (d) {
             return d[COLOR];
         });
-
-    document.forms['sentimentForm'].addEventListener('submit', (event) => {
-        //https://stackoverflow.com/questions/374644/how-do-i-capture-response-of-form-submit
-        event.preventDefault();
-        console.log(event);
-        event.target.elements.likes.value = Array.from(moviesLiked.values()).join(',');
-        event.target.elements.dislikes.value = Array.from(moviesDisliked.values()).join(',');
-        fetch(event.target.action, {
-            method: 'POST',
-            body: new URLSearchParams(new FormData(event.target))
-        }).then((resp) => {
-            resp.json().then(function (j) {
-                alert(j);
-                console.log(j);
-            });
-        }).then((body) => {
-            // doesn't seem necessary
-        }).catch((error) => {
-            console.log('Had Error!');
-            console.log(error);
-        });
-    });
-
 </script>
 </html>
