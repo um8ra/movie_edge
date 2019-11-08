@@ -101,7 +101,7 @@ def sentiment_form(request: HttpRequest) -> HttpResponse:
                   {'form': SentimentForm()})
 
 
-def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
+def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
     request_data = json.loads(request.body)
@@ -110,28 +110,37 @@ def query_recommendations(request: HttpRequest, topn=5) -> JsonResponse:
     movies_disliked = request_data[DISLIKE]
     movies_disliked_int = [int(i) for i in movies_disliked]
 
-    gensim_model_str = EMBEDDER
-    print(movies_liked)
-    print('Likes:')
-    print(df_movies.loc[movies_liked_int])
-    print('Dislikes:')
-    print(df_movies.loc[movies_disliked_int])
-
-    gensim_model_path = gensim_path / gensim_model_str
-    if not gensim_model_path.is_file():
-        raise FileNotFoundError
-
-    if gensim_model_str in dict_gensim_models.keys():
-        model = dict_gensim_models[gensim_model_str]
+    if (len(movies_liked) + len(movies_disliked)) == 0:
+        print('No Data: Random')
+        response = {MOVIE_CHOICES: random_movie_ids(9)}
+        return JsonResponse(response)
     else:
-        model = Word2Vec.load(str(gensim_model_path))
-        dict_gensim_models[gensim_model_str] = model
+        print('Have Data: Calculating...')
+        gensim_model_str = EMBEDDER
+        print(movies_liked)
+        print('Likes:')
+        print(df_movies.loc[movies_liked_int])
+        print('Dislikes:')
+        print(df_movies.loc[movies_disliked_int])
 
-    movies_similar = model.most_similar(positive=movies_liked,
-                                        negative=movies_disliked,
-                                        topn=topn)
+        gensim_model_path = gensim_path / gensim_model_str
+        if not gensim_model_path.is_file():
+            raise FileNotFoundError
 
-    print('Similar: ')
-    print(df_movies.loc[[int(i[0]) for i in movies_similar]])
+        if gensim_model_str in dict_gensim_models.keys():
+            model = dict_gensim_models[gensim_model_str]
+        else:
+            model = Word2Vec.load(str(gensim_model_path))
+            dict_gensim_models[gensim_model_str] = model
 
-    return JsonResponse({MOVIE_CHOICES: random_movie_ids(9)})
+        movies_similar = model.most_similar(positive=movies_liked,
+                                            negative=movies_disliked,
+                                            topn=topn)
+
+        print('Similar: ')
+        print(df_movies.loc[[int(i[0]) for i in movies_similar]])
+
+        # returns List of (movieID, similarity). We only want movieID to return for now.
+        response = {MOVIE_CHOICES: [i[0] for i in movies_similar]}
+        print(response)
+        return JsonResponse(response)
