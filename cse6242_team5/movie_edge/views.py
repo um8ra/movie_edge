@@ -117,10 +117,11 @@ def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     else:
         print('Have Data: Calculating...')
         gensim_model_str = EMBEDDER
-        print(movies_liked)
         print('Likes:')
+        print(movies_liked)
         print(df_movies.loc[movies_liked_int])
         print('Dislikes:')
+        print(movies_disliked)
         print(df_movies.loc[movies_disliked_int])
 
         gensim_model_path = gensim_path / gensim_model_str
