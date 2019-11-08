@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Edge</title>
+    {% load static %}
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        .wrapper {
+            width: 1000px;
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat(3, 200px);
+            grid-template-rows: repeat(3, 350px);
+            grid-auto-flow: column;
+        }
+		.scatter {
+			fill: steelblue;
+			stroke: #000;
+		}
+		body {
+		overflow-x:hidden;
+		overflow-y:hidden
+		}
+		
+			
+    </style>
+</head>
+<body>
+
+<!--https://gridbyexample.com/examples/code/example18.html-->
+<!--div class="wrapper" id="grid"> </div-->
+<div id = "graph"> </div>
+
+</body>
+<script>
+    // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
+    const tableData = JSON.parse('{{ table_data|safe }}');
+    console.log(tableData);
+    const x_min = parseFloat(tableData['L5x__min']);
+    const x_max = parseFloat(tableData['L5x__max']);
+    const y_min = parseFloat(tableData['L5y__min']);
+    const y_max = parseFloat(tableData['L5y__max']);
+    const decoder = tableData['decoder'];
+    let nineChoices = tableData['random_nine'];
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const padding = 25;
+    const MOVIE_ID = 'movie_id';
+    const MOVIE_TITLE = 'movie_title';
+    const DIRECTOR = 'director';
+    const ACTORS = 'actors';
+    const TITLE = 'title';
+    const GENRES = 'genres';
+    const CLUSTER = 'cluster';
+    const COLOR = 'color';
+    const POSTER_URL = 'poster_url';
+   // const X = 'x';
+    //const Y = 'y';
+    const moviesLiked = new Set(); // using set since it will do deduplication
+    const moviesDisliked = new Set(); // using set since it will do deduplication
+    const POSTER_HEIGHT = 300;
+    const POSTER_WIDTH = 200;
+	const zoomParams = {0: {r:20,w:2},
+						1: {r:10,w:1},
+						2: {r:5,w:0.5},
+						3: {r:2.5,w:0.25},
+						4: {r:1.25,w:0.125},
+						5: {r:0.5,w:0.05},
+						minZoom: 1,
+						maxZoom: 50,
+						}
+	
+	
+	
+	
+//    const gridID = 'grid';
+    const data = tableData['data'].map(function (r) {
+            r[MOVIE_TITLE] = decodeURIComponent(r[MOVIE_TITLE]);
+            r[DIRECTOR] = decodeURIComponent(r[DIRECTOR]);
+            r[ACTORS] = decodeURIComponent(r[ACTORS]);
+            return r
+        }
+    );
+/*
+    function buttonClickLike(data) {
+        const movieId = data.target.value;
+        if (moviesDisliked.has(movieId)) {
+            moviesDisliked.delete(movieId);
+        }
+        moviesLiked.add(movieId);
+        console.log(moviesLiked);
+    }
+
+    function buttonClickDislike(data) {
+        const movieId = data.target.value;
+        if (moviesLiked.has(movieId)) {
+            moviesLiked.delete(movieId);
+        }
+        moviesDisliked.add(movieId);
+        console.log(moviesDisliked);
+    }
+
+    function gridNine(movieidList) {
+        // Delete current grid and redraw with new *choices*
+        // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+        const grid = document.getElementById(gridID);
+        while (grid.firstChild) {
+            grid.removeChild(grid.firstChild);
+        }
+        // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
+        movieidList.forEach(function (movieId) {
+                const dataIndex = decoder[movieId];
+                console.log(dataIndex);
+                const divNode = document.createElement('div');
+                const imgNode = document.createElement('img');
+                const buttonLike = document.createElement('BUTTON');
+                buttonLike.innerText = 'Like';
+                buttonLike.onclick = buttonClickLike;
+                buttonLike.value = movieId;
+                const buttonDislike = document.createElement('BUTTON');
+                buttonDislike.innerText = 'Dislike';
+                buttonDislike.onclick = buttonClickDislike;
+                buttonDislike.value = movieId;
+                imgNode.src = data[dataIndex][POSTER_URL];
+                imgNode.height = POSTER_HEIGHT;
+                imgNode.width = POSTER_WIDTH;
+                grid.appendChild(divNode);
+                divNode.appendChild(imgNode);
+                divNode.appendChild(buttonLike);
+                divNode.appendChild(buttonDislike);
+                console.log(movieId);
+            }
+        )
+    }
+
+    gridNine(nineChoices);*/
+	
+	
+	
+	
+	var currentZoom = 0;
+	var tmp =0;
+	var mybbox = {}
+    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
+    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
+	const zScale = d3.scaleQuantize().domain([zoomParams.minZoom,zoomParams.maxZoom]).range([0, 1, 2, 3, 4, 5]);
+    var svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
+
+	var g = svg.append("g")
+			.attr("class","holder")
+	
+	
+	var Red_if_mybbox = function(d){
+	
+		var x = d['L'+currentZoom+'x']
+		var y = d['L'+currentZoom+'y']
+		if (x >= mybbox.left && x <= mybbox.right && y >= mybbox.bot && y <= mybbox.top){
+		//if ((x >= 0 && x <=60 && y >= 0 && y <= 60)){
+		tmp=tmp+1;
+			return "red";
+		} else {
+		
+			return "green";
+		}
+	}
+	
+	
+	
+	
+	g.selectAll('circle')
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("r",zoomParams[currentZoom]['r'])
+		.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+		.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+		.attr("class","scatter");
+
+    var myzoom = d3.zoom()
+       .extent([[0, 0], [width, height]])
+       .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
+       .on("zoom", zoomed);
+   
+    svg.call(myzoom);
+   
+   
+     function zoomed() {
+	    var tx = d3.event.transform
+	 	g.attr("transform",tx );
+		k = d3.event.transform.k;
+		var newZoom = zScale(k)
+		var r;
+		 //https://stackoverflow.com/questions/42695480/d3v4-zoom-coordinates-of-visible-area
+		function getVisibleArea(t) {
+		    var ul = t.invert([0, 0]),
+			lr = t.invert([width, height]);
+
+			return {left:Math.trunc(ul[0]),
+						top:Math.trunc(ul[1]),
+						right:Math.trunc(lr[0]),
+						bot:Math.trunc(lr[1])
+			}
+		}
+			
+		var bbox = getVisibleArea(tx)
+		mybbox = bbox;
+		var bbox_2dCoords = {top: yScale.invert(bbox.bot),
+							bot: yScale.invert(bbox.top),
+							left:xScale.invert(bbox.left),
+							right:xScale.invert(bbox.right)
+		}
+		
+		
+		
+		
+		//currentZoom is a global
+		if (newZoom  >	 currentZoom){ 
+			console.log('Setting new zoom level ' + newZoom + ' ' +k)
+			console.log(bbox)
+			console.log(bbox_2dCoords)	
+			mybbox = bbox_2dCoords
+			currentZoom = newZoom
+			g.selectAll('circle').transition().attr("duration", 1000)
+				.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+				.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+				.attr("r",zoomParams[currentZoom]['r'])
+				.attr("stroke-width",zoomParams[currentZoom]['w'])
+				.style("fill",Red_if_mybbox)
+				
+		/*	
+		g.append('rect')
+			.attr('width',bbox.right-bbox.left)
+			.attr('height',bbox.bot-bbox.top)
+			.attr('x',bbox.left)
+			.attr('y',bbox.top)
+			.attr('fill','red')*/
+		}
+	  }
+
+
+   
+   
+   
+/*
+    document.forms['sentimentForm'].addEventListener('submit', (event) => {
+        //https://stackoverflow.com/questions/374644/how-do-i-capture-response-of-form-submit
+        event.preventDefault();
+        console.log(event);
+        event.target.elements.likes.value=Array.from(moviesLiked.values()).join(',');
+        event.target.elements.dislikes.value=Array.from(moviesDisliked.values()).join(',');
+        fetch(event.target.action, {
+            method: 'POST',
+            body: new URLSearchParams(new FormData(event.target))
+        }).then((resp) => {
+            resp.json().then(function (j) {
+                alert(j);
+                console.log(j);
+            });
+        }).then((body) => {
+            // doesn't seem necessary
+        }).catch((error) => {
+            console.log('Had Error!');
+            console.log(error);
+        });
+    });
+*/
+</script>
+</html>
