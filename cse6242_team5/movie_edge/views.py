@@ -51,14 +51,15 @@ df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
 df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
-def random_movie_ids(n: int) -> List[int]:
+def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
     all_movie_ids = Movie.objects.filter(embedder=EMBEDDER).values_list('id', flat=True)
     random_movies = random.sample(list(all_movie_ids), n)
-    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
+    return_val = Movie.objects.filter(id__in=random_movies, imdb_votes__gte=imdb_votes).values_list(MOVIE_ID, flat=True)
     print('Random Movies!')
     print(return_val)
     return list(return_val)
+
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
