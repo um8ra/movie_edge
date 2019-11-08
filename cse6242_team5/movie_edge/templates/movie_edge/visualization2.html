@@ -71,7 +71,7 @@
 						maxZoom: 50,
 						}
 	
-	
+	const bbox_pad = Math.max(x_max-x_min,y_max-y_min)/20;
 	
 	
 //    const gridID = 'grid';
@@ -150,20 +150,32 @@
 	var g = svg.append("g")
 			.attr("class","holder")
 	
-	
+	/*
 	var Red_if_mybbox = function(d){
 	
 		var x = d['L'+currentZoom+'x']
 		var y = d['L'+currentZoom+'y']
-		if (x >= mybbox.left && x <= mybbox.right && y >= mybbox.bot && y <= mybbox.top){
-		//if ((x >= 0 && x <=60 && y >= 0 && y <= 60)){
-		tmp=tmp+1;
-			return "red";
-		} else {
+		var x_ok = x >= mybbox.left && x <= mybbox.right
+		var y_ok = y >= mybbox.bot && y <= mybbox.top
 		
+		if ( x_ok && y_ok ){		
+			return "red";
+		} else {		
 			return "green";
 		}
+	}*/
+	
+	var bboxFilter = function(d){
+		var x = d['L'+currentZoom+'x']
+		var y = d['L'+currentZoom+'y']
+		var x_ok = x >= mybbox.left-bbox_pad && x <= mybbox.right+bbox_pad
+		var y_ok = y >= mybbox.bot-bbox_pad && y <= mybbox.top+bbox_pad
+		
+		return x_ok && y_ok;	
+	
+	
 	}
+	
 	
 	
 	
@@ -197,9 +209,9 @@
 			lr = t.invert([width, height]);
 
 			return {left:Math.trunc(ul[0]),
-						top:Math.trunc(ul[1]),
+						bot:Math.trunc(ul[1]),
 						right:Math.trunc(lr[0]),
-						bot:Math.trunc(lr[1])
+						top:Math.trunc(lr[1])
 			}
 		}
 			
@@ -211,29 +223,47 @@
 							right:xScale.invert(bbox.right)
 		}
 		
+		mybbox = bbox_2dCoords
+		
+		
+		
 		
 		
 		
 		//currentZoom is a global
-		if (newZoom  >	 currentZoom){ 
+		if (newZoom  != currentZoom){ 
 			console.log('Setting new zoom level ' + newZoom + ' ' +k)
-			console.log(bbox)
-			console.log(bbox_2dCoords)	
+			/*console.log(bbox)
+			console.log(bbox_2dCoords)	*/
 			mybbox = bbox_2dCoords
+			//console.log(mybbox)
+			// Dump old points, insert new ones, transition
+			g.selectAll('.scatter').remove()
+			//insert subset of points
+			var subdata = data.filter(bboxFilter);			
+			g.selectAll('circle')
+			.data(subdata)
+			.enter()
+			.append("circle")
+			.attr("r",zoomParams[currentZoom]['r'])
+			.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+			.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+			.attr("class","scatter");
+			//transition
 			currentZoom = newZoom
 			g.selectAll('circle').transition().attr("duration", 1000)
 				.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
 				.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
 				.attr("r",zoomParams[currentZoom]['r'])
 				.attr("stroke-width",zoomParams[currentZoom]['w'])
-				.style("fill",Red_if_mybbox)
+				//.style("fill",Red_if_mybbox)
 				
 		/*	
 		g.append('rect')
 			.attr('width',bbox.right-bbox.left)
-			.attr('height',bbox.bot-bbox.top)
+			.attr('height',bbox.top-bbox.bot)
 			.attr('x',bbox.left)
-			.attr('y',bbox.top)
+			.attr('y',bbox.bot)
 			.attr('fill','red')*/
 		}
 	  }
