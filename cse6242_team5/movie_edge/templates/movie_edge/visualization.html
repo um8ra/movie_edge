@@ -99,7 +99,7 @@
         return cookieValue;
     }
 
-    function buttonClick(fetchPayload, fetchURL) {
+    function abstractFetch(fetchPayload, fetchURL) {
         console.log('Button Clicked');
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         const fetchParams = {
@@ -130,7 +130,7 @@
         const fetchPayload = Object();
         fetchPayload[LIKE] = Array();
         fetchPayload[DISLIKE] = Array();
-        buttonClick(fetchPayload, fetchURL);
+        abstractFetch(fetchPayload, fetchURL);
     }
 
     function buttonClickSubmit() {
@@ -138,7 +138,7 @@
         const fetchPayload = Object();
         fetchPayload[LIKE] = Array.from(moviesLiked);
         fetchPayload[DISLIKE] = Array.from(moviesDisliked);
-        buttonClick(fetchPayload, fetchURL);
+        abstractFetch(fetchPayload, fetchURL);
     }
 
     function buttonClickLike(data) {
