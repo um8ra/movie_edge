@@ -36,7 +36,7 @@ MOVIE_CHOICES = 'movie_choices'
 LIKE = 'movies_liked'
 DISLIKE = 'movies_disliked'
 
-
+	
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
 
@@ -96,7 +96,7 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     data_json = json.dumps(data)
-    return render(request, 'movie_edge/visualization.html',
+    return render(request, 'movie_edge/visualization2.html',
                   {'table_data': data_json})
 
 
