@@ -140,8 +140,10 @@
 	
 	var visAnchor = {x:0,y:0}
 	var currentZoom = 0;
+	var lastScale = 1;
 	var tmp =0;
 	var mybbox = {}
+	var lastRedrawBbox = {};
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
 	const zScale = d3.scaleQuantize().domain([zoomParams.minZoom,zoomParams.maxZoom]).range([0, 1, 2, 3, 4, 5]);
@@ -209,11 +211,14 @@
 		}
 	
 	
-	var redraw = function (bbox) {
+	var redraw = function (bbox,pad_bigger) {
 		//clear old
 		g.selectAll('.scatter').remove()
 		g.selectAll('.logpoint').remove()
 		//insert subset of points
+		if (pad_bigger){
+			bbox = resizeBbox(bbox,true)
+		}
 		var fil = function(d) {return bboxFilter(d,bbox,currentZoom)} 
 		var subdata = data.filter(fil);			
 		g.selectAll('.scatter')
@@ -239,7 +244,7 @@
 		.attr("class","logpoint")
 		.attr("r",2)
 		.style('fill','red');
-		
+		lastRedrawBbox = bbox;
 		}
 	
 	
@@ -284,16 +289,27 @@
 		var y_ok = visAnchor.y >= smallerBbox.bot  && visAnchor.y <= smallerBbox.top;		
 		if (!(x_ok && y_ok)){		
 			
-			redraw(bbox);
+			redraw(bbox,false);
 		}
+		
+		// if the entire  bbox from full redraw is in the frame, then we should redraw too. (just test the corners)
+		if (k != lastScale){
+			if (lastRedrawBbox.top <= bbox.top || lastRedrawBbox.left >= bbox.left || lastRedrawBbox.right <= bbox.right || lastRedrawBbox.bot >= bbox.bot) {
+				redraw(bbox,true);
+			}
+		}
+		lastScale = k;
+		
+	
+		
 		
 		
 		// handle zoom changes
 		if (newZoom  != currentZoom){ 
 			console.log('Setting new zoom level ' + newZoom + ' ' +k)
 			console.log(bbox)
-			var biggerBbox = resizeBbox(bbox,true)
-			redraw(bbox);
+			
+			redraw(bbox,false);
 			//transition
 			currentZoom = newZoom
 			g.selectAll('.scatter').transition().attr("duration", 3000)
