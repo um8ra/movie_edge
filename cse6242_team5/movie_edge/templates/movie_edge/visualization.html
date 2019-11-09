@@ -10,12 +10,14 @@
 
     <style>
         .grid {
-            width: 30%;
             display: grid;
             grid-gap: 10px;
             grid-template-columns: repeat(3, 200px);
             grid-template-rows: repeat(3, 350px);
             grid-auto-flow: column;
+            width: 30%;
+            background: gray;
+            float: left;
         }
 
         .buttonSubmit {
@@ -29,7 +31,9 @@
         }
 
         .graph {
-            width: 70%
+            width: 70%;
+            float: right;
+            background: darkgray;
         }
 
         .scatter {
@@ -54,9 +58,10 @@
 <br>
 <br>
 <!--https://gridbyexample.com/examples/code/example18.html-->
-<div class="grid" id="grid">
+<div class="container">
+    <div class="grid" id="grid"></div>
+    <div class="graph" id="graph"></div>
 </div>
-<div class="graph" id="graph"></div>
 </body>
 {#Begin: super necessary! Else, disable CSRF Protection in views.py #}
 {% csrf_token %}
@@ -71,7 +76,7 @@
     const y_max = parseFloat(tableData['L5y__max']);
     const decoder = tableData['decoder'];
     let nineChoices = tableData['random_nine'];
-    const width = window.innerWidth;
+    const width = 0.7 * window.innerWidth;
     const height = window.innerHeight;
     const data = tableData['data'].map(inputFormat);
 
