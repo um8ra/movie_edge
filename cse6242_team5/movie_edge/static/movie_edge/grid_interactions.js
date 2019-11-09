@@ -63,6 +63,11 @@ function buttonClickSubmit(fetchURL) {
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
 }
 
+function buttonPlotGoTo(data) {
+    const movieId = data.target.value;
+    console.log('Jon, please implement: ' + movieId);
+}
+
 function gridNine(movieidList) {
     // Delete current grid and redraw with new *choices*
     // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
@@ -76,14 +81,22 @@ function gridNine(movieidList) {
             console.log(dataIndex);
             const divNode = document.createElement('div');
             const imgNode = document.createElement('img');
+
             const buttonLike = document.createElement('BUTTON');
             buttonLike.innerText = 'Like';
             buttonLike.onclick = buttonClickLike;
             buttonLike.value = movieId;
+
             const buttonDislike = document.createElement('BUTTON');
             buttonDislike.innerText = 'Dislike';
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
+
+            const buttonShowMe = document.createElement('BUTTON');
+            buttonShowMe.innerText = 'Show Me!';
+            buttonShowMe.onclick = buttonPlotGoTo;
+            buttonShowMe.value = movieId;
+
             imgNode.src = data[dataIndex][POSTER_URL];
             imgNode.height = POSTER_HEIGHT;
             imgNode.width = POSTER_WIDTH;
@@ -91,6 +104,7 @@ function gridNine(movieidList) {
             divNode.appendChild(imgNode);
             divNode.appendChild(buttonLike);
             divNode.appendChild(buttonDislike);
+            divNode.appendChild(buttonShowMe);
             console.log(movieId);
         }
     )
