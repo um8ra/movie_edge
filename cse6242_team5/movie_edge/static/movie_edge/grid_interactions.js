@@ -22,7 +22,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function abstractFetch(fetchPayload, fetchURL) {
+function abstractFetch(fetchPayload, fetchURL, handleKey, handleFunction) {
     console.log('Button Clicked');
     // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
     const fetchParams = {
@@ -41,9 +41,11 @@ function abstractFetch(fetchPayload, fetchURL) {
         .then((response) => response.json())
         .then(function (data) {
             console.log(data);
-            const movieChoices = data[MOVIE_CHOICES];
-            console.log(movieChoices);
-            gridNine(movieChoices);
+            // Annoyingly, the data MUST be handled in the "then"
+            // You can't return values from this area.
+            // Hence the further function and key abstraction
+            // The key is due to the data being JSON
+            handleFunction(data[handleKey]);
         })
 }
 
@@ -51,18 +53,14 @@ function buttonClickGetRandom(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array();
     fetchPayload[DISLIKE] = Array();
-    const movieChoices = abstractFetch(fetchPayload, fetchURL);
-    console.log(movieChoices[MOVIE_CHOICES]);
-    gridNine(movieChoices);
+    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
 }
 
 function buttonClickSubmit(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array.from(moviesLiked);
     fetchPayload[DISLIKE] = Array.from(moviesDisliked);
-    const movieChoices = abstractFetch(fetchPayload, fetchURL);
-    console.log(movieChoices[MOVIE_CHOICES]);
-    gridNine(movieChoices);
+    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
 }
 
 function gridNine(movieidList) {
