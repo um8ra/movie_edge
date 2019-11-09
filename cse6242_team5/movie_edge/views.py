@@ -11,7 +11,7 @@ import json
 import urllib.parse
 import random
 from typing import List
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -101,7 +101,7 @@ def sentiment_form(request: HttpRequest) -> HttpResponse:
                   {'form': SentimentForm()})
 
 
-@csrf_exempt
+# @csrf_exempt
 def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
