@@ -1,3 +1,10 @@
+function inputFormat (r) {
+    r[MOVIE_TITLE] = decodeURIComponent(r[MOVIE_TITLE]);
+    r[DIRECTOR] = decodeURIComponent(r[DIRECTOR]);
+    r[ACTORS] = decodeURIComponent(r[ACTORS]);
+    return r
+}
+
 function getCookie(name) {
     // https://docs.djangoproject.com/en/2.2/ref/csrf/
     let cookieValue = null;

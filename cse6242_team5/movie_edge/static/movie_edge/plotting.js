@@ -19,3 +19,23 @@ function getVisibleArea(t) {
         top: Math.trunc(lr[1])
     }
 }
+
+function resizeBbox(bbox, bigger) {
+    const height = bbox.top - bbox.bot;
+    const width = bbox.right - bbox.left;
+    if (bigger) {
+        return {
+            top: bbox.top + height * bbox_pad,
+            bot: bbox.bot - height * bbox_pad,
+            left: bbox.left - width * bbox_pad,
+            right: bbox.right + width * bbox_pad
+        }
+    } else {
+        return {
+            top: bbox.top - height * bbox_pad,
+            bot: bbox.bot + height * bbox_pad,
+            left: bbox.left + width * bbox_pad,
+            right: bbox.right - width * bbox_pad
+        }
+    }
+}

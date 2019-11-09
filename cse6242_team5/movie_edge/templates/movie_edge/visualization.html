@@ -10,7 +10,7 @@
 
     <style>
         .grid {
-            width: 50%;
+            width: 30%;
             display: grid;
             grid-gap: 10px;
             grid-template-columns: repeat(3, 200px);
@@ -29,7 +29,7 @@
         }
 
         .graph {
-            width: 50%
+            width: 70%
         }
 
         .scatter {
@@ -70,13 +70,7 @@
     let nineChoices = tableData['random_nine'];
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const data = tableData['data'].map(function (r) {
-            r[MOVIE_TITLE] = decodeURIComponent(r[MOVIE_TITLE]);
-            r[DIRECTOR] = decodeURIComponent(r[DIRECTOR]);
-            r[ACTORS] = decodeURIComponent(r[ACTORS]);
-            return r
-        }
-    );
+    const data = tableData['data'].map(inputFormat);
 
     function buttonClickGetRandom() {
         const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
@@ -108,28 +102,6 @@
 
     const g = svg.append("g")
         .attr("class", "holder");
-
-    function resizeBbox(bbox, bigger) {
-        const height = bbox.top - bbox.bot;
-        const width = bbox.right - bbox.left;
-        if (bigger) {
-            return {
-                top: bbox.top + height * bbox_pad,
-                bot: bbox.bot - height * bbox_pad,
-                left: bbox.left - width * bbox_pad,
-                right: bbox.right + width * bbox_pad
-            }
-        } else {
-            return {
-                top: bbox.top - height * bbox_pad,
-                bot: bbox.bot + height * bbox_pad,
-                left: bbox.left + width * bbox_pad,
-                right: bbox.right - width * bbox_pad
-            }
-        }
-
-    }
-
 
     function redraw(bbox, pad_bigger) {
         //clear old
@@ -163,7 +135,6 @@
             y: (mybbox.top + mybbox.bot) / 2
         };
 
-
         console.log(visAnchor);
         // drop a point at visAnchor just to check
         g.append('circle')
@@ -174,7 +145,6 @@
             .style('fill', 'red');
         lastRedrawBbox = bbox;
     }
-
 
     g.selectAll('circle')
         .data(data)
