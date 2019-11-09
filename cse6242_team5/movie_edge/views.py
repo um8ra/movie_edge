@@ -34,10 +34,11 @@ IMDB_VOTES = 'imdb_votes'
 MOVIE_CHOICES = 'movie_choices'
 LIKE = 'movies_liked'
 DISLIKE = 'movies_disliked'
-
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
-db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, X, Y, MEAN, COUNT, STDDEV, CLUSTER, POSTER_URL, RUNTIME, DIRECTOR,
+
+
+db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, MEAN, COUNT, STDDEV]+  [f'L{i}x' for i in range(6)]+[f'L{i}y' for i in range(6)] +  [POSTER_URL, RUNTIME, DIRECTOR,
            ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
 
 dict_gensim_models = dict()
@@ -63,17 +64,17 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
-    palette = palettes.Category20_20
+    #palette = palettes.Category20_20
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
-        movie[COLOR] = palette[movie[CLUSTER]]
-    movies_x_min = movies.aggregate(Min(X))
-    movies_x_max = movies.aggregate(Max(X))
-    movies_y_min = movies.aggregate(Min(Y))
-    movies_y_max = movies.aggregate(Max(Y))
+       
+    movies_x_min = movies.aggregate(Min('L5x'))
+    movies_x_max = movies.aggregate(Max('L5x'))
+    movies_y_min = movies.aggregate(Min('L5y'))
+    movies_y_max = movies.aggregate(Max('L5y'))
 
     frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
     len_movies = len(frequently_rated_movies)

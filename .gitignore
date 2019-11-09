@@ -103,6 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+#pickles /gensim
+*.pkl
+*.gensim
+
+
 # added for latex work
 
 *.gz
