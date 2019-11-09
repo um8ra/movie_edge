@@ -49,10 +49,10 @@
     </style>
 </head>
 <body>
-<button class="buttonSubmit" type="button" onclick="buttonClickSubmit()">
+<button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
     Click me for movie recommendations!
 </button>
-<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom()">
+<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
     Click on me for some more randomness!
 </button>
 <br>
@@ -79,22 +79,7 @@
     const width = 0.7 * window.innerWidth;
     const height = window.innerHeight;
     const data = tableData['data'].map(inputFormat);
-
-    function buttonClickGetRandom() {
-        const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
-        const fetchPayload = Object();
-        fetchPayload[LIKE] = Array();
-        fetchPayload[DISLIKE] = Array();
-        abstractFetch(fetchPayload, fetchURL);
-    }
-
-    function buttonClickSubmit() {
-        const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
-        const fetchPayload = Object();
-        fetchPayload[LIKE] = Array.from(moviesLiked);
-        fetchPayload[DISLIKE] = Array.from(moviesDisliked);
-        abstractFetch(fetchPayload, fetchURL);
-    }
+    const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
     gridNine(nineChoices);
     let visAnchor = {x: 0, y: 0};
@@ -173,7 +158,6 @@
         .on("zoom", zoomed);
 
     svg.call(myzoom);
-
 
     function zoomed() {
         const tx = d3.event.transform;

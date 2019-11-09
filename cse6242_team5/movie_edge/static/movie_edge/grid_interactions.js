@@ -47,6 +47,24 @@ function abstractFetch(fetchPayload, fetchURL) {
         })
 }
 
+function buttonClickGetRandom(fetchURL) {
+    const fetchPayload = Object();
+    fetchPayload[LIKE] = Array();
+    fetchPayload[DISLIKE] = Array();
+    const movieChoices = abstractFetch(fetchPayload, fetchURL);
+    console.log(movieChoices[MOVIE_CHOICES]);
+    gridNine(movieChoices);
+}
+
+function buttonClickSubmit(fetchURL) {
+    const fetchPayload = Object();
+    fetchPayload[LIKE] = Array.from(moviesLiked);
+    fetchPayload[DISLIKE] = Array.from(moviesDisliked);
+    const movieChoices = abstractFetch(fetchPayload, fetchURL);
+    console.log(movieChoices[MOVIE_CHOICES]);
+    gridNine(movieChoices);
+}
+
 function gridNine(movieidList) {
     // Delete current grid and redraw with new *choices*
     // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
