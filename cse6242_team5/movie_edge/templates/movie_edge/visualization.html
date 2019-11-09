@@ -9,8 +9,8 @@
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
 
     <style>
-        .wrapper {
-            width: 1000px;
+        .grid {
+            width: 50%;
             display: grid;
             grid-gap: 10px;
             grid-template-columns: repeat(3, 200px);
@@ -26,6 +26,10 @@
         .buttonGetRandom {
             height: 64px;
             width: 128px;
+        }
+
+        .graph {
+            width: 50%
         }
 
         .scatter {
@@ -50,9 +54,9 @@
 <br>
 <br>
 <!--https://gridbyexample.com/examples/code/example18.html-->
-<div class="wrapper" id="grid">
+<div class="grid" id="grid">
 </div>
-<div id="graph"></div>
+<div class="graph" id="graph"></div>
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
