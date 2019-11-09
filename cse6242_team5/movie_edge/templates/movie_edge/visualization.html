@@ -105,7 +105,7 @@
     const g = svg.append("g")
         .attr("class", "holder");
 
-    const resizeBbox = function (bbox, bigger) {
+    function resizeBbox(bbox, bigger) {
         const height = bbox.top - bbox.bot;
         const width = bbox.right - bbox.left;
         if (bigger) {
@@ -125,10 +125,10 @@
         }
 
 
-    };
+    }
 
 
-    const bboxFilter = function (d, bbox, zoomLevel) {
+    function bboxFilter(d, bbox, zoomLevel) {
         const x = d['L' + zoomLevel + 'x'];
         const y = d['L' + zoomLevel + 'y'];
         const biggerBbox = resizeBbox(bbox, true);
@@ -138,7 +138,7 @@
         return x_ok && y_ok;
 
 
-    };
+    }
 
     //https://stackoverflow.com/questions/42695480/d3v4-zoom-coordinates-of-visible-area
     function getVisibleArea(t) {
@@ -195,7 +195,7 @@
             .attr("r", 2)
             .style('fill', 'red');
         lastRedrawBbox = bbox;
-    };
+    }
 
 
     g.selectAll('circle')
