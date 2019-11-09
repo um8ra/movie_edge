@@ -9,9 +9,9 @@ from django.db.models import Max, Min
 import pandas as pd
 import json
 import urllib.parse
-from bokeh import palettes
 import random
 from typing import List
+from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -37,9 +37,9 @@ DISLIKE = 'movies_disliked'
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
 
-
-db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, MEAN, COUNT, STDDEV]+  [f'L{i}x' for i in range(6)]+[f'L{i}y' for i in range(6)] +  [POSTER_URL, RUNTIME, DIRECTOR,
-           ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
+db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, MEAN, COUNT, STDDEV] + \
+          [f'L{i}x' for i in range(6)] + [f'L{i}y' for i in range(6)] + \
+          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
@@ -64,7 +64,6 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
-    #palette = palettes.Category20_20
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
@@ -102,6 +101,7 @@ def sentiment_form(request: HttpRequest) -> HttpResponse:
                   {'form': SentimentForm()})
 
 
+@csrf_exempt
 def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
