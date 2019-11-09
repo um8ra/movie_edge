@@ -26,6 +26,16 @@
             width: 128px;
         }
 
+        .scatter {
+            fill: steelblue;
+            stroke: #000;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden
+        }
+
     </style>
 </head>
 <body>
@@ -40,20 +50,21 @@
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="wrapper" id="grid">
 </div>
+<div id="graph"></div>
 </body>
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
     const tableData = JSON.parse('{{ table_data|safe }}');
     console.log(tableData);
-    const x_min = parseFloat(tableData['x__min']);
-    const x_max = parseFloat(tableData['x__max']);
-    const y_min = parseFloat(tableData['y__min']);
-    const y_max = parseFloat(tableData['y__max']);
+    const x_min = parseFloat(tableData['L5x__min']);
+    const x_max = parseFloat(tableData['L5x__max']);
+    const y_min = parseFloat(tableData['L5y__min']);
+    const y_max = parseFloat(tableData['L5y__max']);
     const decoder = tableData['decoder'];
     let nineChoices = tableData['random_nine'];
-    const width = 1024;
-    const height = 1024;
-    const padding = 32;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const padding = 25;
     const MOVIE_ID = 'movie_id';
     const MOVIE_TITLE = 'movie_title';
     const DIRECTOR = 'director';
@@ -72,7 +83,17 @@
     const moviesDisliked = new Set(); // using set since it will do deduplication
     const POSTER_HEIGHT = 300;
     const POSTER_WIDTH = 200;
-
+    const zoomParams = {
+        0: {r: 20, w: 2},
+        1: {r: 10, w: 1},
+        2: {r: 5, w: 0.5},
+        3: {r: 2.5, w: 0.25},
+        4: {r: 1.25, w: 0.125},
+        5: {r: 0.5, w: 0.05},
+        minZoom: 1,
+        maxZoom: 50,
+    };
+    const bbox_pad = 0.25;
     const gridID = 'grid';
     const data = tableData['data'].map(function (r) {
             r[MOVIE_TITLE] = decodeURIComponent(r[MOVIE_TITLE]);
@@ -193,28 +214,195 @@
     }
 
     gridNine(nineChoices);
-    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([padding, width - padding]);
-    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([padding, height - padding]);
+	var visAnchor = {x:0,y:0}
+	var currentZoom = 0;
+	var lastScale = 1;
+	var tmp =0;
+	var mybbox = {}
+	var lastRedrawBbox = {};
+    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
+    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
+	const zScale = d3.scaleQuantize().domain([zoomParams.minZoom,zoomParams.maxZoom]).range([0, 1, 2, 3, 4, 5]);
+    var svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
 
-    const svg = d3.select('body').append('svg');
+	var g = svg.append("g")
+			.attr("class","holder")
 
-    svg.attr('width', 1024).attr('height', 1024)
-        .call(d3.zoom().on("zoom", function () {
-            svg.attr("transform", d3.event.transform)
-        }))
-        .append("g");
+	/*
+	var Red_if_mybbox = function(d){
 
-    svg.selectAll('.circle').data(data).enter()
-        .append('circle')
-        .attr('cx', function (d) {
-            return xScale(d[X]);
-        })
-        .attr('cy', function (d) {
-            return yScale(d[Y]);
-        })
-        .attr('r', 2)
-        .attr('fill', function (d) {
-            return d[COLOR];
-        });
+		var x = d['L'+currentZoom+'x']
+		var y = d['L'+currentZoom+'y']
+		var x_ok = x >= mybbox.left && x <= mybbox.right
+		var y_ok = y >= mybbox.bot && y <= mybbox.top
+
+		if ( x_ok && y_ok ){
+			return "red";
+		} else {
+			return "green";
+		}
+	}*/
+
+	var resizeBbox = function(bbox,bigger){
+		var height = bbox.top-bbox.bot;
+		var width = bbox.right-bbox.left;
+		if (bigger){
+			return {top:bbox.top+height*bbox_pad,
+					bot:bbox.bot-height*bbox_pad,
+					left: bbox.left-width*bbox_pad,
+					right: bbox.right+width*bbox_pad}
+		}
+		else {
+		return {top:bbox.top-height*bbox_pad,
+					bot:bbox.bot+height*bbox_pad,
+					left: bbox.left+width*bbox_pad,
+					right: bbox.right-width*bbox_pad}
+		}
+
+
+	}
+
+
+	var bboxFilter = function(d,bbox,zoomLevel){
+		var x = d['L'+zoomLevel+'x']
+		var y = d['L'+zoomLevel+'y']
+		var biggerBbox = resizeBbox(bbox,true);
+		var x_ok = x >= biggerBbox.left && x <= biggerBbox.right
+		var y_ok = y >= biggerBbox.bot && y <=biggerBbox.top
+
+		return x_ok && y_ok;
+
+
+	}
+
+	 //https://stackoverflow.com/questions/42695480/d3v4-zoom-coordinates-of-visible-area
+	function getVisibleArea(t) {
+		    var ul = t.invert([0, 0]),
+			lr = t.invert([width, height]);
+			return {left:Math.trunc(ul[0]),
+						bot:Math.trunc(ul[1]),
+						right:Math.trunc(lr[0]),
+						top:Math.trunc(lr[1])
+			}
+		}
+
+
+	var redraw = function (bbox,pad_bigger) {
+		//clear old
+		g.selectAll('.scatter').remove()
+		g.selectAll('.logpoint').remove()
+		//insert subset of points
+		if (pad_bigger){
+			bbox = resizeBbox(bbox,true)
+		}
+		var fil = function(d) {return bboxFilter(d,bbox,currentZoom)}
+		var subdata = data.filter(fil);
+		g.selectAll('.scatter')
+		.data(subdata)
+		.enter()
+		.append("circle")
+		.attr("r",zoomParams[currentZoom]['r'])
+		.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+		.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+		.attr("class","scatter");
+		//update visibility anchor
+		console.log('Redraw');
+		console.log(subdata.length)
+		visAnchor = {x:(mybbox.left+mybbox.right)/2,
+					y:(mybbox.top+mybbox.bot)/2}
+
+
+		console.log(visAnchor);
+		// drop a point at visAnchor just to check
+		g.append('circle')
+		.attr('cx',xScale(visAnchor.x))
+		.attr('cy',yScale(visAnchor.y))
+		.attr("class","logpoint")
+		.attr("r",2)
+		.style('fill','red');
+		lastRedrawBbox = bbox;
+		}
+
+
+
+	g.selectAll('circle')
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("r",zoomParams[currentZoom]['r'])
+		.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+		.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+		.attr("class","scatter");
+
+    var myzoom = d3.zoom()
+       .extent([[0, 0], [width, height]])
+       .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
+       .on("zoom", zoomed);
+
+    svg.call(myzoom);
+
+
+     function zoomed() {
+	    var tx = d3.event.transform
+	 	g.attr("transform",tx );
+		k = d3.event.transform.k;
+		var newZoom = zScale(k)
+		var r;
+		var bbox_pixels = getVisibleArea(tx)
+
+		var bbox = {top: yScale.invert(bbox_pixels.bot),
+							bot: yScale.invert(bbox_pixels.top),
+							left:xScale.invert(bbox_pixels.left),
+							right:xScale.invert(bbox_pixels.right)
+		}
+
+		mybbox = bbox
+
+		// check if our anchor is in the bbox, if not we need to redraw
+		var smallerBbox = resizeBbox(bbox,false)
+		mybbox = smallerBbox;
+		var x_ok = visAnchor.x >= smallerBbox.left  && visAnchor.x <= smallerBbox.right;
+		var y_ok = visAnchor.y >= smallerBbox.bot  && visAnchor.y <= smallerBbox.top;
+		if (!(x_ok && y_ok)){
+
+			redraw(bbox,false);
+		}
+
+		// if the entire  bbox from full redraw is in the frame, then we should redraw too. (just test the corners)
+		if (k != lastScale){
+			if (lastRedrawBbox.top <= bbox.top || lastRedrawBbox.left >= bbox.left || lastRedrawBbox.right <= bbox.right || lastRedrawBbox.bot >= bbox.bot) {
+				redraw(bbox,true);
+			}
+		}
+		lastScale = k;
+
+
+
+
+
+		// handle zoom changes
+		if (newZoom  != currentZoom){
+			console.log('Setting new zoom level ' + newZoom + ' ' +k)
+			console.log(bbox)
+
+			redraw(bbox,false);
+			//transition
+			currentZoom = newZoom
+			g.selectAll('.scatter').transition().attr("duration", 3000)
+				.attr("cx",function(d) {return xScale(d['L'+currentZoom+'x'])})
+				.attr("cy",function(d) {return yScale(d['L'+currentZoom+'y'])})
+				.attr("r",zoomParams[currentZoom]['r'])
+				.attr("stroke-width",zoomParams[currentZoom]['w'])
+				//.style("fill",Red_if_mybbox)
+
+		/*
+		g.append('rect')
+			.attr('width',bbox.right-bbox.left)
+			.attr('height',bbox.top-bbox.bot)
+			.attr('x',bbox.left)
+			.attr('y',bbox.bot)
+			.attr('fill','red')*/
+		}
+	  }
 </script>
 </html>

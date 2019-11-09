@@ -8,7 +8,7 @@ class Movie(models.Model):
     genres = models.CharField(max_length=128, null=False)
 	
 	
-	#removed as L5 is same as individual points
+    #removed as L5 is same as individual points
     #x = models.FloatField(null=False)  # X value post t-SNE
     #y = models.FloatField(null=False)  # Y value post t-SNE
     
