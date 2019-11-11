@@ -69,7 +69,9 @@
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
-    const tableData = JSON.parse('{{ table_data|safe }}');
+    var tableData = JSON.parse('{{ table_data|safe }}');
+	const payload = tableData.payload;
+	
     console.log(tableData);
     const x_min = parseFloat(tableData['L5x__min']);
     const x_max = parseFloat(tableData['L5x__max']);
