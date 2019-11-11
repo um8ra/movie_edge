@@ -94,7 +94,14 @@
     var source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y, 'color': color}});
 
     var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
-    var p = plt.figure({ title: "Colorful Scatter", tools: tools});
+    var xdr = new Bokeh.Range1d({ start: x_min, end: x_max });
+    var ydr = new Bokeh.Range1d({ start: y_min, end: y_max });
+    var p = plt.figure({
+        title: "Colorful Scatter",
+        tools: tools,
+        x_range: xdr,
+        y_range: ydr,
+    });
 
     // call the circle glyph method to add some circle glyphs
     var circles = p.circle({ field: "x" }, { field: "y" }, {
