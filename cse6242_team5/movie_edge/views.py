@@ -114,12 +114,10 @@ def index(request: HttpRequest) -> HttpResponse:
         **movies_y_min,
         **movies_y_max,
     }
-    script, div = generate_plot(movies)
+    # script, div = generate_plot(movies)
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
-                  {'table_data': data_json,
-                   'script': script,
-                   'div': div})
+                  {'table_data': data_json})
 
 
 def sentiment_form(request: HttpRequest) -> HttpResponse:

@@ -65,8 +65,7 @@
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="container">
     <div class="grid" id="grid"></div>
-    {{ div|safe }}
-    {{ script|safe }}
+    <div class="graph" id="graph"></div>
 </div>
 {#Begin: super necessary! Else, disable CSRF Protection in views.py #}
 {% csrf_token %}
@@ -85,8 +84,31 @@
     const height = window.innerHeight;
     const data = tableData['data'].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
-
     gridNine(nineChoices);
+    var x = data.map(function(v){return v[X]});
+    var y = data.map(function(v){return v[Y]});
+    var source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y}});
+    var xdr = new Bokeh.Range1d({start: x_min, end: x_max});
+    var ydr = new Bokeh.Range1d({start: y_min, end: y_max});
+
+    var plot = new Bokeh.Plot({
+        title: 'my cool plot',
+        x_range:xdr,
+        y_range:ydr,
+        plot_width: 800,
+        plot_height: 800,
+        {#background_fill_color: 'black',#}
+    });
+
+    var circles = new Bokeh.Circle({
+        x: {field: 'x'},
+        y: {field: 'y'},
+        {#color: 'black',#}
+    });
+    plot.add_glyph(circles, source);
+
+    Bokeh.Plotting.show(plot);
+    {#console.log(source);#}
 
 </script>
 </body>
