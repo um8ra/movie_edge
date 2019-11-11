@@ -87,16 +87,16 @@
     gridNine(nineChoices);
     // https://docs.bokeh.org/en/latest/docs/user_guide/bokehjs.html
     // create some data and a ColumnDataSource
-    var plt = Bokeh.Plotting;
-    var x = data.map(function(v){return v[X]});
-    var y = data.map(function(v){return v[Y]});
-    var color = data.map(function(v){ return v[COLOR]});
-    var source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y, 'color': color}});
+    const plt = Bokeh.Plotting;
+    const x = data.map(function(v){return v[X]});
+    const y = data.map(function(v){return v[Y]});
+    const color = data.map(function(v){ return v[COLOR]});
+    const source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y, 'color': color}});
 
-    var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
-    var xdr = new Bokeh.Range1d({ start: x_min, end: x_max });
-    var ydr = new Bokeh.Range1d({ start: y_min, end: y_max });
-    var p = plt.figure({
+    const tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
+    let xdr = new Bokeh.Range1d({ start: x_min, end: x_max });
+    let ydr = new Bokeh.Range1d({ start: y_min, end: y_max });
+    const p = plt.figure({
         title: "Colorful Scatter",
         tools: tools,
         x_range: xdr,
@@ -104,7 +104,7 @@
     });
 
     // call the circle glyph method to add some circle glyphs
-    var circles = p.circle({ field: "x" }, { field: "y" }, {
+    const circles = p.circle({ field: "x" }, { field: "y" }, {
         source: source,
         fill_color: {field: "color"},
         line_color: {field: "color"},
@@ -112,8 +112,13 @@
 
     // show the plot
     new_plot = plt.show(p);
-    xdr.start(newValue);
-    xdr.end(otherValue);
+
+    // This lets us *dynamically* resize the visible area!
+    // No re-render necessary.
+    newXmin = 10;
+    newXmax = 20;
+    xdr.start = newXmin;
+    xdr.end = newXmax;
 
 </script>
 </body>
