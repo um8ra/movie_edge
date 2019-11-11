@@ -6,19 +6,23 @@ from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie
 from django.db.models import Max, Min
+from django.db.models import QuerySet
 import pandas as pd
 import json
 import urllib.parse
 import random
-from typing import List
+from typing import List, Tuple
+from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource
+from bokeh.embed import components
 # from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
 TITLE = 'movie_title'
 GENRES = 'genres'
-X = 'x'
-Y = 'y'
+X = 'L5x'
+Y = 'L5y'
 MEAN = 'mean'
 COUNT = 'count'
 STDDEV = 'std'
@@ -62,6 +66,24 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     return list(return_val)
 
 
+def generate_plot(movies: QuerySet) -> Tuple[str, str]:
+    fig = figure(title='Taste Space')
+    # imdb_min = movies.aggregate(Min(IMDB_RATING))
+    # imdb_max = movies.aggregate(Max(IMDB_RATING))
+    # metascore_min = movies.aggregate(Min(METASCORE))
+    # metascore_max = movies.aggregate(Max(METASCORE))
+    df_bokeh_movies = pd.DataFrame.from_records(movies)
+    FINAL_SCORE = 'final_score'
+    # Metacritic is a better score method, but fallback to IMDB, else 0. The non-zeros cover 23860 / 23892 movies.
+    df_bokeh_movies[FINAL_SCORE] = df_bokeh_movies[METASCORE].fillna(df_bokeh_movies[IMDB_RATING] * 10).fillna(0)
+    cds = ColumnDataSource(df_bokeh_movies)
+    print(df_bokeh_movies.head())
+    fig.circle(x=X, y=Y, source=cds, color='blue')
+    return components(fig)
+
+
+
+
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
     for movie in movies:
@@ -70,10 +92,10 @@ def index(request: HttpRequest) -> HttpResponse:
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
        
-    movies_x_min = movies.aggregate(Min('L5x'))
-    movies_x_max = movies.aggregate(Max('L5x'))
-    movies_y_min = movies.aggregate(Min('L5y'))
-    movies_y_max = movies.aggregate(Max('L5y'))
+    movies_x_min = movies.aggregate(Min(X))
+    movies_x_max = movies.aggregate(Max(Y))
+    movies_y_min = movies.aggregate(Min(X))
+    movies_y_max = movies.aggregate(Max(Y))
 
     frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
     len_movies = len(frequently_rated_movies)
@@ -90,10 +112,12 @@ def index(request: HttpRequest) -> HttpResponse:
         **movies_y_min,
         **movies_y_max,
     }
-
+    script, div = generate_plot(movies)
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
-                  {'table_data': data_json})
+                  {'table_data': data_json,
+                   'script': script,
+                   'div': div})
 
 
 def sentiment_form(request: HttpRequest) -> HttpResponse:

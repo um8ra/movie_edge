@@ -35,7 +35,7 @@
             width: 128px;
         }
 
-        .graph {
+        .bk-root {
             width: 70%;
             float: right;
             background: darkgray;
@@ -65,9 +65,9 @@
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="container">
     <div class="grid" id="grid"></div>
-    <div class="graph" id="graph"></div>
+    {{ div|safe }}
+    {{ script|safe }}
 </div>
-</body>
 {#Begin: super necessary! Else, disable CSRF Protection in views.py #}
 {% csrf_token %}
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
@@ -87,145 +87,7 @@
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
     gridNine(nineChoices);
-    let visAnchor = {x: 0, y: 0};
-    const currentZoom = 0;
-    let lastScale = 1;
-    const tmp = 0;
-    let mybbox = {};
-    let lastRedrawBbox = {};
-    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
-    const zScale = d3.scaleQuantize().domain([zoomParams.minZoom, zoomParams.maxZoom]).range([0, 1, 2, 3, 4, 5]);
-    const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
-    const g = svg.append("g")
-        .attr("class", "holder");
-
-    function redraw(bbox, pad_bigger) {
-        //clear old
-        g.selectAll('.scatter').remove();
-        g.selectAll('.logpoint').remove();
-        //insert subset of points
-        if (pad_bigger) {
-            bbox = resizeBbox(bbox, true)
-        }
-        const fil = function (d) {
-            return bboxFilter(d, bbox, currentZoom)
-        };
-        const subdata = data.filter(fil);
-        g.selectAll('.scatter')
-            .data(subdata)
-            .enter()
-            .append("circle")
-            .attr("r", zoomParams[currentZoom]['r'])
-            .attr("cx", function (d) {
-                return xScale(d['L' + currentZoom + 'x'])
-            })
-            .attr("cy", function (d) {
-                return yScale(d['L' + currentZoom + 'y'])
-            })
-            .attr("class", "scatter");
-        //update visibility anchor
-        console.log('Redraw');
-        console.log(subdata.length);
-        visAnchor = {
-            x: (mybbox.left + mybbox.right) / 2,
-            y: (mybbox.top + mybbox.bot) / 2
-        };
-
-        console.log(visAnchor);
-        // drop a point at visAnchor just to check
-        g.append('circle')
-            .attr('cx', xScale(visAnchor.x))
-            .attr('cy', yScale(visAnchor.y))
-            .attr("class", "logpoint")
-            .attr("r", 2)
-            .style('fill', 'red');
-        lastRedrawBbox = bbox;
-    }
-
-    g.selectAll('circle')
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("r", zoomParams[currentZoom]['r'])
-        .attr("cx", function (d) {
-            return xScale(d['L' + currentZoom + 'x'])
-        })
-        .attr("cy", function (d) {
-            return yScale(d['L' + currentZoom + 'y'])
-        })
-        .attr("class", "scatter");
-
-    const myzoom = d3.zoom()
-        .extent([[0, 0], [width, height]])
-        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
-        .on("zoom", zoomed);
-
-    svg.call(myzoom);
-
-    function zoomed() {
-        const tx = d3.event.transform;
-        g.attr("transform", tx);
-        const k = d3.event.transform.k;
-        const newZoom = zScale(k);
-        const bbox_pixels = getVisibleArea(tx);
-
-        const bbox = {
-            top: yScale.invert(bbox_pixels.bot),
-            bot: yScale.invert(bbox_pixels.top),
-            left: xScale.invert(bbox_pixels.left),
-            right: xScale.invert(bbox_pixels.right)
-        };
-
-        mybbox = bbox;
-
-        // check if our anchor is in the bbox, if not we need to redraw
-        const smallerBbox = resizeBbox(bbox, false);
-        mybbox = smallerBbox;
-        const x_ok = visAnchor.x >= smallerBbox.left && visAnchor.x <= smallerBbox.right;
-        const y_ok = visAnchor.y >= smallerBbox.bot && visAnchor.y <= smallerBbox.top;
-        if (!(x_ok && y_ok)) {
-
-            redraw(bbox, false);
-        }
-
-        // if the entire  bbox from full redraw is in the frame, then we should redraw too. (just test the corners)
-        if (k !== lastScale) {
-            if (lastRedrawBbox.top <= bbox.top || lastRedrawBbox.left >= bbox.left || lastRedrawBbox.right <= bbox.right || lastRedrawBbox.bot >= bbox.bot) {
-                redraw(bbox, true);
-            }
-        }
-        lastScale = k;
-
-
-        // handle zoom changes
-        if (newZoom !== currentZoom) {
-            console.log('Setting new zoom level ' + newZoom + ' ' + k);
-            console.log(bbox);
-
-            redraw(bbox, false);
-            //transition
-            const currentZoom = newZoom;
-            g.selectAll('.scatter').transition().attr("duration", 3000)
-                .attr("cx", function (d) {
-                    return xScale(d['L' + currentZoom + 'x'])
-                })
-                .attr("cy", function (d) {
-                    return yScale(d['L' + currentZoom + 'y'])
-                })
-                .attr("r", zoomParams[currentZoom]['r'])
-                .attr("stroke-width", zoomParams[currentZoom]['w'])
-            //.style("fill",Red_if_mybbox)
-
-            /*
-            g.append('rect')
-                .attr('width',bbox.right-bbox.left)
-                .attr('height',bbox.top-bbox.bot)
-                .attr('x',bbox.left)
-                .attr('y',bbox.bot)
-                .attr('fill','red')*/
-        }
-    }
 </script>
+</body>
 </html>
