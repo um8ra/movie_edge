@@ -15,6 +15,7 @@ from typing import List, Tuple
 from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource
 from bokeh.embed import components
+from bokeh.transform import linear_cmap
 # from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
@@ -78,7 +79,7 @@ def generate_plot(movies: QuerySet) -> Tuple[str, str]:
     df_bokeh_movies[FINAL_SCORE] = df_bokeh_movies[METASCORE].fillna(df_bokeh_movies[IMDB_RATING] * 10).fillna(0)
     cds = ColumnDataSource(df_bokeh_movies)
     print(df_bokeh_movies.head())
-    fig.circle(x=X, y=Y, source=cds, color='blue')
+    fig.circle(x=X, y=Y, source=cds, color=linear_cmap(FINAL_SCORE, 'Cividis256', 0.0, 100.0))
     return components(fig)
 
 
