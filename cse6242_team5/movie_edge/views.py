@@ -16,6 +16,7 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource
 from bokeh.embed import components
 from bokeh.transform import linear_cmap
+from bokeh.palettes import cividis
 # from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
@@ -39,6 +40,7 @@ IMDB_VOTES = 'imdb_votes'
 MOVIE_CHOICES = 'movie_choices'
 LIKE = 'movies_liked'
 DISLIKE = 'movies_disliked'
+FINAL_SCORE = 'final_score'
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
 
@@ -88,15 +90,27 @@ def generate_plot(movies: QuerySet) -> Tuple[str, str]:
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
+    cividis_palette = cividis(101)
+
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
+
+        metascore = movie[METASCORE]
+        imdbscore = movie[IMDB_RATING]
+        if metascore:
+            movie[FINAL_SCORE] = metascore
+        elif imdbscore:
+            movie[FINAL_SCORE] = imdbscore * 10.0
+        else:
+            movie[FINAL_SCORE] = 0
+        movie[COLOR] = cividis_palette[int(movie[FINAL_SCORE])]
        
     movies_x_min = movies.aggregate(Min(X))
-    movies_x_max = movies.aggregate(Max(Y))
-    movies_y_min = movies.aggregate(Min(X))
+    movies_x_max = movies.aggregate(Max(X))
+    movies_y_min = movies.aggregate(Min(Y))
     movies_y_max = movies.aggregate(Max(Y))
 
     frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
@@ -114,6 +128,7 @@ def index(request: HttpRequest) -> HttpResponse:
         **movies_y_min,
         **movies_y_max,
     }
+
     # script, div = generate_plot(movies)
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
