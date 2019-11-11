@@ -68,7 +68,6 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
 
 
 def generate_plot(movies: QuerySet) -> Tuple[str, str]:
-    fig = figure(title='Taste Space')
     # imdb_min = movies.aggregate(Min(IMDB_RATING))
     # imdb_max = movies.aggregate(Max(IMDB_RATING))
     # metascore_min = movies.aggregate(Min(METASCORE))
@@ -77,9 +76,13 @@ def generate_plot(movies: QuerySet) -> Tuple[str, str]:
     FINAL_SCORE = 'final_score'
     # Metacritic is a better score method, but fallback to IMDB, else 0. The non-zeros cover 23860 / 23892 movies.
     df_bokeh_movies[FINAL_SCORE] = df_bokeh_movies[METASCORE].fillna(df_bokeh_movies[IMDB_RATING] * 10).fillna(0)
+    df_bokeh_movies[MOVIE_TITLE] = df_bokeh_movies[MOVIE_TITLE].map(urllib.parse.unquote)
     cds = ColumnDataSource(df_bokeh_movies)
     print(df_bokeh_movies.head())
-    fig.circle(x=X, y=Y, source=cds, color=linear_cmap(FINAL_SCORE, 'Cividis256', 0.0, 100.0))
+    TOOLTIPS = [(i, '@{}'.format(i)) for i in [MOVIE_ID, TITLE, X, Y]]
+    fig = figure(title='Taste Space', tooltips=TOOLTIPS, output_backend='webgl')
+    fig.circle(x=X, y=Y, source=cds,
+               color=linear_cmap(FINAL_SCORE, 'Cividis256', 0.0, 100.0))
     return components(fig)
 
 
