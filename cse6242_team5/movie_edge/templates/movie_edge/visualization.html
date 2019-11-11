@@ -85,30 +85,45 @@
     const data = tableData['data'].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
     gridNine(nineChoices);
+    // create some data and a ColumnDataSource
     var x = data.map(function(v){return v[X]});
     var y = data.map(function(v){return v[Y]});
     var source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y}});
-    var xdr = new Bokeh.Range1d({start: x_min, end: x_max});
-    var ydr = new Bokeh.Range1d({start: y_min, end: y_max});
 
+    // create some ranges for the plot
+    var xdr = new Bokeh.Range1d({start: -40, end: 40});
+    var ydr = new Bokeh.Range1d({start: -40, end: 40});
+
+    // make the plot
     var plot = new Bokeh.Plot({
-        title: 'my cool plot',
-        x_range:xdr,
-        y_range:ydr,
+        title: "Taste Space",
+        x_range: xdr,
+        y_range: ydr,
         plot_width: 800,
         plot_height: 800,
-        {#background_fill_color: 'black',#}
+        background_fill_color: "#F2F2F7"
     });
 
+    // add axes to the plot
+    var xaxis = new Bokeh.LinearAxis({axis_line_color: null});
+    var yaxis = new Bokeh.LinearAxis({axis_line_color: null});
+    plot.add_layout(xaxis, "below");
+    plot.add_layout(yaxis, "left");
+
+    // add grids to the plot
+    var xgrid = new Bokeh.Grid({ticker: xaxis.ticker, dimension: 0});
+    var ygrid = new Bokeh.Grid({ticker: yaxis.ticker, dimension: 1});
+    plot.add_layout(xgrid);
+    plot.add_layout(ygrid);
+
+    // add a Line glyph
     var circles = new Bokeh.Circle({
-        x: {field: 'x'},
-        y: {field: 'y'},
-        {#color: 'black',#}
+        x: {field: "x"},
+        y: {field: "y"},
     });
     plot.add_glyph(circles, source);
 
     Bokeh.Plotting.show(plot);
-    {#console.log(source);#}
 
 </script>
 </body>
