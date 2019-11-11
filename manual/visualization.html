@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Edge</title>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+
+		body {
+		overflow-x:hidden;
+		overflow-y:hidden
+		}
+		
+		.scatter {
+			stroke: grey;
+		}
+		
+		.selected {
+			stroke: red;
+		}
+		
+		
+			
+    </style>
+</head>
+<body>
+
+<!--https://gridbyexample.com/examples/code/example18.html-->
+<!--div class="wrapper" id="grid"> </div-->
+<div id = "graph"> </div>
+
+</body>
+<script>
+	const zoomParams = {0: {r:20,w:2},
+				1: {r:10,w:1},
+				2: {r:5,w:0.5},
+				3: {r:2.5,w:0.25},
+				4: {r:1.25,w:0.125},
+				5: {r:0.5,w:0.05},
+				minZoom: 1,
+				maxZoom: 64,
+				}
+
+    const padding = 25;
+	const width = window.innerWidth-padding;
+    const height = window.innerHeight-padding;
+	const x_min = -53.3861;
+	const y_min = -44.8468;
+	const y_max = 46.9188;
+	const x_max = 52.6295;
+	const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
+    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
+	const zScale = d3.scaleThreshold().domain([3,6,12,24,48]).range([0, 1, 2, 3, 4, 5]);
+	var colorScale = d3.scaleSequential(d3.interpolatePiYG).domain([0,10]);
+	colorScale.clamp;
+    
+	const bbox_pad = 0.25;
+	
+	
+	
+	
+	
+	function drawGraph(data,highlight,layer) {
+
+		// remove current graph
+		g.selectAll('.scatter').remove()
+		
+		//Got the data, now draw it.
+		g.selectAll('.scatter')
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("r",zoomParams[layer]['r'])
+		.attr("cx",d => xScale(d.x))
+		.attr("cy",d => yScale(d.y))
+		.attr("stroke-width",zoomParams[layer]['w'])
+		.style('fill', d=>colorScale(d.imdb_rating))
+		.attr("class",function (d) {
+				if (d.ID == highlight) {
+					return "selected scatter"
+				}
+				else {
+					return "scatter"
+				
+				}
+		} )
+
+	}
+	
+	 //https://stackoverflow.com/questions/42695480/d3v4-zoom-coordinates-of-visible-area
+	function getVisibleArea(t) {
+		    var ul = t.invert([0, 0]),
+			lr = t.invert([width, height]);
+			return {left:Math.trunc(ul[0]),
+						bot:Math.trunc(ul[1]),
+						right:Math.trunc(lr[0]),
+						top:Math.trunc(lr[1])
+			}
+		}
+		
+	function getBbox(t) {
+			const pixel_bbox = getVisibleArea(t);
+			const tmp = {top: yScale.invert(pixel_bbox.bot),
+							bot: yScale.invert(pixel_bbox.top),
+							left:xScale.invert(pixel_bbox.left),
+							right:xScale.invert(pixel_bbox.right)}
+			const  height = tmp.top-tmp.bot;
+			const  width = tmp.right-tmp.left;			
+			return {top:tmp.top+height*bbox_pad,
+					bot:tmp.bot-height*bbox_pad,
+					left: tmp.left-width*bbox_pad,
+					right: tmp.right+width*bbox_pad}				
+	}
+	
+	
+	
+	function  bboxFilter(d,bbox) {
+	
+		const  x_ok = d.x >= bbox.left && d.x <= bbox.right
+		const  y_ok = d.y >= bbox.bot && d.y <=bbox.top
+		
+		return x_ok && y_ok;	
+	}
+	
+	function animateClusters(movieData, bbox,startLevel,endLevel){
+		
+		const filtered = movieData.filter(d=>bboxFilter(d,bbox));	
+		var colorScale = d3.scaleSequential(d3.interpolatePiYG);
+		colorScale.domain([d3.min(movieData,d=> d.imdb_rating),d3.max(movieData,d=> d.imdb_rating)])
+		
+		//start with removing
+		g.selectAll('.scatter').remove()
+		
+		//Put start points
+		g.selectAll('.scatter')
+		.data(filtered)
+		.enter()
+		.append("circle")
+		.attr("r",zoomParams[startLevel]['r'])
+		.attr("cx",function(d) {return xScale(d['L'+startLevel+'x'])})
+		.attr("cy",function(d) {return yScale(d['L'+startLevel+'y'])})
+		.attr("class","scatter")
+		.attr("stroke-width",zoomParams[endLevel]['w'])
+		.style('fill', d=>colorScale(d.imdb_rating))
+		.style('opacity',1.0)
+		
+		
+		//Transition 
+		g.selectAll('.scatter').transition().duration(1000)
+				.attr("cx",function(d) {return xScale(d['L'+endLevel+'x'])})
+				.attr("cy",function(d) {return yScale(d['L'+endLevel+'y'])})
+				.attr("r",zoomParams[endLevel]['r'])
+				.attr("stroke-width",zoomParams[endLevel]['w'])
+				.style('opacity',1.0)
+				.end()
+				.then(()=> drawGraph(payload[endLevel],0,endLevel));
+
+		//don't forget to redraw when done!
+
+	}
+	//Init
+	var currentZoom = 0;
+	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
+	const g = svg.append("g")
+			.attr("class","holder")
+    var myzoom = d3.zoom()
+       .extent([[0, 0], [width, height]])
+       .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
+       .on("zoom", zoomed);
+    svg.call(myzoom);
+	
+	var payload; // global to pass around the payload data
+	var movieData;
+	var tmp; //debug
+	d3.json('payload.json').then(function (pl) {
+		payload = pl;
+		movieData = payload[5]
+		var data = payload[0];
+		//tmp = data;
+		drawGraph(data,0,0);
+	})	
+   
+   
+	function zoomed() {
+		var tx = d3.event.transform
+	 	g.attr("transform",tx );
+		k = d3.event.transform.k;
+		var newZoom = zScale(k)
+		var r;
+		tmp = newZoom;	
+		
+		// handle zoom changes
+		if (newZoom  != currentZoom){ 
+			var bbox = getBbox(tx);
+			var data = payload[newZoom]
+			console.log('Setting new zoom level ' + newZoom + ' ' +k)
+			animateClusters(movieData, bbox,currentZoom,newZoom)
+			currentZoom = newZoom;
+			
+	}
+   }
+   
+    
+</script>
+</html>
