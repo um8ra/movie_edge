@@ -87,47 +87,23 @@
     gridNine(nineChoices);
     // https://docs.bokeh.org/en/latest/docs/user_guide/bokehjs.html
     // create some data and a ColumnDataSource
+    var plt = Bokeh.Plotting;
     var x = data.map(function(v){return v[X]});
     var y = data.map(function(v){return v[Y]});
     var color = data.map(function(v){ return v[COLOR]});
     var source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y, 'color': color}});
 
-    // create some ranges for the plot
-    var xdr = new Bokeh.Range1d({start: x_min - 1, end: x_max + 1});
-    var ydr = new Bokeh.Range1d({start: y_min - 1, end: y_max + 1});
+    var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
+    var p = plt.figure({ title: "Colorful Scatter", tools: tools });
 
-    // make the plot
-    var plot = new Bokeh.Plot({
-        title: "Taste Space",
-        x_range: xdr,
-        y_range: ydr,
-        plot_width: 800,
-        plot_height: 800,
-        background_fill_color: "#F2F2F7",
+    // call the circle glyph method to add some circle glyphs
+    var circles = p.circle({ field: "x" }, { field: "y" }, {
+        source: source,
+        fill_color: {field: "color"}
     });
 
-    // add axes to the plot
-    var xaxis = new Bokeh.LinearAxis({axis_line_color: null});
-    var yaxis = new Bokeh.LinearAxis({axis_line_color: null});
-    plot.add_layout(xaxis, "below");
-    plot.add_layout(yaxis, "left");
-
-    // add grids to the plot
-    var xgrid = new Bokeh.Grid({ticker: xaxis.ticker, dimension: 0});
-    var ygrid = new Bokeh.Grid({ticker: yaxis.ticker, dimension: 1});
-    plot.add_layout(xgrid);
-    plot.add_layout(ygrid);
-
-    // add a Line glyph
-    FINAL_SCORE = 'final_score';
-    var circles = new Bokeh.Circle({
-        x: {field: "x"},
-        y: {field: "y"},
-        fill_color: {field: COLOR}
-    });
-    plot.add_glyph(circles, source);
-
-    Bokeh.Plotting.show(plot);
+    // show the plot
+    plt.show(p);
 
 </script>
 </body>
