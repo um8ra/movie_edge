@@ -16,6 +16,7 @@ function drawGraph(data,highlight,layer) {
 	.attr("stroke-width",zoomParams[layer]['w'])
 	.style('fill', d=>colorScale(d.imdb_rating))
 	.attr("class",function (d) {
+			
 			if (d.ID == highlight) {
 				return "selected scatter"
 			}
@@ -24,6 +25,7 @@ function drawGraph(data,highlight,layer) {
 			
 			}
 	} )
+	.on("dblclick.zoom",selectHighlight);
 
 }
 	
@@ -62,9 +64,20 @@ function  bboxFilter(d,bbox) {
 	return x_ok && y_ok;	
 }
 
+function  bboxFilter2Level(d,bbox,startLevel,endLevel) {
+
+	const  x_okS = (d['L'+startLevel+'x'] >= bbox.left) && (d['L'+startLevel+'x'] <= bbox.right);
+	const  x_okE = (d['L'+endLevel+'x'] >= bbox.left) && (d['L'+endLevel+'x'] <= bbox.right);
+	const  y_okS = (d['L'+startLevel+'y']>= bbox.bot) && (d['L'+startLevel+'y'] <=bbox.top)
+	const  y_okE = (d['L'+endLevel+'y']>= bbox.bot) && (d['L'+endLevel+'y'] <=bbox.top)
+	
+	return (x_okS && y_okS) || (x_okE && y_okE);	
+}
+
+
 function animateClusters(movieData, bbox,startLevel,endLevel) {
 	
-	const filtered = movieData.filter(d=>bboxFilter(d,bbox));	
+	const filtered = movieData.filter(d=>bboxFilter2Level(d,bbox,startLevel,endLevel));	
 	//start with removing
 	g.selectAll('.scatter').remove()
 	
@@ -94,6 +107,14 @@ function animateClusters(movieData, bbox,startLevel,endLevel) {
 
 	//don't forget to redraw when done!
 
+}
+
+
+function selectHighlight(d) {
+	d3.selectAll('.scatter').attr('class','scatter')
+	d3.select(this).attr('class','scatter selected')
+	
+	
 }
 
 

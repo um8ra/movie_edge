@@ -27,4 +27,4 @@ const zoomParams = {0: {r:20,w:2},
 				maxZoom: 64,
 				};
 const gridID = 'grid';
-const bbox_pad = 0.25;
+const bbox_pad = 0;

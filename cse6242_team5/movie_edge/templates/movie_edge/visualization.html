@@ -98,18 +98,21 @@
 	const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
 	const zScale = d3.scaleThreshold().domain([3,6,12,24,48]).range([0, 1, 2, 3, 4, 5]);
-	var colorScale = d3.scaleSequential(d3.interpolatePiYG).domain([0,10]);
+	var colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0,10]);
     
 	
 	//Init
 	var currentZoom = 0;
 	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
+				
 	const g = svg.append("g")
 			.attr("class","holder")
     var myzoom = d3.zoom()
+	.duration(1000)
        .extent([[0, 0], [width, height]])
        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
        .on("zoom", zoomed);
+	   
     svg.call(myzoom);
 	
 	
