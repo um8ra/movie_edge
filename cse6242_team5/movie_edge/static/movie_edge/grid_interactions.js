@@ -63,9 +63,16 @@ function buttonClickSubmit(fetchURL) {
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
 }
 
-function buttonPlotGoTo(data) {
-    const movieId = data.target.value;
-    console.log('Jon, please implement: ' + movieId);
+function buttonPlotGoTo(v) {
+    const movieId = v.target.value;
+    const movieIndex = decoder[movieId];
+    const movieData = data[movieIndex];
+    const movieX = movieData[X];
+    const movieY = movieData[Y];
+    xdr.start = movieX - 2;
+    xdr.end = movieX + 2;
+    ydr.start = movieY - 2;
+    ydr.end = movieY + 2;
 }
 
 function gridNine(movieidList) {
