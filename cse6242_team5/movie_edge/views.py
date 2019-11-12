@@ -39,7 +39,7 @@ EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim
 
 db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
           [f'L{i}x' for i in range(6)] + [f'L{i}y' for i in range(6)] + \
-          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
+          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES] + ['x','y']
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
