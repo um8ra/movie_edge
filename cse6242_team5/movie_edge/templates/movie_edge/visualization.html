@@ -103,7 +103,7 @@
 	
 	//Init
 	var currentZoom = 0;
-	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
+	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding)
 				
 	const g = svg.append("g")
 			.attr("class","holder")
@@ -113,7 +113,7 @@
        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
        .on("zoom", zoomed);
 	   
-    svg.call(myzoom);
+    svg.call(myzoom).on("dblclick.zoom",selectHighlight);
 	
 	
 	var movieData = payload[5];

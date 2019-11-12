@@ -111,9 +111,23 @@ function animateClusters(movieData, bbox,startLevel,endLevel) {
 
 
 function selectHighlight(d) {
-	d3.selectAll('.scatter').attr('class','scatter')
+	d3.selectAll('.scatter').attr('class','scatter')	
 	d3.select(this).attr('class','scatter selected')
+	x = d3.select(this).attr("cx")
+	y = d3.select(this).attr("cy")
+	k = d3.zoomTransform(svg.node()).k
+	console.log(x,y,k)
 	
+	//https://observablehq.com/@d3/zoom-to-bounding-box
+	d3.event.stopPropagation();
+	 svg.transition().duration(750).call(
+      myzoom.transform,
+      d3.zoomIdentity
+        .translate(width/2, height/2)
+        .scale(k)
+		.translate(-x,-y),
+      d3.mouse(svg.node())
+    );
 	
 }
 
