@@ -120,6 +120,7 @@
         plot_height: 800,
     });
     p.add_tools(hover);
+    p.legend.click_policy = 'hide';
 
     // call the circle glyph method to add some circle glyphs
     const circles = p.circle({field: "x"}, {field: "y"}, {
@@ -136,9 +137,8 @@
         {
             source: source,
         },
-        {#legend_label=MOVIE_TITLE,#}
     );
-
+    text.visible=false;
     // show the plot
     new_plot = plt.show(p);
 

@@ -73,6 +73,9 @@ function buttonPlotGoTo(v) {
     xdr.end = movieX + 2;
     ydr.start = movieY - 2;
     ydr.end = movieY + 2;
+    if(!text.visible) { // not needed, but perhaps prevents a redraw
+        text.visible = true;
+    }
 }
 
 function gridNine(movieidList) {
