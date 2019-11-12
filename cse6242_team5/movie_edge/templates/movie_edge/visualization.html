@@ -95,7 +95,7 @@
         return v[Y]
     });
     const titles = data.map(function (v) {
-        return v[MOVIE_TITLE]
+        return v[MOVIE_TITLE].toString()
     });
     const color = data.map(function (v) {
         return v[COLOR]
@@ -128,6 +128,16 @@
         line_color: {field: "color"},
         radius: 0.1,
     });
+
+    const text = p.text(
+        {field: "x"},
+        {field: "y"},
+        {field: 'title'},
+        {
+            source: source,
+        },
+        {#legend_label=MOVIE_TITLE,#}
+    );
 
     // show the plot
     new_plot = plt.show(p);

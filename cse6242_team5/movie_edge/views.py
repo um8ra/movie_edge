@@ -83,6 +83,7 @@ def generate_plot(movies: QuerySet) -> Tuple[str, str]:
                  plot_width=800, plot_height=800)
     fig.circle(x=X, y=Y, source=cds,
                color=linear_cmap(FINAL_SCORE, 'Cividis256', 0.0, 100.0))
+    fig.text(x=X, y=Y, text=MOVIE_TITLE, source=cds)
     return components(fig)
 
 
