@@ -230,6 +230,8 @@ function highlightAndCenter(pts) {
 	let level = zScale(ptBox.k)
 	let clusters = getPtsClusterIDatLevel(pts,level)
 	console.log(ptBox)
+	
+	centerOnElement(xScale(ptBox.x),yScale(ptBox.y),ptBox.k);
 	d3.selectAll('.scatter')
 	.attr('class', function(d) {
 		if (clusters.includes(d.ID)) {
@@ -238,7 +240,8 @@ function highlightAndCenter(pts) {
 			return "scatter"
 		}
 	})	
-	centerOnElement(xScale(ptBox.x),yScale(ptBox.y),ptBox.k);
+	
+	
 }
 
 
