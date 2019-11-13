@@ -8,6 +8,7 @@
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
+	<script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
     <style>
         .grid {
             display: grid;
@@ -119,7 +120,13 @@
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
 
     drawGraph(payload[0], 0, 0);
-
+	tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d.actors; });
+	svg.call(tip);
+	
+	g.selectAll('.scatter')
+	.on('mouseover', tip.show)
+	.on('mouseout', tip.hide)
+	
 </script>
 </body>
 </html>
