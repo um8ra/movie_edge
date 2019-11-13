@@ -96,7 +96,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        'random_nine': random_movie_ids(9, 10000),
+        'random_movies': random_movie_ids(9, 10000),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,

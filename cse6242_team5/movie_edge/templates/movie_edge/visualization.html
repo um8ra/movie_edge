@@ -87,7 +87,7 @@
     const data = payload[5].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
-    gridNine(tableData['random_nine']);
+    gridMovies(tableData['random_movies']);
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);

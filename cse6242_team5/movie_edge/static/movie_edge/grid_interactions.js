@@ -53,14 +53,14 @@ function buttonClickGetRandom(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array();
     fetchPayload[DISLIKE] = Array();
-    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
+    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
 
 function buttonClickSubmit(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array.from(moviesLiked);
     fetchPayload[DISLIKE] = Array.from(moviesDisliked);
-    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
+    abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
 
 function closurePlotGoTo(movieID) {
@@ -75,7 +75,7 @@ function closurePlotGoTo(movieID) {
     return plotGoTo;
 }
 
-function gridNine(movieidList) {
+function gridMovies(movieidList) {
     const ratio = 1.48;
     const divisor = 2.25;
     const min_val = Math.min(document.getElementById("grid").offsetWidth,
