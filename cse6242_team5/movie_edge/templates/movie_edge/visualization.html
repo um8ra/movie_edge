@@ -8,8 +8,6 @@
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
-
-
     <style>
         .grid {
             display: grid;
@@ -75,8 +73,6 @@
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
-
-
     const tableData = JSON.parse('{{ table_data|safe }}');
     const payload = tableData.payload;
 
@@ -86,13 +82,12 @@
     const y_min = parseFloat(tableData['y__min']);
     const y_max = parseFloat(tableData['y__max']);
     const decoder = tableData['decoder'];
-    let nineChoices = tableData['random_nine'];
     const width = 0.7 * window.innerWidth;
     const height = window.innerHeight;
     const data = payload[5].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
-    gridNine(nineChoices);
+    gridNine(tableData['random_nine']);
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
@@ -114,7 +109,6 @@
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
 
     drawGraph(payload[0], 0, 0);
-
 
 </script>
 </body>
