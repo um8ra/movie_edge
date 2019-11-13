@@ -4,13 +4,14 @@ from pathlib import Path
 from gensim.models import Word2Vec
 from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
-from .models import Movie
+from .models import Movie, c0, c1, c2, c3, c4
 from django.db.models import Max, Min
 import pandas as pd
 import json
 import urllib.parse
 import random
 from typing import List
+
 # from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
@@ -36,10 +37,9 @@ LIKE = 'movies_liked'
 DISLIKE = 'movies_disliked'
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
-
-db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES, MEAN, COUNT, STDDEV] + \
+db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
           [f'L{i}x' for i in range(6)] + [f'L{i}y' for i in range(6)] + \
-          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES]
+          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES] + ['x', 'y', 'movie_id']
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
@@ -64,24 +64,42 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
 
 def index(request: HttpRequest) -> HttpResponse:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
+
     for movie in movies:
         # This is done since quotes and other junk in the title screws up JSON parsing
         movie[MOVIE_TITLE] = urllib.parse.quote(movie[MOVIE_TITLE])
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
-       
-    movies_x_min = movies.aggregate(Min('L5x'))
-    movies_x_max = movies.aggregate(Max('L5x'))
-    movies_y_min = movies.aggregate(Min('L5y'))
-    movies_y_max = movies.aggregate(Max('L5y'))
+
+    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id']
+
+    clusters0 = c0.objects.values(*cols)
+    clusters1 = c1.objects.values(*cols)
+    clusters2 = c2.objects.values(*cols)
+    clusters3 = c3.objects.values(*cols)
+    clusters4 = c4.objects.values(*cols)
+    for clusters in [clusters0, clusters1, clusters2, clusters3, clusters4]:
+        for cluster in clusters:
+            cluster['actors'] = urllib.parse.quote(cluster['actors'])
+            cluster['genres'] = urllib.parse.quote(cluster['genres'])
+
+    movies_x_min = movies.aggregate(Min('x'))
+    movies_x_max = movies.aggregate(Max('x'))
+    movies_y_min = movies.aggregate(Min('y'))
+    movies_y_max = movies.aggregate(Max('y'))
 
     frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
     len_movies = len(frequently_rated_movies)
     randoms = [random.randint(0, len_movies - 1) for _ in range(9)]
     serendipity_movies = [frequently_rated_movies[i][MOVIE_ID] for i in randoms]
     print(serendipity_movies)
+    payload = [list(clusters0), list(clusters1), list(clusters2), list(clusters3), list(clusters4), list(movies)]
+    for i, d in enumerate(payload):
+        for ele in d:
+            ele['ID'] = ele['cluster_id'] if i < 5 else ele['movie_id']
+
     data = {
-        'data': list(movies),
+        'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
         'random_nine': serendipity_movies,

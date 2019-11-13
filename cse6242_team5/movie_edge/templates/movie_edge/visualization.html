@@ -9,6 +9,7 @@
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
 
+
     <style>
         .grid {
             display: grid;
@@ -37,14 +38,18 @@
             background: darkgray;
         }
 
-        .scatter {
-            fill: steelblue;
-            stroke: #000;
-        }
 
         body {
             overflow-x: hidden;
             overflow-y: hidden
+        }
+
+        .scatter {
+            stroke: grey;
+        }
+
+        .selected {
+            stroke: red;
         }
 
     </style>
@@ -69,159 +74,46 @@
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
 <script>
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
+
+
     const tableData = JSON.parse('{{ table_data|safe }}');
+    const payload = tableData.payload;
+
     console.log(tableData);
-    const x_min = parseFloat(tableData['L5x__min']);
-    const x_max = parseFloat(tableData['L5x__max']);
-    const y_min = parseFloat(tableData['L5y__min']);
-    const y_max = parseFloat(tableData['L5y__max']);
+    const x_min = parseFloat(tableData['x__min']);
+    const x_max = parseFloat(tableData['x__max']);
+    const y_min = parseFloat(tableData['y__min']);
+    const y_max = parseFloat(tableData['y__max']);
     const decoder = tableData['decoder'];
     let nineChoices = tableData['random_nine'];
     const width = 0.7 * window.innerWidth;
     const height = window.innerHeight;
-    const data = tableData['data'].map(inputFormat);
+    const data = payload[5].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
     gridNine(nineChoices);
-    let visAnchor = {x: 0, y: 0};
-    const currentZoom = 0;
-    let lastScale = 1;
-    const tmp = 0;
-    let mybbox = {};
-    let lastRedrawBbox = {};
+
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
-    const zScale = d3.scaleQuantize().domain([zoomParams.minZoom, zoomParams.maxZoom]).range([0, 1, 2, 3, 4, 5]);
+    const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
+    const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]);
+
+    //Init
+    let currentZoom = 0;
     const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
     const g = svg.append("g")
         .attr("class", "holder");
-
-    function redraw(bbox, pad_bigger) {
-        //clear old
-        g.selectAll('.scatter').remove();
-        g.selectAll('.logpoint').remove();
-        //insert subset of points
-        if (pad_bigger) {
-            bbox = resizeBbox(bbox, true)
-        }
-        const fil = function (d) {
-            return bboxFilter(d, bbox, currentZoom)
-        };
-        const subdata = data.filter(fil);
-        g.selectAll('.scatter')
-            .data(subdata)
-            .enter()
-            .append("circle")
-            .attr("r", zoomParams[currentZoom]['r'])
-            .attr("cx", function (d) {
-                return xScale(d['L' + currentZoom + 'x'])
-            })
-            .attr("cy", function (d) {
-                return yScale(d['L' + currentZoom + 'y'])
-            })
-            .attr("class", "scatter");
-        //update visibility anchor
-        console.log('Redraw');
-        console.log(subdata.length);
-        visAnchor = {
-            x: (mybbox.left + mybbox.right) / 2,
-            y: (mybbox.top + mybbox.bot) / 2
-        };
-
-        console.log(visAnchor);
-        // drop a point at visAnchor just to check
-        g.append('circle')
-            .attr('cx', xScale(visAnchor.x))
-            .attr('cy', yScale(visAnchor.y))
-            .attr("class", "logpoint")
-            .attr("r", 2)
-            .style('fill', 'red');
-        lastRedrawBbox = bbox;
-    }
-
-    g.selectAll('circle')
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("r", zoomParams[currentZoom]['r'])
-        .attr("cx", function (d) {
-            return xScale(d['L' + currentZoom + 'x'])
-        })
-        .attr("cy", function (d) {
-            return yScale(d['L' + currentZoom + 'y'])
-        })
-        .attr("class", "scatter");
-
     const myzoom = d3.zoom()
+        .duration(1000)
         .extent([[0, 0], [width, height]])
         .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
         .on("zoom", zoomed);
 
-    svg.call(myzoom);
+    svg.call(myzoom).on("dblclick.zoom", selectHighlight);
 
-    function zoomed() {
-        const tx = d3.event.transform;
-        g.attr("transform", tx);
-        const k = d3.event.transform.k;
-        const newZoom = zScale(k);
-        const bbox_pixels = getVisibleArea(tx);
-
-        const bbox = {
-            top: yScale.invert(bbox_pixels.bot),
-            bot: yScale.invert(bbox_pixels.top),
-            left: xScale.invert(bbox_pixels.left),
-            right: xScale.invert(bbox_pixels.right)
-        };
-
-        mybbox = bbox;
-
-        // check if our anchor is in the bbox, if not we need to redraw
-        const smallerBbox = resizeBbox(bbox, false);
-        mybbox = smallerBbox;
-        const x_ok = visAnchor.x >= smallerBbox.left && visAnchor.x <= smallerBbox.right;
-        const y_ok = visAnchor.y >= smallerBbox.bot && visAnchor.y <= smallerBbox.top;
-        if (!(x_ok && y_ok)) {
-
-            redraw(bbox, false);
-        }
-
-        // if the entire  bbox from full redraw is in the frame, then we should redraw too. (just test the corners)
-        if (k !== lastScale) {
-            if (lastRedrawBbox.top <= bbox.top || lastRedrawBbox.left >= bbox.left || lastRedrawBbox.right <= bbox.right || lastRedrawBbox.bot >= bbox.bot) {
-                redraw(bbox, true);
-            }
-        }
-        lastScale = k;
+    drawGraph(payload[0], 0, 0);
 
 
-        // handle zoom changes
-        if (newZoom !== currentZoom) {
-            console.log('Setting new zoom level ' + newZoom + ' ' + k);
-            console.log(bbox);
-
-            redraw(bbox, false);
-            //transition
-            const currentZoom = newZoom;
-            g.selectAll('.scatter').transition().attr("duration", 3000)
-                .attr("cx", function (d) {
-                    return xScale(d['L' + currentZoom + 'x'])
-                })
-                .attr("cy", function (d) {
-                    return yScale(d['L' + currentZoom + 'y'])
-                })
-                .attr("r", zoomParams[currentZoom]['r'])
-                .attr("stroke-width", zoomParams[currentZoom]['w'])
-            //.style("fill",Red_if_mybbox)
-
-            /*
-            g.append('rect')
-                .attr('width',bbox.right-bbox.left)
-                .attr('height',bbox.top-bbox.bot)
-                .attr('x',bbox.left)
-                .attr('y',bbox.bot)
-                .attr('fill','red')*/
-        }
-    }
 </script>
 </html>

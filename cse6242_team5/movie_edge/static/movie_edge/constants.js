@@ -17,15 +17,15 @@ const moviesLiked = new Set(); // using set since it will do deduplication
 const moviesDisliked = new Set(); // using set since it will do deduplication
 const POSTER_HEIGHT = 300;
 const POSTER_WIDTH = 200;
-const zoomParams = {
-    0: {r: 20, w: 2},
-    1: {r: 10, w: 1},
-    2: {r: 5, w: 0.5},
-    3: {r: 2.5, w: 0.25},
-    4: {r: 1.25, w: 0.125},
-    5: {r: 0.5, w: 0.05},
-    minZoom: 1,
-    maxZoom: 50,
-};
-const bbox_pad = 0.25;
+const zoomParams = {0: {r:20,w:2},
+				1: {r:10,w:1},
+				2: {r:5,w:0.5},
+				3: {r:2.5,w:0.25},
+				4: {r:1.25,w:0.125},
+				5: {r:0.5,w:0.05},
+				minZoom: 1,
+				maxZoom: 64,
+				};
 const gridID = 'grid';
+const bbox_pad = 0;
+const IMDB_RATING = 'imdb_rating';
