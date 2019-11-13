@@ -129,10 +129,15 @@ def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     movies_disliked = request_data[DISLIKE]
     movies_disliked_int = [int(i) for i in movies_disliked]
 
-    if (len(movies_liked) + len(movies_disliked)) == 0:
+    len_movies_liked = len(movies_liked)
+    len_movies_disliked = len(movies_disliked)
+    if (len_movies_liked + len_movies_disliked) == 0:
         print('No Data: Random')
         response = {MOVIE_CHOICES: random_movie_ids(9)}
         return JsonResponse(response)
+    elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
+        # Yi and Rocko do stuff here and change the threshold/rules and such
+        pass
     else:
         print('Have Data: Calculating...')
         gensim_model_str = EMBEDDER
