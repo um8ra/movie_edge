@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from pathlib import Path
 from gensim.models import Word2Vec
-from .forms import SentimentForm
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie, c0, c1, c2, c3, c4
 from django.db.models import Max, Min
@@ -112,11 +111,6 @@ def index(request: HttpRequest) -> HttpResponse:
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
-
-
-def sentiment_form(request: HttpRequest) -> HttpResponse:
-    return render(request, 'movie_edge/sentiment_form.html',
-                  {'form': SentimentForm()})
 
 
 # @csrf_exempt
