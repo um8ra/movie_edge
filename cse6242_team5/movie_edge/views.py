@@ -39,7 +39,7 @@ EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim
 
 db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
           [f'L{i}x' for i in range(6)] + [f'L{i}y' for i in range(6)] + \
-          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES] + ['x','y','movie_id']
+          [POSTER_URL, RUNTIME, DIRECTOR, ACTORS, METASCORE, IMDB_RATING, IMDB_VOTES] + ['x', 'y', 'movie_id']
 
 dict_gensim_models = dict()
 base_path = Path(BASE_DIR)
@@ -71,31 +71,17 @@ def index(request: HttpRequest) -> HttpResponse:
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
 
-    
-    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors','cluster_id']
+    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id']
+
     clusters0 = c0.objects.values(*cols)
-    for cluster in clusters0:
-        cluster['actors'] = urllib.parse.quote(cluster['actors'])
-        cluster['genres'] = urllib.parse.quote(cluster['genres'])	
     clusters1 = c1.objects.values(*cols)
-    for cluster in clusters1:
-        cluster['actors'] = urllib.parse.quote(cluster['actors'])
-        cluster['genres'] = urllib.parse.quote(cluster['genres'])
     clusters2 = c2.objects.values(*cols)
-    for cluster in clusters2:
-        cluster['actors'] = urllib.parse.quote(cluster['actors'])
-        cluster['genres'] = urllib.parse.quote(cluster['genres'])
     clusters3 = c3.objects.values(*cols)
-    for cluster in clusters3:
-        cluster['actors'] = urllib.parse.quote(cluster['actors'])
-        cluster['genres'] = urllib.parse.quote(cluster['genres'])
     clusters4 = c4.objects.values(*cols)
-    for cluster in clusters4:
-        cluster['actors'] = urllib.parse.quote(cluster['actors'])
-        cluster['genres'] = urllib.parse.quote(cluster['genres'])
-	
-	
-	
+    for clusters in [clusters0, clusters1, clusters2, clusters3, clusters4]:
+        for cluster in clusters:
+            cluster['actors'] = urllib.parse.quote(cluster['actors'])
+            cluster['genres'] = urllib.parse.quote(cluster['genres'])
 
     movies_x_min = movies.aggregate(Min('x'))
     movies_x_max = movies.aggregate(Max('x'))
@@ -107,14 +93,13 @@ def index(request: HttpRequest) -> HttpResponse:
     randoms = [random.randint(0, len_movies - 1) for _ in range(9)]
     serendipity_movies = [frequently_rated_movies[i][MOVIE_ID] for i in randoms]
     print(serendipity_movies)
-    payload = [list(clusters0), list(clusters1), list(clusters2), list(clusters3), list(clusters4),list(movies)]
-    for i,d in enumerate(payload):
+    payload = [list(clusters0), list(clusters1), list(clusters2), list(clusters3), list(clusters4), list(movies)]
+    for i, d in enumerate(payload):
         for ele in d:
             ele['ID'] = ele['cluster_id'] if i < 5 else ele['movie_id']
-	
-	
+
     data = {
-        'payload': payload ,
+        'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
         'random_nine': serendipity_movies,
