@@ -63,7 +63,7 @@ function buttonClickSubmit(fetchURL) {
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridNine);
 }
 
-function closurePlotGoTo(movieID){
+function closurePlotGoTo(movieID) {
     // movieID isn't actually passed to plotGoTo
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
@@ -71,6 +71,7 @@ function closurePlotGoTo(movieID){
         console.log(movieID);
         console.log('do stuff with movieID')
     }
+
     return plotGoTo;
 }
 
@@ -98,13 +99,7 @@ function gridNine(movieidList) {
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
 
-            // const buttonShowMe = document.createElement('BUTTON');
-            // buttonShowMe.innerText = 'Show Me!';
-            // buttonShowMe.onclick = buttonPlotGoTo;
-            // buttonShowMe.value = movieId;
-
             imgNode.src = data[dataIndex][POSTER_URL];
-            imgNode.value = movieId;
             imgNode.onclick = closurePlotGoTo(movieId);
             imgNode.height = POSTER_HEIGHT;
             imgNode.width = POSTER_WIDTH;
