@@ -87,11 +87,6 @@ def index(request: HttpRequest) -> HttpResponse:
     movies_y_min = movies.aggregate(Min('y'))
     movies_y_max = movies.aggregate(Max('y'))
 
-    frequently_rated_movies = movies.filter(imdb_votes__gte=10000)
-    len_movies = len(frequently_rated_movies)
-    randoms = [random.randint(0, len_movies - 1) for _ in range(9)]
-    serendipity_movies = [frequently_rated_movies[i][MOVIE_ID] for i in randoms]
-    print(serendipity_movies)
     payload = [list(clusters0), list(clusters1), list(clusters2), list(clusters3), list(clusters4), list(movies)]
     for i, d in enumerate(payload):
         for ele in d:
@@ -101,7 +96,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        'random_nine': serendipity_movies,
+        'random_nine': random_movie_ids(9, 10000),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
