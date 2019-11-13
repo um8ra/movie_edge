@@ -78,8 +78,8 @@
 	
 	
 	
-    var tableData = JSON.parse('{{ table_data|safe }}');
-	var payload = tableData.payload;
+    const tableData = JSON.parse('{{ table_data|safe }}');
+	const payload = tableData.payload;
 	
     console.log(tableData);
     const x_min = parseFloat(tableData['x__min']);
@@ -93,21 +93,21 @@
     const data = payload[5].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
-  //  gridNine(nineChoices);
+    gridNine(nineChoices);
 
 	const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width ]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height , 0]);
 	const zScale = d3.scaleThreshold().domain([3,6,12,24,48]).range([0, 1, 2, 3, 4, 5]);
-	var colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0,10]);
+	const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0,10]);
     
 	
 	//Init
-	var currentZoom = 0;
-	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding)
+	let currentZoom = 0;
+	const svg = d3.select('#graph').append('svg').attr("width", width-2*padding).attr("height", height-2*padding);
 				
 	const g = svg.append("g")
-			.attr("class","holder")
-    var myzoom = d3.zoom()
+			.attr("class","holder");
+    const myzoom = d3.zoom()
 	.duration(1000)
        .extent([[0, 0], [width, height]])
        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
@@ -116,8 +116,8 @@
     svg.call(myzoom).on("dblclick.zoom",selectHighlight);
 	
 	
-	var movieData = payload[5];
-	var tmp; //debug
+	const movieData = payload[5];
+	{#var tmp; //debug#}
 	drawGraph(payload[0],0,0);
 	
 	
