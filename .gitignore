@@ -55,7 +55,7 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
-
+db*.sqlite3
 # Flask stuff:
 instance/
 .webassets-cache
@@ -103,6 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+#pickles /gensim
+*.pkl
+*.gensim
+
+
 # added for latex work
 
 *.gz
@@ -123,3 +128,8 @@ venv.bak/
 .idea/
 
 Data/
+ml-20m/
+
+FIt-SNE/
+
+*.gensim

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Edge</title>
+    {% load static %}
+    <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
+
+
+    <style>
+        .grid {
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat(3, 200px);
+            grid-template-rows: repeat(3, 350px);
+            grid-auto-flow: column;
+            width: 30%;
+            background: gray;
+            float: left;
+        }
+
+        .buttonSubmit {
+            height: 64px;
+            width: 128px;
+        }
+
+        .buttonGetRandom {
+            height: 64px;
+            width: 128px;
+        }
+
+        .graph {
+            width: 70%;
+            float: right;
+            background: darkgray;
+        }
+
+
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden
+        }
+
+        .scatter {
+            stroke: grey;
+        }
+
+        .selected {
+            stroke: red;
+        }
+
+    </style>
+</head>
+<body>
+<button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
+    Click me for movie recommendations!
+</button>
+<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
+    Click on me for some more randomness!
+</button>
+<br>
+<br>
+<!--https://gridbyexample.com/examples/code/example18.html-->
+<div class="container">
+    <div class="grid" id="grid"></div>
+    <div class="graph" id="graph"></div>
+</div>
+</body>
+{#Begin: super necessary! Else, disable CSRF Protection in views.py #}
+{% csrf_token %}
+{#End: super necessary! Else, disable CSRF Protection in views.py #}
+<script>
+    // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
+
+
+    const tableData = JSON.parse('{{ table_data|safe }}');
+    const payload = tableData.payload;
+
+    console.log(tableData);
+    const x_min = parseFloat(tableData['x__min']);
+    const x_max = parseFloat(tableData['x__max']);
+    const y_min = parseFloat(tableData['y__min']);
+    const y_max = parseFloat(tableData['y__max']);
+    const decoder = tableData['decoder'];
+    let nineChoices = tableData['random_nine'];
+    const width = 0.7 * window.innerWidth;
+    const height = window.innerHeight;
+    const data = payload[5].map(inputFormat);
+    const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+
+    gridNine(nineChoices);
+
+    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
+    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
+    const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
+    const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]);
+
+    //Init
+    let currentZoom = 0;
+    const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
+
+    const g = svg.append("g")
+        .attr("class", "holder");
+    const myzoom = d3.zoom()
+        .duration(1000)
+        .extent([[0, 0], [width, height]])
+        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
+        .on("zoom", zoomed);
+
+    svg.call(myzoom).on("dblclick.zoom", selectHighlight);
+
+    drawGraph(payload[0], 0, 0);
+
+
+</script>
+</html>
