@@ -118,14 +118,12 @@
         .on("zoom", zoomed);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
-
+	tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background','grey');
     drawGraph(payload[0], 0, 0);
-	tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d.actors; });
-	svg.call(tip);
 	
-	g.selectAll('.scatter')
-	.on('mouseover', tip.show)
-	.on('mouseout', tip.hide)
+	g.call(tip);
+	
+	
 	
 </script>
 </body>

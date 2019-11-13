@@ -28,8 +28,11 @@ function drawGraph(data, highlight, layer) {
             }
         })
         .on("dblclick.zoom", selectHighlight);
-
+		g.selectAll('.scatter')
+		.on('mouseover', tip.show)
+		.on('mouseout', tip.hide)
 }
+
 
 function inputFormatCluster(r) {
 	// like inputFormat in grid_interactions, only for cluster arrays
@@ -239,7 +242,11 @@ function highlightAndCenter(pts) {
 }
 
 
-
+function toolTipContents(d) {
+    return '<p>Actors: '+d.actors+' </p><p>genres: '+d.genres+' </p><p>IMDB rating: '+d.imdb_rating+'</p>' +'<p>NAME: '+d.ID+' </p>'
+	
+	
+}
 
 
 function selectHighlight() {
@@ -257,6 +264,7 @@ function selectHighlight() {
 
 
 function zoomed() {
+	d3.select(".d3-tip").remove();
 	// actions to take when zoom events triggered (largely mangaging zoom animation calls)
     const tx = d3.event.transform;
     g.attr("transform", tx);
@@ -274,4 +282,8 @@ function zoomed() {
         animateClusters(data, bbox, currentZoom, newZoom);
         currentZoom = newZoom;
     }
+	g.call(tip)
+	g.selectAll('.scatter')
+	.on('mouseover', tip.show)
+	.on('mouseout', tip.hide)
 }
