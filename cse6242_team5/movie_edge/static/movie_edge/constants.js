@@ -28,3 +28,4 @@ const zoomParams = {0: {r:20,w:2},
 				};
 const gridID = 'grid';
 const bbox_pad = 0;
+const IMDB_RATING = 'imdb_rating';

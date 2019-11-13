@@ -12,7 +12,7 @@ function drawGraph(data, highlight, layer) {
         .attr("cx", d => xScale(d.x))
         .attr("cy", d => yScale(d.y))
         .attr("stroke-width", zoomParams[layer]['w'])
-        .style('fill', d => colorScale(d.imdb_rating))
+        .style('fill', d => colorScale(d[IMDB_RATING]))
         .attr("class", function (d) {
 
             if (d.ID === highlight) {
@@ -96,7 +96,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         })
         .attr("class", "scatter")
         .attr("stroke-width", zoomParams[endLevel]['w'])
-        .style('fill', d => colorScale(d.imdb_rating))
+        .style('fill', d => colorScale(d[IMDB_RATING]))
         .style('opacity', 1.0);
 
 
@@ -148,7 +148,7 @@ function zoomed() {
     const k = d3.event.transform.k;
     const newZoom = zScale(k);
     // var r;
-    tmp = newZoom;
+    // tmp = newZoom;
 
     // handle zoom changes
     if (newZoom !== currentZoom) {
@@ -156,7 +156,7 @@ function zoomed() {
         // var data = payload[newZoom];
         console.log('Setting new zoom level ' + newZoom + ' ' + k);
 
-        animateClusters(movieData, bbox, currentZoom, newZoom);
+        animateClusters(data, bbox, currentZoom, newZoom);
         currentZoom = newZoom;
     }
 }
