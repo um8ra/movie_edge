@@ -76,6 +76,12 @@ function closurePlotGoTo(movieID) {
 }
 
 function gridNine(movieidList) {
+    ratio = 1.48;
+    divisor = 3;
+    min_val = Math.min(document.getElementById("grid").offsetWidth,
+        document.getElementById("grid").offsetHeight);
+    const poster_width = min_val / (ratio * divisor);
+    const poster_height = min_val / divisor;
     // Delete current grid and redraw with new *choices*
     // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
     const grid = document.getElementById(gridID);
@@ -101,8 +107,8 @@ function gridNine(movieidList) {
 
             imgNode.src = data[dataIndex][POSTER_URL];
             imgNode.onclick = closurePlotGoTo(movieId);
-            imgNode.height = POSTER_HEIGHT;
-            imgNode.width = POSTER_WIDTH;
+            imgNode.height = poster_height;
+            imgNode.width = poster_width;
             grid.appendChild(divNode);
             divNode.appendChild(imgNode);
             divNode.appendChild(buttonLike);
