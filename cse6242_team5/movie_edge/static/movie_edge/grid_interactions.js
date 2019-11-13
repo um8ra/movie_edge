@@ -92,10 +92,10 @@ function gridNine(movieidList) {
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
 
-            const buttonShowMe = document.createElement('BUTTON');
-            buttonShowMe.innerText = 'Show Me!';
-            buttonShowMe.onclick = buttonPlotGoTo;
-            buttonShowMe.value = movieId;
+            // const buttonShowMe = document.createElement('BUTTON');
+            // buttonShowMe.innerText = 'Show Me!';
+            // buttonShowMe.onclick = buttonPlotGoTo;
+            // buttonShowMe.value = movieId;
 
             imgNode.src = data[dataIndex][POSTER_URL];
             imgNode.height = POSTER_HEIGHT;
@@ -104,7 +104,7 @@ function gridNine(movieidList) {
             divNode.appendChild(imgNode);
             divNode.appendChild(buttonLike);
             divNode.appendChild(buttonDislike);
-            divNode.appendChild(buttonShowMe);
+            // divNode.appendChild(buttonShowMe);
             console.log(movieId);
         }
     )
