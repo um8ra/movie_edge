@@ -12,13 +12,14 @@
         .grid {
             display: grid;
             grid-gap: 10px;
-            grid-template-columns: repeat(3, 30%);
-            grid-template-rows: repeat(3, 30%);
+            grid-template-columns: repeat(2, 40%);
+            grid-template-rows: repeat(5, 17%);
             grid-auto-flow: column;
-            width: 30%;
+            width: 20%;
             height: 100vh;
             background: gray;
             float: left;
+            position: relative;
         }
 
         .buttonSubmit {
@@ -87,7 +88,7 @@
     const data = payload[5].map(inputFormat);
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
-    gridMovies(tableData['random_movies']);
+    gridMovies(tableData[MOVIE_CHOICES]);
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);

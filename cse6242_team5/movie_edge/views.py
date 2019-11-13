@@ -10,6 +10,7 @@ import json
 import urllib.parse
 import random
 from typing import List
+import math
 
 # from django.views.decorators.csrf import csrf_exempt
 
@@ -96,7 +97,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        'random_movies': random_movie_ids(9, 10000),
+        MOVIE_CHOICES: random_movie_ids(10, 10000),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
@@ -122,7 +123,7 @@ def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
     len_movies_disliked = len(movies_disliked)
     if (len_movies_liked + len_movies_disliked) == 0:
         print('No Data: Random')
-        response = {MOVIE_CHOICES: random_movie_ids(9)}
+        response = {MOVIE_CHOICES: random_movie_ids(10)}
         return JsonResponse(response)
     elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
         # Yi and Rocko do stuff here and change the threshold/rules and such

@@ -77,7 +77,7 @@ function closurePlotGoTo(movieID) {
 
 function gridMovies(movieidList) {
     const ratio = 1.48;
-    const divisor = 2.25;
+    const divisor = 2.5;
     const min_val = Math.min(document.getElementById("grid").offsetWidth,
         document.getElementById("grid").offsetHeight);
     const poster_width = min_val / (ratio * divisor);
