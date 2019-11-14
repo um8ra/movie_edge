@@ -275,8 +275,8 @@ function tipdir(d){
 	let cx = +this.attributes.cx.value;
 	let cy = +this.attributes.cy.value;
 	let tmp = tx.apply([cx,cy]);
-	console.log(tmp,width,height)
-	console.log(tmp[1],height/2,tmp[1] < (height/2))
+	//console.log(tmp,width,height)
+	//console.log(tmp[1],height/2,tmp[1] < (height/2))
 	let out = ''
 	if (tmp[1] < (height/2)){
 		out = out+'s'
@@ -288,17 +288,8 @@ function tipdir(d){
 	} else {
 		out = out+'w';
 	}
-	/*
- 	if (px < width/2 && py < height<2){
-		out = 'se';
-	} else if (px < width/2 && py >= height/2){
-		out = 'ne';
-	} else if (px >= width/2 && py < height/2){
-		out = 'sw';
-	}  else if (px >= width/2 && py >= height/2){
-		out = 'nw'
-	}*/
-	console.log(out)
+	
+	//console.log(out)
 	return out	
 }
 
