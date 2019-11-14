@@ -242,9 +242,45 @@ function highlightAndCenter(pts) {
 
 }
 
+function array2list(str) {
+	arr = JSON.parse(str)
+	return arr.map(itm=>itm[0] + "("+ itm[1] + ")")
+}
+
+function str2arrayList(str) {
+	let tmp = str.split('|')
+	return tmp.join(', ')
+	
+	
+}
+
+
+function toolTipContentsCluster(d) {
+	//console.log(d.ID)
+	return 	'<p>Cluster: ' + (d.ID.toString()) + ' </p>'+'<p>Frequent Actors (Count): ' 
+			+ array2list(d.actors) + '</p><p>Frequent Genres (Count): ' 
+			+ array2list(d.genres) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>' 
+}
+
+function toolTipContentsMovie(d) {
+	return '<p>Title: ' + d.movie_title + '</p>'+'<p>Actors: ' 
+			+ str2arrayList(d.actors) + '</p><p>Genres: ' 
+			+ str2arrayList(d.genres) + '</p><p>IMDB rating: ' + d.imdb_rating + '</p>' 
+			+ '<p>Director: ' + d.director + '</p><p>Metascore: ' + d.metascore +'</p>' 
+			+ '<img src='+  d.poster_url +'/>'
+}
+
+
+
 
 function toolTipContents(d) {
-    return '<p>Actors: ' + d.actors + ' </p><p>genres: ' + d.genres + ' </p><p>IMDB rating: ' + d.imdb_rating + '</p>' + '<p>NAME: ' + d.ID + ' </p>'
+	//console.log(d)
+    if ('movie_title' in d) {
+		return toolTipContentsMovie(d);
+	} else {
+		return toolTipContentsCluster(d);
+		
+	}
 }
 
 
