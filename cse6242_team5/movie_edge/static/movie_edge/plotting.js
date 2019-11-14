@@ -267,11 +267,40 @@ function toolTipContentsMovie(d) {
 			+ str2arrayList(d.actors) + '</p><p>Genres: ' 
 			+ str2arrayList(d.genres) + '</p><p>IMDB rating: ' + d.imdb_rating + '</p>' 
 			+ '<p>Director: ' + d.director + '</p><p>Metascore: ' + d.metascore +'</p>' 
-			+ '<img src='+  d.poster_url +'/>'
+			+ '<img src='+  d.poster_url +' class="smallImg"/>'
 }
 
-
-
+function tipdir(d){
+	let tx = d3.zoomTransform(d3.select("svg").node());
+	let cx = +this.attributes.cx.value;
+	let cy = +this.attributes.cy.value;
+	let tmp = tx.apply([cx,cy]);
+	console.log(tmp,width,height)
+	console.log(tmp[1],height/2,tmp[1] < (height/2))
+	let out = ''
+	if (tmp[1] < (height/2)){
+		out = out+'s'
+	} else {
+		out = out +'n';
+	}
+	if (tmp[0]<(width/2)){
+		out = out +'e';
+	} else {
+		out = out+'w';
+	}
+	/*
+ 	if (px < width/2 && py < height<2){
+		out = 'se';
+	} else if (px < width/2 && py >= height/2){
+		out = 'ne';
+	} else if (px >= width/2 && py < height/2){
+		out = 'sw';
+	}  else if (px >= width/2 && py >= height/2){
+		out = 'nw'
+	}*/
+	console.log(out)
+	return out	
+}
 
 function toolTipContents(d) {
 	//console.log(d)

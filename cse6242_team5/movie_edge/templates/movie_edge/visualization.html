@@ -9,6 +9,7 @@
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'movie_edge/tooltip.js' %}"></script>
     <style>
         .grid {
             display: grid;
@@ -89,7 +90,11 @@
 			max-width: 400px;
 			max-height: 500px
 			overflow: hidden;
-
+		}
+		
+		.smallImg {
+			height:50%;
+			width:50%
 		}
 
     </style>
@@ -167,6 +172,8 @@
 
     g.call(tip);
 
+	
+	tip.direction(tipdir);
 
 </script>
 </body>
