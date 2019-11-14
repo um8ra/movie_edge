@@ -110,7 +110,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 # @csrf_exempt
-def query_recommendations(request: HttpRequest, topn=9) -> JsonResponse:
+def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
     request_data = json.loads(request.body)
