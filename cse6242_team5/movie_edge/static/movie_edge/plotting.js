@@ -188,10 +188,10 @@ function getPtBbox(pts) {
         centers[lvl] = {x: (d3.max(xs) + d3.min(xs)) / 2, y: (d3.max(ys) + d3.min(ys)) / 2}
     }
 
-    //console.log(levelCoords)
-    //console.log(centers)
+    console.log(levelCoords)
+    console.log(centers)
     // Test zoom levels
-    let best = {x: width / 2, y: height / 2, k: 1};
+    let best = {x: centers[0].x, y:centers[0].y, k: 1};
     for (let k = 1.5; k < zoomParams.maxZoom; k++) {
 
         let zoomLevel = zScale(k);
@@ -227,7 +227,7 @@ function highlightAndCenter(pts) {
     const ptBox = getPtBbox(pts);
     const level = zScale(ptBox.k);
     const clusters = getPtsClusterIDatLevel(pts, level);
-    console.log(ptBox);
+    console.log('ptbox',ptBox);
 
     centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
     d3.selectAll('.scatter')
