@@ -271,12 +271,12 @@ function toolTipContentsMovie(d) {
 }
 
 function tipdir(d){
-	let tx = d3.zoomTransform(d3.select("svg").node());
+	let tx = d3.zoomTransform(d3.select(".holder").node());
 	let cx = +this.attributes.cx.value;
 	let cy = +this.attributes.cy.value;
 	let tmp = tx.apply([cx,cy]);
 	//console.log(tmp,width,height)
-	//console.log(tmp[1],height/2,tmp[1] < (height/2))
+	//console.log(tx,cx,cy)
 	let out = ''
 	if (tmp[1] < (height/2)){
 		out = out+'s'
