@@ -123,7 +123,7 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     len_movies_disliked = len(movies_disliked)
     if (len_movies_liked + len_movies_disliked) == 0:
         print('No Data: Random')
-        response = {MOVIE_CHOICES: random_movie_ids(10)}
+        response = {MOVIE_CHOICES: random_movie_ids(topn)}
         return JsonResponse(response)
     elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
         # Yi and Rocko do stuff here and change the threshold/rules and such
