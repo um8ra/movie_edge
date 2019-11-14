@@ -17,8 +17,7 @@
             grid-template-rows: repeat(5, 17%);
             grid-auto-flow: column;
             width: 30%;
-            height: 100vh;
-            background: gray;
+            height: 100%;
             float: left;
             position: relative;
         }
@@ -35,6 +34,7 @@
 
         .graph {
             width: 70%;
+            height: 100%;
             float: right;
             background: darkgray;
         }
@@ -53,21 +53,56 @@
             stroke: red;
         }
 
+        .box {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+            background: red;
+        }
+
+        .top {
+            background-color: dimgray;
+            position:absolute;
+            top:0;
+            height: 10%;
+            width:100%;
+        }
+        .left-half {
+            background-color: darkgray;
+            position: absolute;
+            left: 0;
+            top:10%;
+            width: 30%;
+            height: 100%;
+        }
+
+        .right-half {
+            background-color: gray;
+            position: absolute;
+            right: 0;
+            top:10%;
+            width: 70%;
+            height:100%;
+        }
+
     </style>
 </head>
 <body>
-<button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
-    Click me for movie recommendations!
-</button>
-<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
-    Click on me for some more randomness!
-</button>
-<br>
-<br>
+<div class="top" id="buttons">
+        <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
+            Click me for movie recommendations!
+        </button>
+        <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
+            Click on me for some more randomness!
+        </button>
+    <p>top</p>
+</div>
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="container">
-    <div class="grid" id="grid"></div>
-    <div class="graph" id="graph"></div>
+    <div class="box">
+        <div class="left-half grid" id="grid"><p>left</p></div>
+        <div class="right-half graph" id="graph"><p>right</p></div>
+    </div>
 </div>
 
 {#Begin: super necessary! Else, disable CSRF Protection in views.py #}
