@@ -79,7 +79,7 @@ function gridMovies(movieidList) {
     const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
     const divHeightNormalized = (divHeight - 128) / 5 / ratio;
-    const divWidth = document.getElementById("grid").offsetWidth / 2.5;
+    const divWidth = document.getElementById("grid").offsetWidth / 2.75;
 
     let poster_width = 100;
     let poster_height = 150;
