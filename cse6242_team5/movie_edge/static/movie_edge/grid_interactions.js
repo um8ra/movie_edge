@@ -116,7 +116,8 @@ function gridMovies(movieidList) {
             // divNode.appendChild(buttonShowMe);
             console.log(movieId);
         }
-    )
+    );
+    highlightAndCenter(movieidList);
 }
 
 function buttonClickLike(data) {

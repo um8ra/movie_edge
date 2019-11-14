@@ -97,9 +97,6 @@
     //DELETE ME
     const q = tableData[MOVIE_CHOICES];
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
-
-    gridMovies(tableData[MOVIE_CHOICES]);
-
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
     const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
@@ -123,6 +120,8 @@
 
     g.call(tip);
 
+    const initial_choices = tableData[MOVIE_CHOICES];
+    gridMovies(initial_choices);
 
 </script>
 </body>
