@@ -76,12 +76,12 @@ function closurePlotGoTo(movieID) {
 }
 
 function gridMovies(movieidList) {
-    const ratio = 1.48;
-    const divisor = 2.5;
-    const min_val = Math.min(document.getElementById("grid").offsetWidth,
-        document.getElementById("grid").offsetHeight);
-    const poster_width = min_val / (ratio * divisor);
-    const poster_height = min_val / divisor;
+    // const ratio = 1.48;
+    // const divisor = 2.5;
+    // const min_val = Math.min(document.getElementById("grid").offsetWidth,
+    //     document.getElementById("grid").offsetHeight);
+    const poster_width = 100;
+    const poster_height = 150;
     // Delete current grid and redraw with new *choices*
     // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
     const grid = document.getElementById(gridID);
@@ -122,6 +122,7 @@ function gridMovies(movieidList) {
 
 function buttonClickLike(data) {
     const movieId = data.target.value;
+    console.log('Liked: ' + movieId);
     if (moviesDisliked.has(movieId)) {
         moviesDisliked.delete(movieId);
     }
@@ -131,6 +132,7 @@ function buttonClickLike(data) {
 
 function buttonClickDislike(data) {
     const movieId = data.target.value;
+    console.log('Disliked: ' + movieId);
     if (moviesLiked.has(movieId)) {
         moviesLiked.delete(movieId);
     }
