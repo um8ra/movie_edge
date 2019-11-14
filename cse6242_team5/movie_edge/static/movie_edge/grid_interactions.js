@@ -78,16 +78,18 @@ function closurePlotGoTo(movieID) {
 function gridMovies(movieidList) {
     const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
-    const divWidth = document.getElementById("grid").offsetWidth;
+    const divHeightNormalized = (divHeight - 128) / 5 / ratio;
+    const divWidth = document.getElementById("grid").offsetWidth / 2.75;
+
     let poster_width = 100;
     let poster_height = 150;
-    if((divHeight / 7) > (divWidth / 3)) {
-        console.log('width limited');
-        poster_width = divWidth / 3;
-        poster_height = poster_width * ratio;
+    if(divHeightNormalized > divWidth) {
+        // alert('width limited');
+        poster_width = divWidth;
+        poster_height = divWidth * ratio;
     } else {
-        console.log('height limited');
-        poster_height = divHeight / 7;
+        // alert('height limited');
+        poster_height = divHeightNormalized;
         poster_width = poster_height / ratio;
     }
     // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
