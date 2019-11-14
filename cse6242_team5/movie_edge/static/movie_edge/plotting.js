@@ -173,14 +173,13 @@ function getPtBbox(pts) {
     //returns x,y,k to center on the target points, in pixel space
 
     // Start with getting a bbox in x/y
-    let movies = payload[5];
-    let indices = pts.map(x => decoder[x]);
-    let objs = [];
+    const movies = payload[5];
+    const indices = pts.map(x => decoder[x]);
+    const objs = [];
     indices.forEach(i => objs.push(movies[i]));
-    let levelCoords = {};
-    let centers = {};
-    let lvl = 0;
-    for (lvl = 0; lvl < 6; lvl++) {
+    const levelCoords = {};
+    const centers = {};
+    for (let lvl = 0; lvl < 6; lvl++) {
         levelCoords[lvl] = objs.map(function (d) {
             return {x: d['L' + lvl + 'x'], y: d['L' + lvl + 'y']}
         });
@@ -246,8 +245,6 @@ function highlightAndCenter(pts) {
 
 function toolTipContents(d) {
     return '<p>Actors: ' + d.actors + ' </p><p>genres: ' + d.genres + ' </p><p>IMDB rating: ' + d.imdb_rating + '</p>' + '<p>NAME: ' + d.ID + ' </p>'
-
-
 }
 
 

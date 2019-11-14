@@ -8,7 +8,7 @@
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
-	<script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
     <style>
         .grid {
             display: grid;
@@ -87,15 +87,15 @@
     const width = 0.7 * window.innerWidth;
     const height = window.innerHeight;
     const data = payload[5].map(inputFormat);
-	payload[5] = data;
-	payload[0] = payload[0].map(inputFormatCluster)
-	payload[1] = payload[1].map(inputFormatCluster)
-	payload[2] = payload[2].map(inputFormatCluster)
-	payload[3] = payload[3].map(inputFormatCluster)
-	payload[4] = payload[4].map(inputFormatCluster)
-	
-	//DELETE ME
-	const q=tableData[MOVIE_CHOICES]
+    payload[5] = data;
+    payload[0] = payload[0].map(inputFormatCluster);
+    payload[1] = payload[1].map(inputFormatCluster);
+    payload[2] = payload[2].map(inputFormatCluster);
+    payload[3] = payload[3].map(inputFormatCluster);
+    payload[4] = payload[4].map(inputFormatCluster);
+
+    //DELETE ME
+    const q = tableData[MOVIE_CHOICES];
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
 
     gridMovies(tableData[MOVIE_CHOICES]);
@@ -118,13 +118,12 @@
         .on("zoom", zoomed);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
-	tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background','grey');
+    tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'grey');
     drawGraph(payload[0], 0, 0);
-	
-	g.call(tip);
-	
-	
-	
+
+    g.call(tip);
+
+
 </script>
 </body>
 </html>
