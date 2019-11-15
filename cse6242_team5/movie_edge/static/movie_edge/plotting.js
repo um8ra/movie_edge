@@ -7,7 +7,7 @@ function drawGraph(data, highlight, layer) {
 
     // remove current graph
     g.selectAll('.scatter').remove();
-
+	g.selectAll('.labels').remove();	
     //Got the data, now draw it.
     g.selectAll('.scatter')
         .data(data)
@@ -31,6 +31,14 @@ function drawGraph(data, highlight, layer) {
     g.selectAll('.scatter')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide)
+	const k = d3.zoomTransform(svg.node()).k;
+	const lvl = zScale(k);
+	if (lvl < 5){
+		applyLabelsClusters();
+	} else {
+		applyLabelsMovies();
+	}
+	
 }
 
 
@@ -362,12 +370,58 @@ function tipoff(d) {
     
 }
 
-function applyLabels(){
+function applyLabelsClusters(){
 	// hack to just put labels on all nodes
 	const k = d3.zoomTransform(svg.node()).k;
 	const lvl = zScale(k);
-	let pts = d3.selectAll('.scatter').filter( d => d.ID == 1)
-	console.log(pts)
+	let clusterLabel1 = function(d){
+		let genres = JSON.parse(d.genres).slice(0,2).map(x=>x[0]).join('/')		
+		return genres +', starring';
+	}
+	let clusterLabel2 = function(d){		
+		let actors = JSON.parse(d.actors).slice(0,2).map(x=>x[0]).join(' & ')
+		return actors
+	}
+	//https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
+	g.selectAll('nodeLabels')
+		.data(payload[lvl])
+		.enter()
+		.append("svg:text")
+		.attr("x", d=>xScale(d.x))
+		.attr("y", d=>yScale(d.y)-(zoomParams[lvl].r*1.5))
+		.attr("class","labels lvl"+lvl)
+		.text(clusterLabel1)	
+		.style("font-size",(zoomParams[lvl].r/2)+'px')
+		.attr('text-anchor','middle')
+		
+	g.selectAll('nodeLabels')
+		.data(payload[lvl])
+		.enter()
+		.append("svg:text")
+		.attr("x", d=>xScale(d.x))
+		.attr("y", d=>yScale(d.y)-(zoomParams[lvl].r*1))
+		.attr("class","labels lvl"+lvl)
+		.text(clusterLabel2)
+		.style("font-size",(zoomParams[lvl].r/2)+'px')
+		.attr('text-anchor','middle')
+	
+}
+
+function applyLabelsMovies(){
+	// hack to just put labels on all nodes
+	
+	//https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
+	g.selectAll('nodeLabels')
+		.data(data)
+		.enter()
+		.append("svg:text")
+		.attr("x", d=>xScale(d.x))
+		.attr("y", d=>yScale(d.y)-(zoomParams[5].r*1.5))
+		.text(d=>d.movie_title)
+		.attr("class","labels lvl5")
+		.style("font-size",(zoomParams[5].r/2)+'px')
+		.attr('text-anchor','middle')
+		
 	
 }
 
