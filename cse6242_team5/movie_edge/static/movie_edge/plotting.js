@@ -521,6 +521,29 @@ function highlight(ids) {
 	const k = d3.zoomTransform(svg.node()).k;
 	const lvl = 'L'+zScale(k);
 	
+	d3.selectAll('.scatter')
+		.attr("class",function(d) {
+			if (zScale(k) <5) {
+				let clusters = data.filter(x=> ids.includes(x.movie_id)).map(y=> y[lvl])
+				if (clusters.includes(d.ID )) {
+					return "scatter selected"
+				} else {
+					return "scatter"
+				}
+			} else {
+					if (ids.includes(d.ID) ){
+						return "scatter selected"						
+					} else {
+					return "scatter"
+				}
+			
+			}
+			
+			
+			
+		})
+	
+	/*
 	if (zScale(k)<5) {
 		let rows = data.filter(x=>ids.includes(x.movie_id))
 		rows.forEach(function (d) {
@@ -531,7 +554,7 @@ function highlight(ids) {
 		d3.selectAll('.scatter').filter( d => ids.includes(d.ID)).attr('class', 'scatter selected');
 		
 	}
-	
+	*/
 }
 
 
