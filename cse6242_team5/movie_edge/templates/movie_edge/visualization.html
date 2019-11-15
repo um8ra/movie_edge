@@ -79,7 +79,8 @@
         }
 
         .right-half {
-            background-color: rgb(39, 40, 34); /* monokai gray background */
+            //background-color: rgb(39, 40, 34); /* monokai gray background */
+			background-color: white;
             position: absolute;
             right: 0;
             top: 10%;
@@ -151,7 +152,8 @@
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
     const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
-    const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]);
+    //const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]); // I don't like the colors?
+	const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
 
     //Init
     let currentZoom = 0;
@@ -171,7 +173,7 @@
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);
 
-
+	tip.offset(tipoff);
     tip.direction(tipdir);
 
 </script>

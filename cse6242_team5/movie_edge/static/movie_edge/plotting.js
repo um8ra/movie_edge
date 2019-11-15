@@ -337,6 +337,41 @@ function highlightAndCenterSingle(id) {
 } 
 
 
+function tipoff(d) {
+	// offset calculator for tip
+    const tx = d3.zoomTransform(d3.select(".holder").node());
+    const cx = +this.attributes.cx.value;
+    const cy = +this.attributes.cy.value;
+    let tmp = tx.apply([cx, cy]);
+    //console.log(tmp,width,height)
+    //console.log(tx,cx,cy)
+    let out = [0,0];
+	//return [(this.getBBox().height / 2)-100, 50]
+	if (tmp[1] < (height / 2)) {
+        out[0] = 0
+    } else {
+        out[0] = -this.getBBox().height
+    }
+    if (tmp[0] < (width / 2)) {
+        out[1] = this.getBBox().width
+    } else {
+        out[1] = -this.getBBox().width;
+    }
+    
+	return out;
+    
+}
+
+function applyLabels(){
+	// hack to just put labels on all nodes
+	const k = d3.zoomTransform(svg.node()).k;
+	const lvl = zScale(k);
+	let pts = d3.selectAll('.scatter').filter( d => d.ID == 1)
+	console.log(pts)
+	
+}
+
+
 function zoomed() {
     d3.select(".d3-tip").remove();
     // actions to take when zoom events triggered (largely mangaging zoom animation calls)
