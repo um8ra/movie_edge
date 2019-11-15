@@ -57,7 +57,7 @@ function drawGraph(data, toHighlight, layer) {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", zoomParams[layer]['r'])
+        .attr("r", d=> sizeScales[layer](d))
         .attr("cx", d => xScale(d.x))
         .attr("cy", d => yScale(d.y))
         .attr("stroke-width", zoomParams[layer]['w'])
@@ -163,7 +163,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .data(filtered)
         .enter()
         .append("circle")
-        .attr("r", zoomParams[startLevel]['r'])
+        .attr("r", d=> sizeScales[startLevel](d))
         .attr("cx", function (d) {
             return xScale(d['L' + startLevel + 'x'])
         })
@@ -184,7 +184,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .attr("cy", function (d) {
             return yScale(d['L' + endLevel + 'y'])
         })
-        .attr("r", zoomParams[endLevel]['r'])
+        .attr("r", d=> sizeScales[endLevel](d))
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()
