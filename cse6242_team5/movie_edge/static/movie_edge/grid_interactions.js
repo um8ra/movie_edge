@@ -53,6 +53,7 @@ function buttonClickGetRandom(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array();
     fetchPayload[DISLIKE] = Array();
+    fetchPayload[MOVIES_SHOWN] = Array.from(gridHistorySet);
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
 
@@ -60,6 +61,7 @@ function buttonClickSubmit(fetchURL) {
     const fetchPayload = Object();
     fetchPayload[LIKE] = Array.from(moviesLiked);
     fetchPayload[DISLIKE] = Array.from(moviesDisliked);
+    fetchPayload[MOVIES_SHOWN] = Array.from(gridHistorySet);
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
 

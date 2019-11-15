@@ -34,6 +34,7 @@ IMDB_VOTES = 'imdb_votes'
 MOVIE_CHOICES = 'movie_choices'
 LIKE = 'movies_liked'
 DISLIKE = 'movies_disliked'
+MOVIES_SHOWN = 'movies_shown'
 EMBEDDER = 'w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim'
 
 db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
@@ -114,6 +115,8 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
     request_data = json.loads(request.body)
+    movies_shown = request_data[MOVIES_SHOWN]
+    print(movies_shown)
     movies_liked = request_data[LIKE]
     movies_liked_int = [int(i) for i in movies_liked]
     movies_disliked = request_data[DISLIKE]

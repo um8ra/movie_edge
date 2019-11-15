@@ -146,7 +146,7 @@
     {#const qq = [ 280, 704, 1609, 3334, 3811, 31930, 33463, 80398, 98154, 109483 ];#}
 
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
-
+    currentGrid = tableData[MOVIE_CHOICES];
     gridMovies(tableData[MOVIE_CHOICES]);
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
