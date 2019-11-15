@@ -111,13 +111,14 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 # @csrf_exempt
-def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
+def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
     # Making sure model data is fine
 
     request_data = json.loads(request.body)
 
     # These are all movieIds
-    # movies_shown = request_data[MOVIES_SHOWN]  # List[int]
+    movies_shown = request_data[MOVIES_SHOWN]  # List[int]
+    movies_shown_str_set = {str(i) for i in movies_shown}
     movies_liked = request_data[LIKE]  # List[str]
     # movies_liked_int = [int(i) for i in movies_liked]  # List[int]
     movies_disliked = request_data[DISLIKE]  # List[str]
@@ -152,14 +153,24 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
             model = Word2Vec.load(str(gensim_model_path))
             dict_gensim_models[gensim_model_str] = model
 
-        movies_similar = model.most_similar(positive=movies_liked,
-                                            negative=movies_disliked,
-                                            topn=topn)
+        # This prevents re-showing of movies
+        while True:
+            movies_similar = model.most_similar(positive=movies_liked,
+                                                negative=movies_disliked,
+                                                topn=topn) # note topn starts at 20
+            movies_similar_list = [i[0] for i in movies_similar]
+            movies_similar_set = set(movies_similar_list)
+            new_movies = movies_similar_set - movies_shown_str_set
+            if len(new_movies) >= 10 or topn >= 1000:
+                response = {MOVIE_CHOICES: [new_movies.pop() for _ in range(10)]}
+                return JsonResponse(response)
+            topn *= 2
+
 
         # print('Similar: ')
         # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
         # returns List of (movieID, similarity). We only want movieID to return for now.
-        response = {MOVIE_CHOICES: [i[0] for i in movies_similar]}
+
         # print(response)
-        return JsonResponse(response)
+
