@@ -98,6 +98,7 @@ function gridMovies(movieidList) {
         grid.removeChild(grid.firstChild);
     }
     // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
+    currentGrid = movieidList;
     movieidList.forEach(function (movieId) {
             const dataIndex = decoder[movieId];
             console.log(dataIndex);
@@ -138,6 +139,14 @@ function buttonClickLike(data) {
     if (moviesDisliked.has(movieId)) {
         moviesDisliked.delete(movieId);
     }
+
+    if(moviesLikedQueue.length >= QUEUE_MAX) {
+        moviesLikedQueue.push(movieID);
+        moviesLikedQueue.shift();
+    } else {
+        moviesLikedQueue.push(movieID);
+    }
+
     moviesLiked.add(movieId);
     console.log(moviesLiked);
 }
