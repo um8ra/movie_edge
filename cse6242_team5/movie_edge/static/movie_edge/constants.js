@@ -14,8 +14,8 @@ const DISLIKE = 'movies_disliked';
 const MOVIES_SHOWN = 'movies_shown';
 const X = 'x';
 const Y = 'y';
-const moviesLiked = new Set(); // using set since it will do deduplication
-const moviesDisliked = new Set(); // using set since it will do deduplication
+const moviesLikedSet = new Set(); // using set since it will do deduplication
+const moviesDislikedSet = new Set(); // using set since it will do deduplication
 const zoomParams = {
     0: {r: 20, w: 2},
     1: {r: 10, w: 1},
@@ -32,5 +32,5 @@ const IMDB_RATING = 'imdb_rating';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = Array();
 const gridHistorySet = new Set();
-const moviesLikedQueue = Array();
-const moviesDislikedQueue = Array();
+const moviesLikedOrdered = Array();
+const moviesDislikedOrdered = Array();

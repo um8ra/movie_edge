@@ -59,8 +59,8 @@ function buttonClickGetRandom(fetchURL) {
 
 function buttonClickSubmit(fetchURL) {
     const fetchPayload = Object();
-    fetchPayload[LIKE] = Array.from(moviesLiked);
-    fetchPayload[DISLIKE] = Array.from(moviesDisliked);
+    fetchPayload[LIKE] = Array.from(moviesLikedSet);
+    fetchPayload[DISLIKE] = Array.from(moviesDislikedSet);
     fetchPayload[MOVIES_SHOWN] = Array.from(gridHistorySet);
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
@@ -140,35 +140,23 @@ function gridMovies(movieidList) {
 function buttonClickLike(data) {
     const movieId = data.target.value;
     console.log('Liked: ' + movieId);
-    if (moviesDisliked.has(movieId)) {
-        moviesDisliked.delete(movieId);
+    if (moviesDislikedSet.has(movieId)) {
+        moviesDislikedSet.delete(movieId);
     }
 
-    if (moviesLikedQueue.length >= QUEUE_MAX_LENGTH) {
-        moviesLikedQueue.push(movieId);
-        moviesLikedQueue.shift();
-    } else {
-        moviesLikedQueue.push(movieId);
-    }
-
-    moviesLiked.add(movieId);
-    console.log(moviesLiked);
+    moviesLikedSet.add(movieId);
+    moviesLikedOrdered.push(movieId);
+    console.log(moviesLikedSet);
 }
 
 function buttonClickDislike(data) {
     const movieId = data.target.value;
     console.log('Disliked: ' + movieId);
-    if (moviesLiked.has(movieId)) {
-        moviesLiked.delete(movieId);
+    if (moviesLikedSet.has(movieId)) {
+        moviesLikedSet.delete(movieId);
     }
 
-    if (moviesDislikedQueue.length >= QUEUE_MAX_LENGTH) {
-        moviesDislikedQueue.push(movieId);
-        moviesDislikedQueue.shift();
-    } else {
-        moviesDislikedQueue.push(movieId);
-    }
-
-    moviesDisliked.add(movieId);
-    console.log(moviesDisliked);
+    moviesDislikedSet.add(movieId);
+    moviesDislikedOrdered.push(movieId);
+    console.log(moviesDislikedSet);
 }
