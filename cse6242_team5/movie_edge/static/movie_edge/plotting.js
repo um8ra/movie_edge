@@ -8,7 +8,9 @@ function drawGraph(data, highlight, layer) {
     // remove current graph
     g.selectAll('.scatter').remove();
 	g.selectAll('.labels').remove();	
+	g.selectAll('path').remove();
     //Got the data, now draw it.
+	drawArcs();
     g.selectAll('.scatter')
         .data(data)
         .enter()
@@ -108,6 +110,9 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
     const filtered = movieData.filter(d => bboxFilter2Level(d, bbox, startLevel, endLevel));
     //start with removing
     g.selectAll('.scatter').remove();
+	g.selectAll('path').remove();
+	g.selectAll('.labels').remove();
+	
 
     //Put start points
     g.selectAll('.scatter')
@@ -238,6 +243,7 @@ function highlightAndCenter(pts) {
     console.log('ptbox', ptBox);
 
     centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
+	if (level < 5){
     d3.selectAll('.scatter')
         .attr('class', function (d) {
             if (clusters.includes(d.ID)) {
@@ -246,6 +252,17 @@ function highlightAndCenter(pts) {
                 return "scatter"
             }
         })
+	} else {
+		d3.selectAll('.scatter')
+        .attr('class', function (d) {
+            if (pts.includes(d.movie_id)) {
+                return "scatter selected"
+            } else {
+                return "scatter"
+            }
+        })
+		
+	}
 
 
 }
@@ -424,6 +441,99 @@ function applyLabelsMovies(){
 		
 	
 }
+
+function drawArcs() {
+	// draws arcs from current movie to each item in curerntGrid
+
+	const k = d3.zoomTransform(svg.node()).k;
+	const lvl = zScale(k);
+	if (lvl <5){
+	let currentMovieCluster = data.filter(x=>x.ID==currentMovie)[0]['L'+lvl]
+	//console.log(currentMovieCluster)
+	let currentGridCluster = currentGrid.map(q=> data.filter(x=>x.ID==q)[0]['L'+lvl])
+	//console.log(currentGridCluster)
+	let currentMovieLoc = payload[lvl][currentMovieCluster]
+	//console.log(currentMovieLoc)
+	let currentGridLoc = currentGridCluster.map(q=> payload[lvl][q])
+	//console.log(currentGridLoc)
+	let links = []
+	currentGridLoc.forEach(function (loc) {
+		links.push({source:currentMovieLoc,target:loc})
+	})
+	console.log(links)
+	let path = g.selectAll("path")
+		.data(links)
+		.enter()
+		.append("path")
+		.attr("d", function(d) {
+        var dx = xScale(d.target.x) - xScale(d.source.x),
+            dy = yScale(d.target.y) - yScale(d.source.y),
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" +
+            xScale(d.source.x) + "," +
+            yScale(d.source.y) + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            xScale(d.target.x) + "," +
+            yScale(d.target.y);
+    })
+	.style("fill","None")
+	.style("stroke","Black")
+	.attr("class","arc")
+	.style('stroke-width',zoomParams[lvl].r/5)
+	} else {
+		let currentMovieLoc = data.filter(x=>x.movie_id==currentMovie)[0]
+		//console.log(currentMovieLoc)
+		let currentGridLoc = data.filter(x=>currentGrid.includes(x.movie_id))
+		//console.log(currentGridLoc)
+		let links = []
+		currentGridLoc.forEach(function (loc) {
+			links.push({source:currentMovieLoc,target:loc})
+		})
+		console.log(links)
+		let path = g.selectAll("path")
+			.data(links)
+			.enter()
+			.append("path")
+			.attr("d", function(d) {
+			var dx = xScale(d.target.x) - xScale(d.source.x),
+				dy = yScale(d.target.y) - yScale(d.source.y),
+				dr = Math.sqrt(dx * dx + dy * dy);
+			return "M" +
+				xScale(d.source.x) + "," +
+				yScale(d.source.y) + "A" +
+				dr + "," + dr + " 0 0,1 " +
+				xScale(d.target.x) + "," +
+				yScale(d.target.y);
+		})
+		.style("fill","None")
+		.style("stroke","Black")
+		.attr("class","arc")
+		.style('stroke-width',zoomParams[lvl].r/5)
+		
+		
+	}
+	
+}
+
+
+function highlight(ids) {
+	//flags all movies in ids (or their clusters)
+	const k = d3.zoomTransform(svg.node()).k;
+	const lvl = 'L'+zScale(k);
+	
+	if (zScale(k)<5) {
+		let rows = data.filter(x=>ids.includes(x.movie_id))
+		rows.forEach(function (d) {
+			let node = d3.selectAll('.scatter').filter( dd => dd.ID == d[lvl])
+			node.attr('class', 'scatter selected');
+	})
+	} else {
+		d3.selectAll('.scatter').filter( d => ids.includes(d.ID)).attr('class', 'scatter selected');
+		
+	}
+	
+}
+
 
 
 function zoomed() {

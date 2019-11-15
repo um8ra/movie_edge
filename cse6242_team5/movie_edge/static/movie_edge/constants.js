@@ -31,7 +31,7 @@ const bbox_pad = 0;
 const IMDB_RATING = 'imdb_rating';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = Array();
-let currentMovie = 1; //current movie selected
+
 const gridHistorySet = new Set();
 const moviesLikedOrdered = Array();
 const moviesDislikedOrdered = Array();
