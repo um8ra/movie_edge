@@ -114,7 +114,11 @@ function gridMovies(movieidList) {
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
 
-            imgNode.src = data[dataIndex][POSTER_URL];
+            thisMovieData = data[dataIndex];
+            movieTitle = thisMovieData[MOVIE_TITLE];
+            imgNode.src = thisMovieData[POSTER_URL];
+            imgNode.alt = movieTitle;
+            imgNode.title = movieTitle;
             imgNode.onclick = closurePlotGoTo(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
