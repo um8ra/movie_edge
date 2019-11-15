@@ -318,6 +318,25 @@ function selectHighlight() {
 }
 
 
+function highlightAndCenterSingle(id) {
+	//highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
+	let itm = data.filter( x=> x.ID == id)[0];
+	const k = d3.zoomTransform(svg.node()).k;
+    d3.selectAll('.scatter').attr('class', 'scatter');
+	let currID = itm['L'+zScale(k)]
+	
+	let node = d3.selectAll('.scatter').filter( d => d.ID == id)
+	node.attr('class', 'scatter selected');
+    const px = node.attr("cx");
+    const py = node.attr("cy");
+    
+    
+    centerOnElement(px, py, k);
+	
+	
+} 
+
+
 function zoomed() {
     d3.select(".d3-tip").remove();
     // actions to take when zoom events triggered (largely mangaging zoom animation calls)
