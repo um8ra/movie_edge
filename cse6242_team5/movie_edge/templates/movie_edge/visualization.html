@@ -94,9 +94,10 @@
         }
 
         .d3-tip {
-            max-width: 400px;
+            max-width: 300px;
             max-height: 500px;
             overflow: hidden;
+			border-radius: 10px;
         }
 
         .smallImg {
@@ -175,7 +176,7 @@
         .on("zoom", zoomed);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
-    tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'grey');
+    tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
     drawGraph(payload[0], 0, 0);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);

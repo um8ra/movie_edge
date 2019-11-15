@@ -328,7 +328,7 @@ function toolTipContentsCluster(d) {
     //console.log(d.ID)
     return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
         + array2list(d.actors).slice(0,5) + '</p><p>Frequent Genres (Frequency): '
-        + array2list(d.genres).slice(0,5) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>'
+        + array2list(d.genres).slice(0,5) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating.toFixed(2) + '</p>'
 }
 
 function toolTipContentsMovie(d) {
@@ -437,7 +437,7 @@ function applyLabelsClusters(){
 	const lvl = zScale(k);
 	let clusterLabel1 = function(d){
 		let genres = JSON.parse(d.genres).slice(0,2).map(x=>x[0]).join('/')		
-		return genres +', starring';
+		return genres +', with';
 	}
 	let clusterLabel2 = function(d){		
 		let actors = JSON.parse(d.actors).slice(0,2).map(x=>x[0]).join(' & ')
