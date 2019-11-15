@@ -559,6 +559,97 @@ function drawArcs() {
 	
 }
 
+function drawHistory() {
+	// draws arcs in history of likes
+
+	const k = d3.zoomTransform(svg.node()).k;
+	const lvl = zScale(k);
+	if (lvl <5){
+	//let currentMovieCluster = data.filter(x=>x.ID==currentMovie)[0]['L'+lvl]
+	//console.log(currentMovieCluster)
+	let currentHistCluster = moviesLikedOrdered.map(q=> data.filter(x=>x.ID==q)[0]['L'+lvl])
+	//console.log(currentGridCluster)
+	//let currentMovieLoc = payload[lvl][currentMovieCluster]
+	//console.log(currentMovieLoc)
+	let currentHistLoc = currentHistCluster.map(q=> payload[lvl][q])
+	//console.log(currentGridLoc)
+	let links = []
+	let i;
+	let curr = currentHistLoc[0]
+	for (i=1; i<currentHistLoc.length;i++){
+		links.push({source:curr,target:currentHistLoc[i]})	
+		curr = currentHistLoc[i];
+	}
+	console.log(links)
+	console.log('xxx')
+	let path = g.append('g')
+		.attr("class","history_paths").selectAll("path")
+		.data(links)
+		.enter()
+		.append("path")
+		.attr("d", function(d) {
+        var dx = xScale(d.target.x) - xScale(d.source.x),
+            dy = yScale(d.target.y) - yScale(d.source.y),
+            dr = Math.sqrt(dx * dx + dy * dy);
+			var q = "M" +
+            xScale(d.source.x) + "," +
+            yScale(d.source.y) + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            xScale(d.target.x) + "," +
+            yScale(d.target.y)
+			console.log(q)
+        return "M" +
+            xScale(d.source.x) + "," +
+            yScale(d.source.y) + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            xScale(d.target.x) + "," +
+            yScale(d.target.y);
+    })
+	.style("fill","None")
+	.style("stroke","steelblue")
+	.attr("class","arc")
+	.style('stroke-width',zoomParams[lvl].r/5)
+	} else {
+		let i;
+		let tmp;
+		let links = []
+		let curr = data.filter(x=>x.ID == moviesLikedOrdered[0])[0]
+		for (i=1; i<moviesLikedOrdered.length;i++){
+			tmp = data.filter(x=>x.ID == moviesLikedOrdered[i])[0]
+			links.push({source:curr,target:tmp})	
+			curr = tmp;
+	}
+		
+		console.log(links)
+		let path = g.append('g')
+		.attr("class","history_paths").selectAll("path")
+			.data(links)
+			.enter()
+			.append("path")
+			.attr("d", function(d) {
+			var dx = xScale(d.target.x) - xScale(d.source.x),
+				dy = yScale(d.target.y) - yScale(d.source.y),
+				dr = Math.sqrt(dx * dx + dy * dy);
+			return "M" +
+				xScale(d.source.x) + "," +
+				yScale(d.source.y) + "A" +
+				dr + "," + dr + " 0 0,1 " +
+				xScale(d.target.x) + "," +
+				yScale(d.target.y);
+		})
+		.style("fill","None")
+		.style("stroke","steelblue")
+		.attr("class","arc")
+		.style('stroke-width',zoomParams[lvl].r/5)
+		
+		
+	}
+	
+	
+	
+	
+}
+
 
 
 
