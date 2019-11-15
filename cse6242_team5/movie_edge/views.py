@@ -58,8 +58,8 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
     random_movies = random.sample(list(all_movie_ids), n)
     return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
-    print('Random Movies!')
-    print(return_val)
+    # print('Random Movies!')
+    # print(return_val)
     return list(return_val)
 
 
@@ -156,10 +156,10 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
                                             negative=movies_disliked,
                                             topn=topn)
 
-        print('Similar: ')
-        print(df_movies.loc[[int(i[0]) for i in movies_similar]])
+        # print('Similar: ')
+        # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
         # returns List of (movieID, similarity). We only want movieID to return for now.
         response = {MOVIE_CHOICES: [i[0] for i in movies_similar]}
-        print(response)
+        # print(response)
         return JsonResponse(response)
