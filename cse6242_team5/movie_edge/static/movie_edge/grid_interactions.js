@@ -68,8 +68,8 @@ function closurePlotGoTo(movieID) {
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
     function plotGoTo() {
-        console.log(movieID);
-        console.log('do stuff with movieID')
+        console.warn('Move Poster Clicked: Jon to implement highlightAndCenterSingle');
+        highlightAndCenter([movieID]);
     }
 
     return plotGoTo;
