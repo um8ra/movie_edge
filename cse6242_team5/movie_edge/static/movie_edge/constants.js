@@ -31,6 +31,5 @@ const IMDB_RATING = 'imdb_rating';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = tableData[MOVIE_CHOICES];
 const gridHistorySet = new Set(tableData[MOVIE_CHOICES]);
-const gridHistoryArray = tableData[MOVIE_CHOICES].map(x => x); // makes deep copy
 const moviesLikedQueue = Array();
 const moviesDislikedQueue = Array();

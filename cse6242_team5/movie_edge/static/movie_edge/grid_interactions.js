@@ -99,6 +99,7 @@ function gridMovies(movieidList) {
     }
     // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
     currentGrid = movieidList;
+    movieidList.map(x => gridHistorySet.add(x));
     movieidList.forEach(function (movieId) {
             const dataIndex = decoder[movieId];
             console.log(dataIndex);
