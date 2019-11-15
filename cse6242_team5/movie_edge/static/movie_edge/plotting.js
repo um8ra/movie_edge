@@ -313,7 +313,7 @@ function highlightAndCenter(pts) {
 
 function array2list(str) {
     arr = JSON.parse(str);
-    return arr.map(itm => itm[0] + "(" + itm[1] + ")")
+    return arr.map(itm => itm[0] + " (" + itm[1] + ")")
 }
 
 function str2arrayList(str) {
@@ -326,9 +326,9 @@ function str2arrayList(str) {
 
 function toolTipContentsCluster(d) {
     //console.log(d.ID)
-    return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Count): '
-        + array2list(d.actors) + '</p><p>Frequent Genres (Count): '
-        + array2list(d.genres) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>'
+    return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
+        + array2list(d.actors).slice(0,5) + '</p><p>Frequent Genres (Frequency): '
+        + array2list(d.genres).slice(0,5) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>'
 }
 
 function toolTipContentsMovie(d) {
