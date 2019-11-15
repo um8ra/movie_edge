@@ -157,7 +157,7 @@ def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
         while True:
             movies_similar = model.most_similar(positive=movies_liked,
                                                 negative=movies_disliked,
-                                                topn=topn) # note topn starts at 20
+                                                topn=topn)  # note topn starts at 20
             movies_similar_list = [i[0] for i in movies_similar]
             movies_similar_set = set(movies_similar_list)
             new_movies = movies_similar_set - movies_shown_str_set
@@ -166,11 +166,9 @@ def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
                 return JsonResponse(response)
             topn *= 2
 
-
         # print('Similar: ')
         # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
 
         # returns List of (movieID, similarity). We only want movieID to return for now.
 
         # print(response)
-
