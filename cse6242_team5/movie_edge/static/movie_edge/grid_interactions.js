@@ -78,6 +78,7 @@ function closurePlotGoTo(movieID) {
 }
 
 function gridMovies(movieidList) {
+    highlightAndCenter(movieidList);
     const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
     const divHeightNormalized = (divHeight - 128) / 5 / ratio;
