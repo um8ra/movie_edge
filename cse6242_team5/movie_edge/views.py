@@ -4,7 +4,7 @@ from pathlib import Path
 from gensim.models import Word2Vec
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie, c0, c1, c2, c3, c4
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Q
 import pandas as pd
 import json
 import urllib.parse
@@ -19,10 +19,11 @@ TITLE = 'movie_title'
 GENRES = 'genres'
 X = 'x'
 Y = 'y'
-MEAN = 'mean'
-COUNT = 'count'
-STDDEV = 'std'
-CLUSTER = 'cluster'
+# MEAN = 'mean'
+# COUNT = 'count'
+# STDDEV = 'std'
+# CLUSTER = 'cluster'
+CLUSTER_ID = 'cluster_id'
 COLOR = 'color'
 POSTER_URL = 'poster_url'
 RUNTIME = 'runtime'
@@ -55,8 +56,40 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
+
+    ## The imdb_votes column of db.sqlite3 has to be changed from lower case 'null' to upper case true 'NULL'
+    ## otherwise django treat it a str -> ValueError: invalid literal for int() with base 10: 'null'
     all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
     random_movies = random.sample(list(all_movie_ids), n)
+    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
+    # print('Random Movies!')
+    # print(return_val)
+    return list(return_val)
+
+
+def random_popular_movie_ids(n: int, L0_max_imdb_votes=500000) -> List[int]:
+    ## Pick 10 clusters from all 50 c0/L0 clusters
+    # all_c0_ids = c0.objects.values_list('id', flat=True)
+    # random_c0_ids = random.sample(list(all_c0_ids), n)
+    # random_c0_cluster_ids = c0.objects.filter(id__in=random_c0_ids).values_list(CLUSTER_ID, flat=True)
+    # # print(all_c0_ids)
+    # # print(random_c0_ids)
+
+    ## Pick 10 clusters from the 12 most popular c0/L0 clusters with max imdb_votes >= 500000
+    pop_c0_cluster_ids = Movie.objects.values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
+                                      .filter(max_imdb_votes__gte=L0_max_imdb_votes).values_list('L0', flat=True)
+    random_c0_cluster_ids = random.sample(list(pop_c0_cluster_ids), n)
+    # print(pop_c0_cluster_ids)
+    # print(random_c0_cluster_ids)
+
+    ## Pick 1 movie per cluster
+    random_movies = []
+    for c0_cluster_id in random_c0_cluster_ids:
+        _movie_ids = Movie.objects.filter(L0=c0_cluster_id).order_by('-'+IMDB_VOTES).values_list('id', flat=True)[:n]
+        _movie_id = random.choice(list(_movie_ids))
+        # print(c0_cluster_id, _movie_id)
+        random_movies.append(_movie_id)
+
     return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
     # print('Random Movies!')
     # print(return_val)
@@ -98,7 +131,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        MOVIE_CHOICES: random_movie_ids(10, 10000),
+        MOVIE_CHOICES: random_popular_movie_ids(10, L0_max_imdb_votes=500000),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
@@ -111,7 +144,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 # @csrf_exempt
-def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
+def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
 
     request_data = json.loads(request.body)
@@ -128,7 +161,7 @@ def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
     len_movies_disliked = len(movies_disliked)
     if (len_movies_liked + len_movies_disliked) == 0:
         # print('No Data: Random')
-        response = {MOVIE_CHOICES: random_movie_ids(topn)}
+        response = {MOVIE_CHOICES: random_popular_movie_ids(topn, L0_max_imdb_votes=500000)}
         return JsonResponse(response)
     elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
         # Yi and Rocko do stuff here and change the threshold/rules and such
@@ -153,18 +186,32 @@ def query_recommendations(request: HttpRequest, topn=20) -> JsonResponse:
             model = Word2Vec.load(str(gensim_model_path))
             dict_gensim_models[gensim_model_str] = model
 
-        # This prevents re-showing of movies
-        while True:
-            movies_similar = model.most_similar(positive=movies_liked,
-                                                negative=movies_disliked,
-                                                topn=topn)  # note topn starts at 20
-            movies_similar_list = [i[0] for i in movies_similar]
-            movies_similar_set = set(movies_similar_list)
-            new_movies = movies_similar_set - movies_shown_str_set
-            if len(new_movies) >= 10 or topn >= 1000:
-                response = {MOVIE_CHOICES: [new_movies.pop() for _ in range(10)]}
-                return JsonResponse(response)
-            topn *= 2
+        ## This prevents re-showing of movies, while preserving score order
+        movies_similar = model.wv.most_similar(positive=movies_liked,
+                                               negative=movies_disliked,
+                                               topn=len(model.wv.vocab)) # all movies
+        new_topn_idx = []
+        for i, m in enumerate(movies_similar):
+            if m[0] not in movies_shown_str_set:
+                new_topn_idx.append(i)
+            if len(new_topn_idx) == topn:
+                break
+
+        response = {MOVIE_CHOICES: [movies_similar[i][0] for i in new_topn_idx]}
+        return JsonResponse(response)
+
+        # # This prevents re-showing of movies
+        # while True:
+        #     movies_similar = model.wv.most_similar(positive=movies_liked,
+        #                                            negative=movies_disliked,
+        #                                            topn=topn)  # note topn starts at 20
+        #     movies_similar_list = [i[0] for i in movies_similar]
+        #     movies_similar_set = set(movies_similar_list)
+        #     new_movies = movies_similar_set - movies_shown_str_set
+        #     if len(new_movies) >= 10 or topn >= 1000:
+        #         response = {MOVIE_CHOICES: [new_movies.pop() for _ in range(10)]}
+        #         return JsonResponse(response)
+        #     topn *= 2
 
         # print('Similar: ')
         # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
