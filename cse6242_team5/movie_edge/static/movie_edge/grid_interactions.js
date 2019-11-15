@@ -144,10 +144,10 @@ function buttonClickLike(data) {
     }
 
     if (moviesLikedQueue.length >= QUEUE_MAX_LENGTH) {
-        moviesLikedQueue.push(movieID);
+        moviesLikedQueue.push(movieId);
         moviesLikedQueue.shift();
     } else {
-        moviesLikedQueue.push(movieID);
+        moviesLikedQueue.push(movieId);
     }
 
     moviesLiked.add(movieId);
@@ -162,10 +162,10 @@ function buttonClickDislike(data) {
     }
 
     if (moviesDislikedQueue.length >= QUEUE_MAX_LENGTH) {
-        moviesDislikedQueue.push(movieID);
+        moviesDislikedQueue.push(movieId);
         moviesDislikedQueue.shift();
     } else {
-        moviesDislikedQueue.push(movieID);
+        moviesDislikedQueue.push(movieId);
     }
 
     moviesDisliked.add(movieId);
