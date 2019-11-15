@@ -115,11 +115,13 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
     assert gensim_path.is_dir(), "Gensim Directory Not Correct"
     request_data = json.loads(request.body)
-    movies_shown = request_data[MOVIES_SHOWN] # List[str]
-    movies_liked = request_data[LIKE] # List[str]
-    movies_liked_int = [int(i) for i in movies_liked] # List[int]
-    movies_disliked = request_data[DISLIKE] # List[str]
-    movies_disliked_int = [int(i) for i in movies_disliked] # List[str]
+
+    # These are all movieIds
+    movies_shown = request_data[MOVIES_SHOWN]  # List[int]
+    movies_liked = request_data[LIKE]  # List[str]
+    movies_liked_int = [int(i) for i in movies_liked]  # List[int]
+    movies_disliked = request_data[DISLIKE]  # List[str]
+    movies_disliked_int = [int(i) for i in movies_disliked]  # List[str]
 
     len_movies_liked = len(movies_liked)
     len_movies_disliked = len(movies_disliked)
