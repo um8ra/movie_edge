@@ -188,10 +188,10 @@ function getPtBbox(pts) {
         centers[lvl] = {x: (d3.max(xs) + d3.min(xs)) / 2, y: (d3.max(ys) + d3.min(ys)) / 2}
     }
 
-    console.log(levelCoords)
-    console.log(centers)
+    console.log(levelCoords);
+    console.log(centers);
     // Test zoom levels
-    let best = {x: centers[0].x, y:centers[0].y, k: 1};
+    let best = {x: centers[0].x, y: centers[0].y, k: 1};
     for (let k = 1.5; k < zoomParams.maxZoom; k++) {
 
         let zoomLevel = zScale(k);
@@ -227,7 +227,7 @@ function highlightAndCenter(pts) {
     const ptBox = getPtBbox(pts);
     const level = zScale(ptBox.k);
     const clusters = getPtsClusterIDatLevel(pts, level);
-    console.log('ptbox',ptBox);
+    console.log('ptbox', ptBox);
 
     centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
     d3.selectAll('.scatter')
@@ -243,64 +243,64 @@ function highlightAndCenter(pts) {
 }
 
 function array2list(str) {
-	arr = JSON.parse(str)
-	return arr.map(itm=>itm[0] + "("+ itm[1] + ")")
+    arr = JSON.parse(str);
+    return arr.map(itm => itm[0] + "(" + itm[1] + ")")
 }
 
 function str2arrayList(str) {
-	let tmp = str.split('|')
-	return tmp.join(', ')
-	
-	
+    let tmp = str.split('|');
+    return tmp.join(', ')
+
+
 }
 
 
 function toolTipContentsCluster(d) {
-	//console.log(d.ID)
-	return 	'<p>Cluster: ' + (d.ID.toString()) + ' </p>'+'<p>Frequent Actors (Count): ' 
-			+ array2list(d.actors) + '</p><p>Frequent Genres (Count): ' 
-			+ array2list(d.genres) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>' 
+    //console.log(d.ID)
+    return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Count): '
+        + array2list(d.actors) + '</p><p>Frequent Genres (Count): '
+        + array2list(d.genres) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating + '</p>'
 }
 
 function toolTipContentsMovie(d) {
-	return '<p>Title: ' + d.movie_title + '</p>'+'<p>Actors: ' 
-			+ str2arrayList(d.actors) + '</p><p>Genres: ' 
-			+ str2arrayList(d.genres) + '</p><p>IMDB rating: ' + d.imdb_rating + '</p>' 
-			+ '<p>Director: ' + d.director + '</p><p>Metascore: ' + d.metascore +'</p>' 
-			+ '<img src='+  d.poster_url +' class="smallImg"/>'
+    return '<p>Title: ' + d.movie_title + '</p>' + '<p>Actors: '
+        + str2arrayList(d.actors) + '</p><p>Genres: '
+        + str2arrayList(d.genres) + '</p><p>IMDB rating: ' + d.imdb_rating + '</p>'
+        + '<p>Director: ' + d.director + '</p><p>Metascore: ' + d.metascore + '</p>'
+        + '<img alt="" src=' + d.poster_url + ' class="smallImg"/>'
 }
 
-function tipdir(d){
-	let tx = d3.zoomTransform(d3.select(".holder").node());
-	let cx = +this.attributes.cx.value;
-	let cy = +this.attributes.cy.value;
-	let tmp = tx.apply([cx,cy]);
-	//console.log(tmp,width,height)
-	//console.log(tx,cx,cy)
-	let out = ''
-	if (tmp[1] < (height/2)){
-		out = out+'s'
-	} else {
-		out = out +'n';
-	}
-	if (tmp[0]<(width/2)){
-		out = out +'e';
-	} else {
-		out = out+'w';
-	}
-	
-	//console.log(out)
-	return out	
+function tipdir(d) {
+    const tx = d3.zoomTransform(d3.select(".holder").node());
+    const cx = +this.attributes.cx.value;
+    const cy = +this.attributes.cy.value;
+    let tmp = tx.apply([cx, cy]);
+    //console.log(tmp,width,height)
+    //console.log(tx,cx,cy)
+    let out = '';
+    if (tmp[1] < (height / 2)) {
+        out = out + 's'
+    } else {
+        out = out + 'n';
+    }
+    if (tmp[0] < (width / 2)) {
+        out = out + 'e';
+    } else {
+        out = out + 'w';
+    }
+
+    //console.log(out)
+    return out
 }
 
 function toolTipContents(d) {
-	//console.log(d)
+    //console.log(d)
     if ('movie_title' in d) {
-		return toolTipContentsMovie(d);
-	} else {
-		return toolTipContentsCluster(d);
-		
-	}
+        return toolTipContentsMovie(d);
+    } else {
+        return toolTipContentsCluster(d);
+
+    }
 }
 
 
