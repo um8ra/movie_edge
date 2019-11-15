@@ -55,7 +55,7 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 
 def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
-    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
+    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list(MOVIE_ID, flat=True)
     random_movies = random.sample(list(all_movie_ids), n)
     return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
     # print('Random Movies!')
@@ -72,7 +72,7 @@ def index(request: HttpRequest) -> HttpResponse:
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
 
-    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id']
+    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id','cluster_size']
 
     clusters0 = c0.objects.values(*cols)
     clusters1 = c1.objects.values(*cols)
