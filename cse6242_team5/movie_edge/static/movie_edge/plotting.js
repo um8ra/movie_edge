@@ -57,7 +57,7 @@ function drawGraph(data, toHighlight, layer) {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", d=> sizeScales[layer](d))
+        .attr("r", sizeScales[layer])
         .attr("cx", d => xScale(d.x))
         .attr("cy", d => yScale(d.y))
         .attr("stroke-width", zoomParams[layer]['w'])
@@ -163,7 +163,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .data(filtered)
         .enter()
         .append("circle")
-        .attr("r", d=> sizeScales[startLevel](d))
+        .attr("r", zoomParams[startLevel]['r'])
         .attr("cx", function (d) {
             return xScale(d['L' + startLevel + 'x'])
         })
@@ -171,7 +171,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
             return yScale(d['L' + startLevel + 'y'])
         })
         .attr("class", "scatter")
-        .attr("stroke-width", zoomParams[endLevel]['w'])
+        .attr("stroke-width", zoomParams[startLevel]['w'])
         .style('fill', d => colorScale(d[IMDB_RATING]))
         .style('opacity', 1.0);
 
@@ -184,7 +184,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .attr("cy", function (d) {
             return yScale(d['L' + endLevel + 'y'])
         })
-        .attr("r", d=> sizeScales[endLevel](d))
+        .attr("r", zoomParams[endLevel]['r'])
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()

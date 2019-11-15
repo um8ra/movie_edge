@@ -168,8 +168,8 @@
 	var i = 0;
 	for (i=0;i<5;i++){
 		let sizes = payload[i].map(x=>x.cluster_size)
-		let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
-		
+		//let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
+		let tmp = d3.scaleLinear().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
 		sizeScales.push(function (d) {return tmp(d.cluster_size)})	
 	}
 	sizeScales.push(function(d) {return zoomParams[5].r})
