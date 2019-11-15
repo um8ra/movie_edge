@@ -14,30 +14,31 @@
         .grid {
             display: grid;
             grid-gap: 10px;
-            grid-template-columns: repeat(2, 40%);
+            grid-template-columns: repeat(2, 50%);
             grid-template-rows: repeat(5, 17%);
             grid-auto-flow: column;
-            width: 30%;
+            width: 20%;
             height: 100%;
             float: left;
             position: relative;
         }
 
         .buttonSubmit {
-            height: 64px;
-            width: 128px;
+            height: 80px;
+            width: 150px;
         }
 
         .buttonGetRandom {
-            height: 64px;
-            width: 128px;
+            height: 80px;
+            width: 150px;
         }
 
         .graph {
-            width: 70%;
+            width: 80%;
             height: 100%;
             float: right;
             background: darkgray;
+            position: relative;
         }
 		.history {
 			stroke: orange;
@@ -68,7 +69,8 @@
             background-color: dimgray;
             position: absolute;
             top: 0;
-            height: 10%;
+            left: 0;
+            height: 90px;
             width: 100%;
         }
 
@@ -76,8 +78,8 @@
             background-color: black;
             position: absolute;
             left: 0;
-            top: 10%;
-            width: 30%;
+            top: 90px;
+            width: 20%;
             height: 100%;
         }
 
@@ -86,8 +88,8 @@
 			background-color: white;
             position: absolute;
             right: 0;
-            top: 10%;
-            width: 70%;
+            top: 90px;
+            width: 80%;
             height: 100%;
         }
 
@@ -109,10 +111,10 @@
 <body>
 <div class="top" id="buttons">
     <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
-        Click me for movie recommendations!
+        Click for recommendations
     </button>
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
-        Click on me for some more randomness!
+        Click for random suggestions
     </button>
 </div>
 <!--https://gridbyexample.com/examples/code/example18.html-->
