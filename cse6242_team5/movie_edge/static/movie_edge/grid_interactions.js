@@ -140,7 +140,7 @@ function buttonClickLike(data) {
         moviesDisliked.delete(movieId);
     }
 
-    if(moviesLikedQueue.length >= QUEUE_MAX) {
+    if(moviesLikedQueue.length >= QUEUE_MAX_LENGTH) {
         moviesLikedQueue.push(movieID);
         moviesLikedQueue.shift();
     } else {
