@@ -83,7 +83,7 @@ function gridMovies(movieidList) {
 
     let poster_width = 100;
     let poster_height = 150;
-    if(divHeightNormalized > divWidth) {
+    if (divHeightNormalized > divWidth) {
         // alert('width limited');
         poster_width = divWidth;
         poster_height = divWidth * ratio;
@@ -140,7 +140,7 @@ function buttonClickLike(data) {
         moviesDisliked.delete(movieId);
     }
 
-    if(moviesLikedQueue.length >= QUEUE_MAX_LENGTH) {
+    if (moviesLikedQueue.length >= QUEUE_MAX_LENGTH) {
         moviesLikedQueue.push(movieID);
         moviesLikedQueue.shift();
     } else {
@@ -157,6 +157,14 @@ function buttonClickDislike(data) {
     if (moviesLiked.has(movieId)) {
         moviesLiked.delete(movieId);
     }
+
+    if (moviesDislikedQueue.length >= QUEUE_MAX_LENGTH) {
+        moviesDislikedQueue.push(movieID);
+        moviesDislikedQueue.shift();
+    } else {
+        moviesDislikedQueue.push(movieID);
+    }
+
     moviesDisliked.add(movieId);
     console.log(moviesDisliked);
 }
