@@ -113,42 +113,42 @@ def index(request: HttpRequest) -> HttpResponse:
 # @csrf_exempt
 def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
-    assert gensim_path.is_dir(), "Gensim Directory Not Correct"
+
     request_data = json.loads(request.body)
 
     # These are all movieIds
-    movies_shown = request_data[MOVIES_SHOWN]  # List[int]
+    # movies_shown = request_data[MOVIES_SHOWN]  # List[int]
     movies_liked = request_data[LIKE]  # List[str]
-    movies_liked_int = [int(i) for i in movies_liked]  # List[int]
+    # movies_liked_int = [int(i) for i in movies_liked]  # List[int]
     movies_disliked = request_data[DISLIKE]  # List[str]
-    movies_disliked_int = [int(i) for i in movies_disliked]  # List[str]
+    # movies_disliked_int = [int(i) for i in movies_disliked]  # List[str]
 
     len_movies_liked = len(movies_liked)
     len_movies_disliked = len(movies_disliked)
     if (len_movies_liked + len_movies_disliked) == 0:
-        print('No Data: Random')
+        # print('No Data: Random')
         response = {MOVIE_CHOICES: random_movie_ids(topn)}
         return JsonResponse(response)
     elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
         # Yi and Rocko do stuff here and change the threshold/rules and such
         pass
     else:
-        print('Have Data: Calculating...')
+        # print('Have Data: Calculating...')
         gensim_model_str = EMBEDDER
-        print('Likes:')
-        print(movies_liked)
-        print(df_movies.loc[movies_liked_int])
-        print('Dislikes:')
-        print(movies_disliked)
-        print(df_movies.loc[movies_disliked_int])
-
-        gensim_model_path = gensim_path / gensim_model_str
-        if not gensim_model_path.is_file():
-            raise FileNotFoundError
+        # print('Likes:')
+        # print(movies_liked)
+        # print(df_movies.loc[movies_liked_int])
+        # print('Dislikes:')
+        # print(movies_disliked)
+        # print(df_movies.loc[movies_disliked_int])
 
         if gensim_model_str in dict_gensim_models.keys():
             model = dict_gensim_models[gensim_model_str]
         else:
+            assert gensim_path.is_dir(), "Gensim Directory Not Correct"
+            gensim_model_path = gensim_path / gensim_model_str
+            if not gensim_model_path.is_file():
+                raise FileNotFoundError
             model = Word2Vec.load(str(gensim_model_path))
             dict_gensim_models[gensim_model_str] = model
 
