@@ -40,10 +40,11 @@
             background: darkgray;
             position: relative;
         }
-		.history {
-			stroke: orange;
-		
-		}
+
+        .history {
+            stroke: orange;
+
+        }
 
         body {
             overflow-x: hidden;
@@ -96,8 +97,8 @@
         }
 
         .right-half {
-            //background-color: rgb(39, 40, 34); /* monokai gray background */
-			background-color: white;
+        / / background-color: rgb(39, 40, 34); /* monokai gray background */
+            background-color: white;
             position: absolute;
             right: 0;
             top: 90px;
@@ -109,7 +110,7 @@
             max-width: 300px;
             max-height: 600px;
             overflow: hidden;
-			border-radius: 10px;
+            border-radius: 10px;
         }
 
         .smallImg {
@@ -174,7 +175,7 @@
     payload[2] = payload[2].map(inputFormatCluster);
     payload[3] = payload[3].map(inputFormatCluster);
     payload[4] = payload[4].map(inputFormatCluster);
-	let currentMovie = 1; //current movie selected
+    let currentMovie = 1; //current movie selected
     //DELETE ME
     {#const q = tableData[MOVIE_CHOICES];#}
     {#const qq = [ 280, 704, 1609, 3334, 3811, 31930, 33463, 80398, 98154, 109483 ];#}
@@ -186,21 +187,25 @@
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
     const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
     //const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]); // I don't like the colors?
-	
-	const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
-	
-	const sizeScales = [];
-	for (let i=0;i<5;i++){
-		let sizes = payload[i].map(x=>x[CLUSTER_SIZE]);
-		//let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
-		let tmp = d3.scaleLinear().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2]);
-		sizeScales.push(function (d) {return tmp(d[CLUSTER_SIZE])})
-	}
-	sizeScales.push(function(d) {return zoomParams[5].r});
+
+    const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
+
+    const sizeScales = [];
+    for (let i = 0; i < 5; i++) {
+        let sizes = payload[i].map(x => x[CLUSTER_SIZE]);
+        //let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
+        let tmp = d3.scaleLinear().domain([d3.min(sizes), d3.max(sizes)]).range([zoomParams[i].r * 0.5, zoomParams[i].r * 2]);
+        sizeScales.push(function (d) {
+            return tmp(d[CLUSTER_SIZE])
+        })
+    }
+    sizeScales.push(function () {
+        return zoomParams[5].r
+    });
 
     //Init
     let currentZoom = 0;
-	//TODO -- setting svg height/width here prevents graph from being dynamic
+    //TODO -- setting svg height/width here prevents graph from being dynamic
     const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
     const g = svg.append("g")
@@ -214,13 +219,13 @@
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
     drawGraph(payload[0], 0, 0);
-	let tmp = currentGrid;
-	tmp.push(currentMovie);
-	highlightAndCenter(tmp);
+    let tmp = currentGrid;
+    tmp.push(currentMovie);
+    highlightAndCenter(tmp);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);
 
-	tip.offset(tipoff);
+    tip.offset(tipoff);
     tip.direction(tipdir);
 
 </script>
