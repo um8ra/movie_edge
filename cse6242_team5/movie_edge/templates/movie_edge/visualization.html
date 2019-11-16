@@ -65,14 +65,26 @@
             background: red;
         }
 
-        .top {
+        .topL {
             background-color: dimgray;
             position: absolute;
             top: 0;
             left: 0;
             height: 90px;
-            width: 100%;
+            width: 20%;
         }
+
+        .topR {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 90px;
+            width: 80%;
+            vertical-align: center;
+            horiz-align: center;
+        }
+
 
         .left-half {
             background-color: black;
@@ -110,25 +122,27 @@
         }
 
         .screen-title {
-            vertical-align: center;
-            width: 100%;
+            /*vertical-align: center;*/
             text-align: center;
-            font-size: 50px;
+            font-size: 200%;
             color: white;
         }
 
     </style>
 </head>
 <body>
-<div class="top" id="buttons">
+<div class="topL" id="buttons">
     <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
         Click for recommendations
     </button>
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
     </button>
-    <text class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</text>
 </div>
+<div class="topR" id="title">
+    <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
+</div>
+
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="container">
     <div class="box">
