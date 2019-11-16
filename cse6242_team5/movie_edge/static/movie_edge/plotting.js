@@ -498,6 +498,34 @@ function drawArcs() {
 
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
+
+    function innerDrawArcs(currentMovieLoc, currentGridLoc) {
+        let links = [];
+        currentGridLoc.forEach(function (loc) {
+            links.push({source: currentMovieLoc, target: loc})
+        });
+        console.log(links);
+        g.selectAll("path")
+            .data(links)
+            .enter()
+            .append("path")
+            .attr("d", function (d) {
+                let dx = xScale(d.target.x) - xScale(d.source.x),
+                    dy = yScale(d.target.y) - yScale(d.source.y),
+                    dr = Math.sqrt(dx * dx + dy * dy);
+                return "M" +
+                    xScale(d.source.x) + "," +
+                    yScale(d.source.y) + "A" +
+                    dr + "," + dr + " 0 0,1 " +
+                    xScale(d.target.x) + "," +
+                    yScale(d.target.y);
+            })
+            .style("fill", "None")
+            .style("stroke", "Black")
+            .attr("class", "arc")
+            .style('stroke-width', zoomParams[lvl].r / 5)
+    }
+
     if (lvl < 5) {
         let currentMovieCluster = data.filter(x => x.ID == currentMovie)[0]['L' + lvl];
         //console.log(currentMovieCluster)
@@ -506,64 +534,14 @@ function drawArcs() {
         let currentMovieLoc = payload[lvl][currentMovieCluster];
         //console.log(currentMovieLoc)
         let currentGridLoc = currentGridCluster.map(q => payload[lvl][q]);
-        //console.log(currentGridLoc)
-        let links = [];
-        currentGridLoc.forEach(function (loc) {
-            links.push({source: currentMovieLoc, target: loc})
-        });
-        console.log(links);
-        let path = g.selectAll("path")
-            .data(links)
-            .enter()
-            .append("path")
-            .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
-                    dy = yScale(d.target.y) - yScale(d.source.y),
-                    dr = Math.sqrt(dx * dx + dy * dy);
-                return "M" +
-                    xScale(d.source.x) + "," +
-                    yScale(d.source.y) + "A" +
-                    dr + "," + dr + " 0 0,1 " +
-                    xScale(d.target.x) + "," +
-                    yScale(d.target.y);
-            })
-            .style("fill", "None")
-            .style("stroke", "Black")
-            .attr("class", "arc")
-            .style('stroke-width', zoomParams[lvl].r / 5)
+        innerDrawArcs(currentMovieLoc, currentGridLoc);
     } else {
         let currentMovieLoc = data.filter(x => x.movie_id == currentMovie)[0];
         //console.log(currentMovieLoc)
         let currentGridLoc = data.filter(x => currentGrid.includes(x.movie_id));
         //console.log(currentGridLoc)
-        let links = [];
-        currentGridLoc.forEach(function (loc) {
-            links.push({source: currentMovieLoc, target: loc})
-        });
-        console.log(links);
-        let path = g.selectAll("path")
-            .data(links)
-            .enter()
-            .append("path")
-            .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
-                    dy = yScale(d.target.y) - yScale(d.source.y),
-                    dr = Math.sqrt(dx * dx + dy * dy);
-                return "M" +
-                    xScale(d.source.x) + "," +
-                    yScale(d.source.y) + "A" +
-                    dr + "," + dr + " 0 0,1 " +
-                    xScale(d.target.x) + "," +
-                    yScale(d.target.y);
-            })
-            .style("fill", "None")
-            .style("stroke", "Black")
-            .attr("class", "arc")
-            .style('stroke-width', zoomParams[lvl].r / 5)
-
-
+        innerDrawArcs(currentMovieLoc, currentGridLoc);
     }
-
 }
 
 function drawHistory() {
