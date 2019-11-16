@@ -537,9 +537,9 @@ function drawArcs() {
         let currentGridLoc = currentGridCluster.map(q => payload[lvl][q]);
         innerDrawArcs(currentMovieLoc, currentGridLoc);
     } else {
-        let currentMovieLoc = data.filter(x => x.movie_id === currentMovie)[0];
+        let currentMovieLoc = data.filter(x => x[MOVIE_ID] === currentMovie)[0];
         console.log(currentMovieLoc);
-        let currentGridLoc = data.filter(x => currentGrid.includes(x.movie_id));
+        let currentGridLoc = data.filter(x => currentGrid.includes(x[MOVIE_ID]));
         console.log(currentGridLoc);
         innerDrawArcs(currentMovieLoc, currentGridLoc);
     }
