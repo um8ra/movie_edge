@@ -433,12 +433,10 @@ function applyLabelsClusters() {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
     let clusterLabel1 = function (d) {
-        let genres = JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/');
-        return genres + ', with';
+        return JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/') + ', with';
     };
     let clusterLabel2 = function (d) {
-        let actors = JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
-        return actors
+        return JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
     };
     //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
     g.selectAll('nodeLabels')
