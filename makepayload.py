@@ -173,7 +173,7 @@ for level in range(5):
     
     
 tmp = df_output.copy()
-tmp['imdb_votes']=tmp['imdb_votes'].fillna(-1)
+tmp['imdb_votes']=tmp['imdb_votes'].fillna(value=-1)
 tmp = tmp.fillna('N/A')
 tmp = df_output.copy().fillna("null")
 tmp['x'] = tmp.L5x;

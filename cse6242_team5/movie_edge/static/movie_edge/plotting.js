@@ -85,6 +85,7 @@ function drawGraph(data, toHighlight, layer) {
 	}
 	//highlight grid
 	highlight(currentGrid)
+	highlightAndCenterSingle(currentMovie)	
 }
 
 
@@ -191,11 +192,14 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .style('opacity', 1.0)
         .end()
         .then(() => drawGraph(payload[endLevel], 0, endLevel)); //don't forget to redraw when done!
+		
+		
 
 }
 
 //https://observablehq.com/@d3/zoom-to-bounding-box
 function centerOnElement(px, py, k) {
+	d3.event.stopPropagation();
     //Transition to center on x/y (pixel coords) at scale level k
     svg.transition().duration(750).call(
         myzoom.transform,
@@ -391,12 +395,13 @@ function selectHighlight() {
 
 function highlightAndCenterSingle(id) {
 	//highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
+	
 	let itm = data.filter( x=> x.ID == id)[0];
 	const k = d3.zoomTransform(svg.node()).k;
     d3.selectAll('.scatter').attr('class', 'scatter');
 	let currID = itm['L'+zScale(k)]
 	
-	let node = d3.selectAll('.scatter').filter( d => d.ID == id)
+	let node = d3.selectAll('.scatter').filter( d => d.ID == currID)
 	node.attr('class', 'scatter selected');
     const px = node.attr("cx");
     const py = node.attr("cy");
