@@ -70,8 +70,7 @@ function closurePlotGoTo(movieID) {
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
     function plotGoTo() {
-        console.warn('Move Poster Clicked: Jon to implement highlightAndCenterSingle');
-        highlightAndCenter([movieID]);
+        highlightAndCenterSingle(movieID);
     }
 
     return plotGoTo;
@@ -84,7 +83,7 @@ function gridMovies(movieidList) {
     // const divHeightNormalized = (divHeight - 128) / 5 / ratio;
     // const divWidth = document.getElementById("grid").offsetWidth / 2.75;
 
-    let poster_height = Math.min((divHeight/5) - 50, 150);
+    let poster_height = Math.min((divHeight / 5) - 50, 150);
     let poster_width = (poster_height * 2 / 3);
     console.log("Thumbnails: ", divHeight, poster_height, poster_width);
     // let poster_width = 100;
@@ -188,4 +187,13 @@ function buttonClickDislike(data) {
     }
     console.log('Liked: ', moviesLikedSet);
     console.log('Disiked: ', moviesDislikedSet);
+}
+
+function findMovie(formBox) {
+    matchString = formBox.children[0].value;
+    const re = new RegExp(matchString, 'i');
+    stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
+    console.log('Matches in SearchBox: ');
+    console.log(stringMatches);
+    highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
 }

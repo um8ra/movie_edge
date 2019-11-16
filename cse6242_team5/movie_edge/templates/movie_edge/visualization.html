@@ -39,6 +39,12 @@
             width: 9vw;
         }
 
+        .searchForm {
+            height: 80px;
+            width: 9vw;
+            float: right;
+        }
+
         .graph {
             width: calc(100% - 150px);
             height: 100%;
@@ -78,7 +84,7 @@
             top: 0;
             left: 0;
             height: 90px;
-            width: 30%;
+            width: 50%;
         }
 
         .topR {
@@ -87,7 +93,7 @@
             top: 0;
             right: 0;
             height: 90px;
-            width: 70%;
+            width: 50%;
             vertical-align: center;
             horiz-align: center;
         }
@@ -144,7 +150,12 @@
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
     </button>
-    <button class="buttonReset" type="button" onclick="resetZoom()">Reset Zoom</button>
+    <button class="buttonReset" type="button" onclick="resetZoom()">
+        Reset Zoom
+    </button>
+    <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
+        <input type="text" name="movieRegex">
+    </form>
 </div>
 <div class="topR" id="title">
     <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
