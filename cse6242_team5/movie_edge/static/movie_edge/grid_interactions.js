@@ -116,16 +116,16 @@ function gridMovies(movieidList) {
             buttonLike.innerText = 'Like';
             buttonLike.onclick = buttonClickLike;
             buttonLike.value = movieId;
-            buttonLike.id = 'LikeBtn_'+movieId;
+            buttonLike.id = 'LikeBtn_' + movieId;
 
             const buttonDislike = document.createElement('BUTTON');
             buttonDislike.innerText = 'Dislike';
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
-            buttonDislike.id = 'DislikeBtn_'+movieId;
+            buttonDislike.id = 'DislikeBtn_' + movieId;
 
-            thisMovieData = data[dataIndex];
-            movieTitle = thisMovieData[MOVIE_TITLE];
+            const thisMovieData = data[dataIndex];
+            const movieTitle = thisMovieData[MOVIE_TITLE];
             imgNode.src = thisMovieData[POSTER_URL];
             imgNode.alt = movieTitle;
             imgNode.title = movieTitle;
@@ -146,19 +146,19 @@ function buttonClickLike(data) {
     const movieId = data.target.value;
     if (moviesLikedSet.has(movieId)) {
         moviesLikedSet.delete(movieId);
-        theButton = d3.select(this);
-        theButton.style('background','white');
-        theButton.style('color','black');
+        let theButton = d3.select(this);
+        theButton.style('background', 'white');
+        theButton.style('color', 'black');
     } else {
         if (moviesDislikedSet.has(movieId)) {
             moviesDislikedSet.delete(movieId);
-            theButton = d3.select('#DislikeBtn_'+movieId);
-            theButton.style('background','white');
-            theButton.style('color','black');
+            let theButton = d3.select('#DislikeBtn_' + movieId);
+            theButton.style('background', 'white');
+            theButton.style('color', 'black');
         }
         moviesLikedSet.add(movieId);
         moviesLikedOrdered.push(movieId);
-        theButton = d3.select(this);
+        let theButton = d3.select(this);
         theButton.style('background', 'green');
         theButton.style('color', 'white');
     }
@@ -170,19 +170,19 @@ function buttonClickDislike(data) {
     const movieId = data.target.value;
     if (moviesDislikedSet.has(movieId)) {
         moviesDislikedSet.delete(movieId);
-        theButton = d3.select(this);
-        theButton.style('background','white');
-        theButton.style('color','black');
+        let theButton = d3.select(this);
+        theButton.style('background', 'white');
+        theButton.style('color', 'black');
     } else {
         if (moviesLikedSet.has(movieId)) {
             moviesLikedSet.delete(movieId);
-            theButton = d3.select('#LikeBtn_' + movieId);
+            let theButton = d3.select('#LikeBtn_' + movieId);
             theButton.style('background', 'white');
             theButton.style('color', 'black');
         }
         moviesDislikedSet.add(movieId);
         moviesDislikedOrdered.push(movieId);
-        theButton = d3.select(this);
+        let theButton = d3.select(this);
         theButton.style('background', 'red');
         theButton.style('color', 'white');
     }
