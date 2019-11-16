@@ -9,7 +9,7 @@ import pandas as pd
 import json
 import urllib.parse
 import random
-from typing import List
+from typing import List, Set
 
 # from django.views.decorators.csrf import csrf_exempt
 
@@ -57,8 +57,8 @@ df_movies.index.rename(MOVIE_ID, inplace=True)
 def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
 
-    ## The imdb_votes column of db.sqlite3 has to be changed from lower case 'null' to upper case true 'NULL'
-    ## otherwise django treat it a str -> ValueError: invalid literal for int() with base 10: 'null'
+    # The imdb_votes column of db.sqlite3 has to be changed from lower case 'null' to upper case true 'NULL'
+    # otherwise django treat it a str -> ValueError: invalid literal for int() with base 10: 'null'
     all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
     random_movies = random.sample(list(all_movie_ids), n)
     return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
@@ -67,7 +67,7 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     return list(return_val)
 
 
-def random_popular_movie_ids(n: int, movies_shown_int_set=[]) -> List[int]:
+def random_popular_movie_ids(n: int, movies_shown_int_set: Set) -> List[int]:
     # Initial random sampling strategy now works as follows
     # 0. Exclude shown movies from SQL query
     # 1. Order L0 clusters by max(imdb_votes) desc
@@ -77,18 +77,18 @@ def random_popular_movie_ids(n: int, movies_shown_int_set=[]) -> List[int]:
 
     # print(len(movies_shown_int_set))
     pop_c0_cluster_ids = Movie.objects.exclude(movie_id__in=movies_shown_int_set) \
-                                      .values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
-                                      .order_by('-max_imdb_votes') \
-                                      .values_list('L0', flat=True)
+        .values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
+        .order_by('-max_imdb_votes') \
+        .values_list('L0', flat=True)
     # print(pop_c0_cluster_ids)
 
-    ## Pick 1 movie per cluster
+    # Pick 1 movie per cluster
     random_movies = []
     for c0_cluster_id in pop_c0_cluster_ids:
         _movie_ids = Movie.objects.exclude(movie_id__in=movies_shown_int_set) \
-                                  .filter(L0=c0_cluster_id) \
-                                  .order_by('-'+IMDB_VOTES) \
-                                  .values_list('movie_id', flat=True)
+            .filter(L0=c0_cluster_id) \
+            .order_by('-' + IMDB_VOTES) \
+            .values_list('movie_id', flat=True)
         _movie_id = random.choice(list(_movie_ids[:n]))
         # print(c0_cluster_id, _movie_id)
         random_movies.append(_movie_id)
@@ -111,7 +111,7 @@ def index(request: HttpRequest) -> HttpResponse:
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
 
-    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id','cluster_size']
+    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id', 'cluster_size']
 
     clusters0 = c0.objects.values(*cols)
     clusters1 = c1.objects.values(*cols)
@@ -137,7 +137,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        MOVIE_CHOICES: random_popular_movie_ids(10),
+        MOVIE_CHOICES: random_popular_movie_ids(10, set()),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
@@ -198,10 +198,10 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
             model = Word2Vec.load(str(gensim_model_path))
             dict_gensim_models[gensim_model_str] = model
 
-        ## This prevents re-showing of movies, while preserving score order
+        # This prevents re-showing of movies, while preserving score order
         movies_similar = model.wv.most_similar(positive=movies_liked,
                                                negative=movies_disliked,
-                                               topn=len(model.wv.vocab)) # all movies
+                                               topn=len(model.wv.vocab))  # all movies
         new_topn_idx = []
         for i, m in enumerate(movies_similar):
             if m[0] not in movies_shown_str_set:
