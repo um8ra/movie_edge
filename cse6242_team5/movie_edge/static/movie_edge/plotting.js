@@ -177,7 +177,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .style('opacity', 1.0);
 
 
-    //Transition
+    //Transition to end points
     g.selectAll('.scatter').transition().duration(1000)
         .attr("cx", function (d) {
             return xScale(d['L' + endLevel + 'x'])
