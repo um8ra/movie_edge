@@ -1,5 +1,5 @@
 UPDATE movie_edge_movie
-SET imdb_votes = NULL
+SET imdb_votes = -1
 WHERE imdb_votes = 'null';
 
 UPDATE movie_edge_movie
