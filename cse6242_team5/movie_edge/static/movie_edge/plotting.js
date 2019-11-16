@@ -527,19 +527,20 @@ function drawArcs() {
     }
 
     if (lvl < 5) {
-        let currentMovieCluster = data.filter(x => x.ID == currentMovie)[0]['L' + lvl];
-        //console.log(currentMovieCluster)
-        let currentGridCluster = currentGrid.map(q => data.filter(x => x.ID == q)[0]['L' + lvl]);
-        //console.log(currentGridCluster)
+        let currentMovieCluster = data.filter(x => x.ID === currentMovie)[0]['L' + lvl];
+        // console.log(currentMovieCluster);
+        // console.log(currentGrid);
+        let currentGridCluster = currentGrid.map(i => parseInt(i)).map(q => data.filter(x => x.ID === q)[0]['L' + lvl]);
+        // console.log(currentGridCluster);
         let currentMovieLoc = payload[lvl][currentMovieCluster];
-        //console.log(currentMovieLoc)
+        // console.log(currentMovieLoc);
         let currentGridLoc = currentGridCluster.map(q => payload[lvl][q]);
         innerDrawArcs(currentMovieLoc, currentGridLoc);
     } else {
-        let currentMovieLoc = data.filter(x => x.movie_id == currentMovie)[0];
-        //console.log(currentMovieLoc)
+        let currentMovieLoc = data.filter(x => x.movie_id === currentMovie)[0];
+        console.log(currentMovieLoc);
         let currentGridLoc = data.filter(x => currentGrid.includes(x.movie_id));
-        //console.log(currentGridLoc)
+        console.log(currentGridLoc);
         innerDrawArcs(currentMovieLoc, currentGridLoc);
     }
 }
