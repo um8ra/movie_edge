@@ -327,16 +327,16 @@ function str2arrayList(str) {
 function toolTipContentsCluster(d) {
     //console.log(d.ID)
     return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
-        + array2list(d.actors).slice(0, 5) + '</p><p>Frequent Genres (Frequency): '
-        + array2list(d.genres).slice(0, 5) + '</p><p>Average IMDB rating: ' + d.imdb_rating.toFixed(2) + '</p><p>Number of movies: ' + d.cluster_size + '</p>'
+        + array2list(d[ACTORS]).slice(0, 5) + '</p><p>Frequent Genres (Frequency): '
+        + array2list(d[GENRES]).slice(0, 5) + '</p><p>Average IMDB rating: ' + d[IMDB_RATING].toFixed(2) + '</p><p>Number of movies: ' + d[CLUSTER_SIZE] + '</p>'
 }
 
 function toolTipContentsMovie(d) {
-    return '<p>Title: ' + d.movie_title + '</p>' + '<p>Actors: '
-        + str2arrayList(d.actors) + '</p><p>Genres: '
-        + str2arrayList(d.genres) + '</p><p>IMDB rating: ' + d.imdb_rating + '</p>'
-        + '<p>Director: ' + d.director + '</p><p>Metascore: ' + d.metascore + '</p>'
-        + '<img alt="" src=' + d.poster_url + ' class="smallImg"/>'
+    return '<p>Title: ' + d[MOVIE_TITLE] + '</p>' + '<p>Actors: '
+        + str2arrayList(d[ACTORS]) + '</p><p>Genres: '
+        + str2arrayList(d[GENRES]) + '</p><p>IMDB rating: ' + d[IMDB_RATING] + '</p>'
+        + '<p>Director: ' + d[DIRECTOR] + '</p><p>Metascore: ' + d[METASCORE] + '</p>'
+        + '<img alt="" src=' + d[POSTER_URL] + ' class="smallImg"/>'
 }
 
 function tipdir(d) {
@@ -389,20 +389,17 @@ function selectHighlight() {
 
 function highlightAndCenterSingle(id) {
     //highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
-    let itm = data.filter(x => x.ID == id)[0];
+    let itm = data.filter(x => x.ID === id)[0];
     const k = d3.zoomTransform(svg.node()).k;
     d3.selectAll('.scatter').attr('class', 'scatter');
-    let currID = itm['L' + zScale(k)]
+    let currID = itm['L' + zScale(k)];
 
-    let node = d3.selectAll('.scatter').filter(d => d.ID == currID);
+    let node = d3.selectAll('.scatter').filter(d => d.ID === currID);
     node.attr('class', 'scatter selected');
     const px = node.attr("cx");
     const py = node.attr("cy");
 
-
     centerOnElement(px, py, k);
-
-
 }
 
 
@@ -436,11 +433,11 @@ function applyLabelsClusters() {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
     let clusterLabel1 = function (d) {
-        let genres = JSON.parse(d.genres).slice(0, 2).map(x => x[0]).join('/')
+        let genres = JSON.parse(d.genres).slice(0, 2).map(x => x[0]).join('/');
         return genres + ', with';
     };
     let clusterLabel2 = function (d) {
-        let actors = JSON.parse(d.actors).slice(0, 2).map(x => x[0]).join(' & ')
+        let actors = JSON.parse(d.actors).slice(0, 2).map(x => x[0]).join(' & ');
         return actors
     };
     //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
@@ -478,7 +475,7 @@ function applyLabelsMovies() {
         .append("svg:text")
         .attr("x", d => xScale(d.x))
         .attr("y", d => yScale(d.y) - (zoomParams[5].r * 1.5))
-        .text(d => d.movie_title)
+        .text(d => d[MOVIE_TITLE])
         .attr("class", "labels lvl5")
         .style("font-size", (zoomParams[5].r / 2) + 'px')
         .attr('text-anchor', 'middle')
@@ -492,11 +489,11 @@ function drawArcs() {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
     if (lvl < 5) {
-        let currentMovieCluster = data.filter(x => x.ID == currentMovie)[0]['L' + lvl];
+        let currentMovieCluster = data.filter(x => x.ID === currentMovie)[0]['L' + lvl];
         //console.log(currentMovieCluster)
-        let currentGridCluster = currentGrid.map(q => data.filter(x => x.ID == q)[0]['L' + lvl]);
+        let currentGridCluster = currentGrid.map(q => data.filter(x => x.ID === q)[0]['L' + lvl]);
         //console.log(currentGridCluster)
-        let currentMovieLoc = payload[lvl][currentMovieCluster]
+        let currentMovieLoc = payload[lvl][currentMovieCluster];
         //console.log(currentMovieLoc)
         let currentGridLoc = currentGridCluster.map(q => payload[lvl][q]);
         //console.log(currentGridLoc)
@@ -525,9 +522,9 @@ function drawArcs() {
             .attr("class", "arc")
             .style('stroke-width', zoomParams[lvl].r / 5)
     } else {
-        let currentMovieLoc = data.filter(x => x.movie_id == currentMovie)[0];
+        let currentMovieLoc = data.filter(x => x[MOVIE_ID] === currentMovie)[0];
         //console.log(currentMovieLoc)
-        let currentGridLoc = data.filter(x => currentGrid.includes(x.movie_id));
+        let currentGridLoc = data.filter(x => currentGrid.includes(x[MOVIE_ID]));
         //console.log(currentGridLoc)
         let links = [];
         currentGridLoc.forEach(function (loc) {
@@ -567,7 +564,7 @@ function drawHistory() {
     if (lvl < 5) {
         //let currentMovieCluster = data.filter(x=>x.ID==currentMovie)[0]['L'+lvl]
         //console.log(currentMovieCluster)
-        let currentHistCluster = moviesLikedOrdered.map(q => data.filter(x => x.ID == q)[0]['L' + lvl]);
+        let currentHistCluster = moviesLikedOrdered.map(q => data.filter(x => x.ID === q)[0]['L' + lvl]);
         //console.log(currentGridCluster)
         //let currentMovieLoc = payload[lvl][currentMovieCluster]
         //console.log(currentMovieLoc)
@@ -588,10 +585,10 @@ function drawHistory() {
             .enter()
             .append("path")
             .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
+                let dx = xScale(d.target.x) - xScale(d.source.x),
                     dy = yScale(d.target.y) - yScale(d.source.y),
                     dr = Math.sqrt(dx * dx + dy * dy);
-                var q = "M" +
+                let q = "M" +
                     xScale(d.source.x) + "," +
                     yScale(d.source.y) + "A" +
                     dr + "," + dr + " 0 0,1 " +
@@ -613,9 +610,9 @@ function drawHistory() {
         let i;
         let tmp;
         let links = [];
-        let curr = data.filter(x => x.ID == moviesLikedOrdered[0])[0];
+        let curr = data.filter(x => x.ID === moviesLikedOrdered[0])[0];
         for (i = 1; i < moviesLikedOrdered.length; i++) {
-            tmp = data.filter(x => x.ID == moviesLikedOrdered[i])[0];
+            tmp = data.filter(x => x.ID === moviesLikedOrdered[i])[0];
             links.push({source: curr, target: tmp});
             curr = tmp;
         }
@@ -627,7 +624,7 @@ function drawHistory() {
             .enter()
             .append("path")
             .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
+                let dx = xScale(d.target.x) - xScale(d.source.x),
                     dy = yScale(d.target.y) - yScale(d.source.y),
                     dr = Math.sqrt(dx * dx + dy * dy);
                 return "M" +

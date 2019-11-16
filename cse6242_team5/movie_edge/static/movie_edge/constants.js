@@ -6,6 +6,7 @@ const ACTORS = 'actors';
 const TITLE = 'title';
 const GENRES = 'genres';
 const CLUSTER = 'cluster';
+const CLUSTER_SIZE = 'cluster_size';
 const COLOR = 'color';
 const POSTER_URL = 'poster_url';
 const MOVIE_CHOICES = 'movie_choices';
@@ -29,6 +30,7 @@ const zoomParams = {
 const gridID = 'grid';
 const bbox_pad = 0;
 const IMDB_RATING = 'imdb_rating';
+const METASCORE = 'metascore';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = Array();
 
