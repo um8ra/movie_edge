@@ -163,7 +163,8 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .data(filtered)
         .enter()
         .append("circle")
-        .attr("r", zoomParams[startLevel]['r'])
+        .attr("r", sizeScales[startLevel])
+		//zoomParams[startLevel]['r'])
         .attr("cx", function (d) {
             return xScale(d['L' + startLevel + 'x'])
         })
@@ -185,6 +186,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
             return yScale(d['L' + endLevel + 'y'])
         })
         .attr("r", zoomParams[endLevel]['r'])
+		//.attr("r",sizeScales[endLevel])
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()
