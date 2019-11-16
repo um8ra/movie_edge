@@ -84,7 +84,8 @@ function drawGraph(data, toHighlight, layer) {
 		applyLabelsMovies();
 	}
 	//highlight grid
-	highlight(currentGrid)
+	highlight(currentGrid);
+	highlightAndCenterSingle(currentMovie);
 }
 
 
@@ -396,7 +397,7 @@ function highlightAndCenterSingle(id) {
     d3.selectAll('.scatter').attr('class', 'scatter');
 	let currID = itm['L'+zScale(k)]
 	
-	let node = d3.selectAll('.scatter').filter( d => d.ID == id)
+	let node = d3.selectAll('.scatter').filter( d => d.ID == currID)
 	node.attr('class', 'scatter selected');
     const px = node.attr("cx");
     const py = node.attr("cy");
