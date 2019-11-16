@@ -84,8 +84,8 @@ function gridMovies(movieidList) {
     const divHeightNormalized = (divHeight - 128) / 5 / ratio;
     const divWidth = document.getElementById("grid").offsetWidth / 2.75;
 
-    let poster_width = 100;
-    let poster_height = 150;
+    let poster_width = 150;
+    let poster_height = 225;
     if (divHeightNormalized > divWidth) {
         // alert('width limited');
         poster_width = divWidth;
@@ -113,11 +113,13 @@ function gridMovies(movieidList) {
             buttonLike.innerText = 'Like';
             buttonLike.onclick = buttonClickLike;
             buttonLike.value = movieId;
+            buttonLike.id = 'LikeBtn_'+movieId;
 
             const buttonDislike = document.createElement('BUTTON');
             buttonDislike.innerText = 'Dislike';
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
+            buttonDislike.id = 'DislikeBtn_'+movieId;
 
             thisMovieData = data[dataIndex];
             movieTitle = thisMovieData[MOVIE_TITLE];
@@ -139,24 +141,48 @@ function gridMovies(movieidList) {
 
 function buttonClickLike(data) {
     const movieId = data.target.value;
-    console.log('Liked: ' + movieId);
-    if (moviesDislikedSet.has(movieId)) {
-        moviesDislikedSet.delete(movieId);
+    if (moviesLikedSet.has(movieId)) {
+        moviesLikedSet.delete(movieId);
+        theButton = d3.select(this);
+        theButton.style('background','white');
+        theButton.style('color','black');
+    } else {
+        if (moviesDislikedSet.has(movieId)) {
+            moviesDislikedSet.delete(movieId);
+            theButton = d3.select('#DislikeBtn_'+movieId);
+            theButton.style('background','white');
+            theButton.style('color','black');
+        }
+        moviesLikedSet.add(movieId);
+        moviesLikedOrdered.push(movieId);
+        theButton = d3.select(this);
+        theButton.style('background', 'green');
+        theButton.style('color', 'white');
     }
-
-    moviesLikedSet.add(movieId);
-    moviesLikedOrdered.push(movieId);
-    console.log(moviesLikedSet);
+    console.log('Liked: ', moviesLikedSet);
+    console.log('Disiked: ', moviesDislikedSet);
 }
 
 function buttonClickDislike(data) {
     const movieId = data.target.value;
-    console.log('Disliked: ' + movieId);
-    if (moviesLikedSet.has(movieId)) {
-        moviesLikedSet.delete(movieId);
+    if (moviesDislikedSet.has(movieId)) {
+        moviesDislikedSet.delete(movieId);
+        theButton = d3.select(this);
+        theButton.style('background','white');
+        theButton.style('color','black');
+    } else {
+        if (moviesLikedSet.has(movieId)) {
+            moviesLikedSet.delete(movieId);
+            theButton = d3.select('#LikeBtn_' + movieId);
+            theButton.style('background', 'white');
+            theButton.style('color', 'black');
+        }
+        moviesDislikedSet.add(movieId);
+        moviesDislikedOrdered.push(movieId);
+        theButton = d3.select(this);
+        theButton.style('background', 'red');
+        theButton.style('color', 'white');
     }
-
-    moviesDislikedSet.add(movieId);
-    moviesDislikedOrdered.push(movieId);
-    console.log(moviesDislikedSet);
+    console.log('Liked: ', moviesLikedSet);
+    console.log('Disiked: ', moviesDislikedSet);
 }
