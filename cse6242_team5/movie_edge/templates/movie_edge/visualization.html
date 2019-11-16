@@ -198,12 +198,10 @@
 		sizeScales.push(function (d) {return tmp(d.cluster_size)})	
 	}
 	sizeScales.push(function(d) {return zoomParams[5].r})
-	
-
 
     //Init
     let currentZoom = 0;
-	//TODO -- setting height/width here prevents graph from being dynamic
+	//TODO -- setting svg height/width here prevents graph from being dynamic
     const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
     const g = svg.append("g")
