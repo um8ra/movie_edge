@@ -191,6 +191,9 @@
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
     drawGraph(payload[0], 0, 0);
+	let tmp = currentGrid
+	tmp.push(currentMovie)
+	highlightAndCenter(tmp)
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);
 
