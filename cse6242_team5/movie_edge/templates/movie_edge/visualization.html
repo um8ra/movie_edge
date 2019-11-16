@@ -8,9 +8,10 @@
     <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
-    <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
-    <script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'movie_edge/tooltip.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/bokeh-1.4.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/bokeh-api-1.4.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/bokeh-tables-1.4.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/bokeh-widgets-1.4.0.min.js' %}"></script>
     <style>
         .grid {
             display: grid;
@@ -140,6 +141,13 @@
             color: white;
         }
 
+        .bk-root {
+            width: 70%;
+            top:90px;
+            float: right;
+            background: darkgray;
+        }
+
     </style>
 </head>
 <body>
@@ -149,9 +157,6 @@
     </button>
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
-    </button>
-    <button class="buttonReset" type="button" onclick="resetZoom()">
-        Reset Zoom
     </button>
     <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
         <input type="text" name="movieRegex">
@@ -186,12 +191,6 @@
     const width = window.innerWidth; //0.7 *
     const height = window.innerHeight;
     const data = payload[5].map(inputFormat);
-    payload[5] = data;
-    payload[0] = payload[0].map(inputFormatCluster);
-    payload[1] = payload[1].map(inputFormatCluster);
-    payload[2] = payload[2].map(inputFormatCluster);
-    payload[3] = payload[3].map(inputFormatCluster);
-    payload[4] = payload[4].map(inputFormatCluster);
     let currentMovie = 1; //current movie selected
     //DELETE ME
     {#const q = tableData[MOVIE_CHOICES];#}
@@ -200,50 +199,61 @@
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
     currentGrid = tableData[MOVIE_CHOICES];
 
-    const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
-    const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
-    //const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]); // I don't like the colors?
+    const plt = Bokeh.Plotting;
+    const x = data.map(function (v) {
+        return v[X]
+    });
+    const y = data.map(function (v) {
+        return v[Y]
+    });
+    const titles = data.map(function (v) {
+        return v[MOVIE_TITLE].toString()
+    });
+    const color = data.map(function (v) {
+        return v[COLOR]
+    });
+    const source = new Bokeh.ColumnDataSource({data: {'x': x, 'y': y, 'color': color, 'title': titles}});
 
-    const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
+    const tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
+    let xdr = new Bokeh.Range1d({start: x_min, end: x_max});
+    let ydr = new Bokeh.Range1d({start: y_min, end: y_max});
 
-    const sizeScales = [];
-    for (let i = 0; i < 5; i++) {
-        let sizes = payload[i].map(x => x[CLUSTER_SIZE]);
-        //let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
-        let tmp = d3.scaleLinear().domain([d3.min(sizes), d3.max(sizes)]).range([zoomParams[i].r * 0.5, zoomParams[i].r * 2]);
-        sizeScales.push(function (d) {
-            return tmp(d[CLUSTER_SIZE])
-        })
-    }
-    sizeScales.push(function () {
-        return zoomParams[5].r
+    // https://stackoverflow.com/questions/31684523/use-the-hovertool-in-bokehjs
+    const tooltip = ("<div>Title: @title </div>");
+    const hover = new Bokeh.HoverTool({
+        tooltips: tooltip
+    });
+    const p = plt.figure({
+        title: "Colorful Scatter",
+        tools: tools,
+        x_range: xdr,
+        y_range: ydr,
+        plot_width: 800,
+        plot_height: 800,
+    });
+    p.add_tools(hover);
+    p.legend.click_policy = 'hide';
+
+    // call the circle glyph method to add some circle glyphs
+    const circles = p.circle({field: "x"}, {field: "y"}, {
+        source: source,
+        fill_color: {field: "color"},
+        line_color: {field: "color"},
+        radius: 0.1,
     });
 
-    //Init
-    let currentZoom = 0;
-    //TODO -- setting svg height/width here prevents graph from being dynamic
-    const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
-
-    const g = svg.append("g")
-        .attr("class", "holder");
-    const myzoom = d3.zoom()
-        .duration(1000)
-        .extent([[0, 0], [width, height]])
-        .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
-        .on("zoom", zoomed);
-
-    svg.call(myzoom).on("dblclick.zoom", selectHighlight);
-    tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
-    drawGraph(payload[0], 0, 0);
-    let tmp = currentGrid;
-    tmp.push(currentMovie);
-    highlightAndCenter(tmp);
+    const text = p.text(
+        {field: "x"},
+        {field: "y"},
+        {field: 'title'},
+        {
+            source: source,
+        },
+    );
+    text.visible=false;
+    // show the plot
+    new_plot = plt.show(p);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
-    g.call(tip);
-
-    tip.offset(tipoff);
-    tip.direction(tipdir);
 
 </script>
 </body>
