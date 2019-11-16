@@ -433,11 +433,11 @@ function applyLabelsClusters() {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
     let clusterLabel1 = function (d) {
-        let genres = JSON.parse(d.genres).slice(0, 2).map(x => x[0]).join('/');
+        let genres = JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/');
         return genres + ', with';
     };
     let clusterLabel2 = function (d) {
-        let actors = JSON.parse(d.actors).slice(0, 2).map(x => x[0]).join(' & ');
+        let actors = JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
         return actors
     };
     //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
@@ -450,7 +450,7 @@ function applyLabelsClusters() {
         .attr("class", "labels lvl" + lvl)
         .text(clusterLabel1)
         .style("font-size", (zoomParams[lvl].r / 2) + 'px')
-        .attr('text-anchor', 'middle')
+        .attr('text-anchor', 'middle');
 
     g.selectAll('nodeLabels')
         .data(payload[lvl])
@@ -497,17 +497,17 @@ function drawArcs() {
         //console.log(currentMovieLoc)
         let currentGridLoc = currentGridCluster.map(q => payload[lvl][q]);
         //console.log(currentGridLoc)
-        let links = []
+        let links = [];
         currentGridLoc.forEach(function (loc) {
             links.push({source: currentMovieLoc, target: loc})
-        })
+        });
         console.log(links);
-        let path = g.selectAll("path")
+        g.selectAll("path")
             .data(links)
             .enter()
             .append("path")
             .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
+                let dx = xScale(d.target.x) - xScale(d.source.x),
                     dy = yScale(d.target.y) - yScale(d.source.y),
                     dr = Math.sqrt(dx * dx + dy * dy);
                 return "M" +
@@ -531,12 +531,12 @@ function drawArcs() {
             links.push({source: currentMovieLoc, target: loc})
         });
         console.log(links);
-        let path = g.selectAll("path")
+        g.selectAll("path")
             .data(links)
             .enter()
             .append("path")
             .attr("d", function (d) {
-                var dx = xScale(d.target.x) - xScale(d.source.x),
+                let dx = xScale(d.target.x) - xScale(d.source.x),
                     dy = yScale(d.target.y) - yScale(d.source.y),
                     dr = Math.sqrt(dx * dx + dy * dy);
                 return "M" +
@@ -579,7 +579,7 @@ function drawHistory() {
         }
         console.log(links);
         console.log('xxx');
-        let path = g.append('g')
+        g.append('g')
             .attr("class", "history_paths").selectAll("path")
             .data(links)
             .enter()
@@ -618,7 +618,7 @@ function drawHistory() {
         }
 
         console.log(links);
-        let path = g.append('g')
+        g.append('g')
             .attr("class", "history_paths").selectAll("path")
             .data(links)
             .enter()
