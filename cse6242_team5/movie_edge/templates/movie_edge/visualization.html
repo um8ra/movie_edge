@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Movie Edge</title>
     {% load static %}
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png" />
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png"/>
     <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
@@ -30,6 +30,11 @@
         }
 
         .buttonGetRandom {
+            height: 80px;
+            width: 9vw;
+        }
+
+        .buttonReset {
             height: 80px;
             width: 9vw;
         }
@@ -73,7 +78,7 @@
             top: 0;
             left: 0;
             height: 90px;
-            width: 20%;
+            width: 30%;
         }
 
         .topR {
@@ -82,7 +87,7 @@
             top: 0;
             right: 0;
             height: 90px;
-            width: 80%;
+            width: 70%;
             vertical-align: center;
             horiz-align: center;
         }
@@ -139,6 +144,7 @@
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
     </button>
+    <button class="buttonReset" type="button" onclick="resetZoom">Reset Zoom DOES NOT WORK?</button>
 </div>
 <div class="topR" id="title">
     <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
