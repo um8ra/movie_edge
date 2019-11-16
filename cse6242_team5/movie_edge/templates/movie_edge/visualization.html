@@ -25,12 +25,12 @@
 
         .buttonSubmit {
             height: 80px;
-            width: 150px;
+            width: 9vw;
         }
 
         .buttonGetRandom {
             height: 80px;
-            width: 150px;
+            width: 9vw;
         }
 
         .graph {
@@ -165,7 +165,7 @@
     const y_min = parseFloat(tableData['y__min']);
     const y_max = parseFloat(tableData['y__max']);
     const decoder = tableData['decoder'];
-    const width = 0.7 * window.innerWidth;
+    const width = window.innerWidth; //0.7 *
     const height = window.innerHeight;
     const data = payload[5].map(inputFormat);
     payload[5] = data;
@@ -203,6 +203,7 @@
 
     //Init
     let currentZoom = 0;
+	//TODO -- setting height/width here prevents graph from being dynamic
     const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
     const g = svg.append("g")
