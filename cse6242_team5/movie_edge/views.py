@@ -67,30 +67,36 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     return list(return_val)
 
 
-def random_popular_movie_ids(n: int, L0_max_imdb_votes=500000) -> List[int]:
-    ## Pick 10 clusters from all 50 c0/L0 clusters
-    # all_c0_ids = c0.objects.values_list('id', flat=True)
-    # random_c0_ids = random.sample(list(all_c0_ids), n)
-    # random_c0_cluster_ids = c0.objects.filter(id__in=random_c0_ids).values_list(CLUSTER_ID, flat=True)
-    # # print(all_c0_ids)
-    # # print(random_c0_ids)
+def random_popular_movie_ids(n: int, movies_shown_int_set=[]) -> List[int]:
+    # Initial random sampling strategy now works as follows
+    # 0. Exclude shown movies from SQL query
+    # 1. Order L0 clusters by max(imdb_votes) desc
+    # 3. Identify n most popular movies within each cluster
+    # 4. Randomly select 1 such movie and iterate to next L0 cluster
+    # 5. Stop if 10 randomly sampled movies are accumulated
 
-    ## Pick 10 clusters from the 12 most popular c0/L0 clusters with max imdb_votes >= 500000
-    pop_c0_cluster_ids = Movie.objects.values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
-                                      .filter(max_imdb_votes__gte=L0_max_imdb_votes).values_list('L0', flat=True)
-    random_c0_cluster_ids = random.sample(list(pop_c0_cluster_ids), n)
+    # print(len(movies_shown_int_set))
+    pop_c0_cluster_ids = Movie.objects.exclude(movie_id__in=movies_shown_int_set) \
+                                      .values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
+                                      .order_by('-max_imdb_votes') \
+                                      .values_list('L0', flat=True)
     # print(pop_c0_cluster_ids)
-    # print(random_c0_cluster_ids)
 
     ## Pick 1 movie per cluster
     random_movies = []
-    for c0_cluster_id in random_c0_cluster_ids:
-        _movie_ids = Movie.objects.filter(L0=c0_cluster_id).order_by('-'+IMDB_VOTES).values_list('id', flat=True)[:n]
-        _movie_id = random.choice(list(_movie_ids))
+    for c0_cluster_id in pop_c0_cluster_ids:
+        _movie_ids = Movie.objects.exclude(movie_id__in=movies_shown_int_set) \
+                                  .filter(L0=c0_cluster_id) \
+                                  .order_by('-'+IMDB_VOTES) \
+                                  .values_list('movie_id', flat=True)
+        _movie_id = random.choice(list(_movie_ids[:n]))
         # print(c0_cluster_id, _movie_id)
         random_movies.append(_movie_id)
+        if len(random_movies) == 10:
+            break
 
-    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
+    return_val = random_movies
+
     # print('Random Movies!')
     # print(return_val)
     return list(return_val)
@@ -131,7 +137,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'payload': payload,
         # Since D3 likes to operate on arrays, this decodes movie-id to array position
         'decoder': {m[MOVIE_ID]: i for i, m in enumerate(movies)},
-        MOVIE_CHOICES: random_popular_movie_ids(10, L0_max_imdb_votes=500000),
+        MOVIE_CHOICES: random_popular_movie_ids(10),
         **movies_x_min,
         **movies_x_max,
         **movies_y_min,
@@ -151,17 +157,23 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
 
     # These are all movieIds
     movies_shown = request_data[MOVIES_SHOWN]  # List[int]
+    movies_shown_int_set = set(movies_shown)
     movies_shown_str_set = {str(i) for i in movies_shown}
     movies_liked = request_data[LIKE]  # List[str]
     # movies_liked_int = [int(i) for i in movies_liked]  # List[int]
     movies_disliked = request_data[DISLIKE]  # List[str]
     # movies_disliked_int = [int(i) for i in movies_disliked]  # List[str]
 
+    len_movies_shown = len(movies_shown_int_set)
     len_movies_liked = len(movies_liked)
     len_movies_disliked = len(movies_disliked)
-    if (len_movies_liked + len_movies_disliked) == 0:
-        # print('No Data: Random')
-        response = {MOVIE_CHOICES: random_popular_movie_ids(topn, L0_max_imdb_votes=500000)}
+    if len_movies_liked == 0:
+        # print('No Liked Data: Random')
+        response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
+        return JsonResponse(response)
+    elif len_movies_shown <= 30:
+        # print('Not enough data: Random')
+        response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
         return JsonResponse(response)
     elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
         # Yi and Rocko do stuff here and change the threshold/rules and such
@@ -199,19 +211,6 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
 
         response = {MOVIE_CHOICES: [movies_similar[i][0] for i in new_topn_idx]}
         return JsonResponse(response)
-
-        # # This prevents re-showing of movies
-        # while True:
-        #     movies_similar = model.wv.most_similar(positive=movies_liked,
-        #                                            negative=movies_disliked,
-        #                                            topn=topn)  # note topn starts at 20
-        #     movies_similar_list = [i[0] for i in movies_similar]
-        #     movies_similar_set = set(movies_similar_list)
-        #     new_movies = movies_similar_set - movies_shown_str_set
-        #     if len(new_movies) >= 10 or topn >= 1000:
-        #         response = {MOVIE_CHOICES: [new_movies.pop() for _ in range(10)]}
-        #         return JsonResponse(response)
-        #     topn *= 2
 
         # print('Similar: ')
         # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
