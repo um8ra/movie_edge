@@ -79,14 +79,14 @@ function closurePlotGoTo(movieID) {
 
 function gridMovies(movieidList) {
     highlightAndCenter(movieidList);
-    const ratio = 1.48;
+    // const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
-    const divHeightNormalized = (divHeight - 128) / 5 / ratio;
-    const divWidth = document.getElementById("grid").offsetWidth / 2.75;
+    // const divHeightNormalized = (divHeight - 128) / 5 / ratio;
+    // const divWidth = document.getElementById("grid").offsetWidth / 2.75;
 
     let poster_height = Math.min((divHeight/5) - 50, 150);
     let poster_width = (poster_height * 2 / 3);
-    console.log("Thumbnails: ", divHeight, poster_height, poster_width)
+    console.log("Thumbnails: ", divHeight, poster_height, poster_width);
     // let poster_width = 100;
     // let poster_height = 150;
     // if (divHeightNormalized > divWidth) {
