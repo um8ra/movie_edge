@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from pathlib import Path
 from gensim.models import Word2Vec
+from sklearn.linear_model import RidgeCV
 from cse6242_team5.settings import BASE_DIR
 from .models import Movie, c0, c1, c2, c3, c4
 from django.db.models import Max, Min, Q
+import numpy as np
 import pandas as pd
 import json
 import urllib.parse
@@ -67,15 +69,14 @@ def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
     return list(return_val)
 
 
-def random_popular_movie_ids(n: int, movies_shown_int_set: Set) -> List[int]:
+def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     # Initial random sampling strategy now works as follows
     # 0. Exclude shown movies from SQL query
     # 1. Order L0 clusters by max(imdb_votes) desc
-    # 3. Identify n most popular movies within each cluster
+    # 3. Identify topn most popular movies within each cluster
     # 4. Randomly select 1 such movie and iterate to next L0 cluster
     # 5. Stop if 10 randomly sampled movies are accumulated
 
-    # print(len(movies_shown_int_set))
     pop_c0_cluster_ids = Movie.objects.exclude(movie_id__in=movies_shown_int_set) \
         .values('L0').annotate(max_imdb_votes=Max(IMDB_VOTES)) \
         .order_by('-max_imdb_votes') \
@@ -89,7 +90,7 @@ def random_popular_movie_ids(n: int, movies_shown_int_set: Set) -> List[int]:
             .filter(L0=c0_cluster_id) \
             .order_by('-' + IMDB_VOTES) \
             .values_list('movie_id', flat=True)
-        _movie_id = random.choice(list(_movie_ids[:n]))
+        _movie_id = random.choice(list(_movie_ids[:topn]))
         # print(c0_cluster_id, _movie_id)
         random_movies.append(_movie_id)
         if len(random_movies) == 10:
@@ -98,6 +99,95 @@ def random_popular_movie_ids(n: int, movies_shown_int_set: Set) -> List[int]:
     return_val = random_movies
 
     # print('Random Movies!')
+    # print(return_val)
+    return list(return_val)
+
+
+def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set, 
+    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
+
+    gensim_model_str = embedder
+    # print('Likes:')
+    # print(movies_liked)
+    # print(df_movies.loc[movies_liked_int])
+    # print('Dislikes:')
+    # print(movies_disliked)
+    # print(df_movies.loc[movies_disliked_int])
+
+    if gensim_model_str in dict_gensim_models.keys():
+        model = dict_gensim_models[gensim_model_str]
+    else:
+        assert gensim_path.is_dir(), "Gensim Directory Not Correct"
+        gensim_model_path = gensim_path / gensim_model_str
+        if not gensim_model_path.is_file():
+            raise FileNotFoundError
+        model = Word2Vec.load(str(gensim_model_path))
+        dict_gensim_models[gensim_model_str] = model
+
+    # This prevents re-showing of movies, while preserving score order
+    movies_similar = model.wv.most_similar(positive=movies_liked,
+                                           negative=movies_disliked,
+                                           topn=len(model.wv.vocab))  # all movies
+    new_topn_idx = []
+    for i, m in enumerate(movies_similar):
+        if m[0] not in movies_shown_str_set:
+            new_topn_idx.append(i)
+        if len(new_topn_idx) == topn:
+            break
+
+    return_val = [movies_similar[i][0] for i in new_topn_idx]
+    # print('Word2Vec most_similar Movies!')
+    # print(return_val)
+    return list(return_val)
+
+
+def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set, 
+    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
+
+    gensim_model_str = embedder
+    if gensim_model_str in dict_gensim_models.keys():
+        model = dict_gensim_models[gensim_model_str]
+    else:
+        assert gensim_path.is_dir(), "Gensim Directory Not Correct"
+        gensim_model_path = gensim_path / gensim_model_str
+        if not gensim_model_path.is_file():
+            raise FileNotFoundError
+        model = Word2Vec.load(str(gensim_model_path))
+        dict_gensim_models[gensim_model_str] = model
+
+    ## load movie_vectors learned from Word2vec emnbedding model
+    movies_embedded = list(model.wv.vocab.keys())
+    movie_vectors_dict = dict()
+    for _movie_id in movies_embedded:
+        movie_vectors_dict[_movie_id] = model.wv[_movie_id]
+    movie_vectors = np.array(list(movie_vectors_dict.values()))
+    movie_vectors_df = pd.DataFrame(movie_vectors, index=movies_embedded)
+
+    ## train RidgeCV user model with insurance check on embedding vocab
+    movies_rated = movies_liked + movies_disliked
+    movies_rated = [str(m) for m in movies_rated] # str(m) as insurance check
+    liked = np.zeros(len(movies_rated), dtype=int)
+    liked[:len(movies_liked)] = 1
+
+    idx_in_vocab = [i for i, m in enumerate(movies_rated) if m in movies_embedded]
+    movies_rated_in_vocab = [movies_rated[i] for i in idx_in_vocab]
+    _movie_vectors = movie_vectors_df.loc[movies_rated_in_vocab]
+    _liked = liked[idx_in_vocab]
+
+    print(movies_rated)
+    print(_movie_vectors)
+    print(_liked)
+    user_model = RidgeCV(alphas=[8.]).fit(_movie_vectors, _liked)
+
+    ## predict recommendation based on RidgeCV user model
+    new_idx = [i for i, m in enumerate(movies_embedded) if m not in movies_shown_str_set]
+    new_movie_vectors = movie_vectors[new_idx]
+    new_movie_scores = user_model.predict(new_movie_vectors).clip(0,1)
+
+    new_topn_idx = new_movie_scores.argsort()[::-1][:topn]
+    new_movies = [movies_embedded[i] for i in new_idx]
+    return_val = [new_movies[i] for i in new_topn_idx]
+    # print('RidgeCV predict Movies!')
     # print(return_val)
     return list(return_val)
 
@@ -167,54 +257,26 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     len_movies_shown = len(movies_shown_int_set)
     len_movies_liked = len(movies_liked)
     len_movies_disliked = len(movies_disliked)
+
+    print('Shown #: {}'.format(len_movies_shown),
+          'Liked #: {}'.format(len_movies_liked),
+          'Disliked #: {}'.format(len_movies_disliked))
+
     if len_movies_liked == 0:
-        # print('No Liked Data: Random')
+        print('...No Liked Data: Random...')
         response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
         return JsonResponse(response)
-    elif len_movies_shown <= 30:
-        # print('Not enough data: Random')
+    elif len_movies_shown <= 10:
+        print('...Not enough data: Random...')
         response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
         return JsonResponse(response)
-    elif len_movies_liked > 0 and len_movies_disliked > 0 and (len_movies_liked + len_movies_disliked) > 10000:
-        # Yi and Rocko do stuff here and change the threshold/rules and such
-        pass
+    elif len_movies_liked > 30 and len_movies_disliked > 30:
+        print('...Have Data: Calculating RidgeCV predictions...')
+        ## Require enough training samples from both classes for statistical significance
+        ## More serendippity once enough like and dislike data are collected
+        response = {MOVIE_CHOICES: ridge_regression_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
+        return JsonResponse(response)
     else:
-        # print('Have Data: Calculating...')
-        gensim_model_str = EMBEDDER
-        # print('Likes:')
-        # print(movies_liked)
-        # print(df_movies.loc[movies_liked_int])
-        # print('Dislikes:')
-        # print(movies_disliked)
-        # print(df_movies.loc[movies_disliked_int])
-
-        if gensim_model_str in dict_gensim_models.keys():
-            model = dict_gensim_models[gensim_model_str]
-        else:
-            assert gensim_path.is_dir(), "Gensim Directory Not Correct"
-            gensim_model_path = gensim_path / gensim_model_str
-            if not gensim_model_path.is_file():
-                raise FileNotFoundError
-            model = Word2Vec.load(str(gensim_model_path))
-            dict_gensim_models[gensim_model_str] = model
-
-        # This prevents re-showing of movies, while preserving score order
-        movies_similar = model.wv.most_similar(positive=movies_liked,
-                                               negative=movies_disliked,
-                                               topn=len(model.wv.vocab))  # all movies
-        new_topn_idx = []
-        for i, m in enumerate(movies_similar):
-            if m[0] not in movies_shown_str_set:
-                new_topn_idx.append(i)
-            if len(new_topn_idx) == topn:
-                break
-
-        response = {MOVIE_CHOICES: [movies_similar[i][0] for i in new_topn_idx]}
+        print('...Have Data: Calculating word2vec most_similar...')
+        response = {MOVIE_CHOICES: word2vec_most_similar_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
         return JsonResponse(response)
-
-        # print('Similar: ')
-        # print(df_movies.loc[[int(i[0]) for i in movies_similar]])
-
-        # returns List of (movieID, similarity). We only want movieID to return for now.
-
-        # print(response)
