@@ -2,8 +2,8 @@ from django.db import models
 
 
 class Movie(models.Model):
-    embedder = models.CharField(max_length=128, db_index=True, null=False)  # The model that ran this data
-    movie_id = models.IntegerField(null=False)  # Movie ID based on movielens data
+    embedder = models.CharField(max_length=128, db_index=False, null=False)  # The model that ran this data
+    movie_id = models.IntegerField(null=False,db_index=True)  # Movie ID based on movielens data
     movie_title = models.CharField(max_length=256, null=False)
     genres = models.CharField(max_length=128, null=False)
 
@@ -38,7 +38,7 @@ class Movie(models.Model):
     actors = models.CharField(max_length=512, null=False)
     metascore = models.IntegerField(null=True)
     imdb_rating = models.FloatField(null=True)
-    imdb_votes = models.IntegerField(null=True)
+    imdb_votes = models.IntegerField(null=False)
 
     class Meta:
         constraints = [
@@ -48,6 +48,7 @@ class Movie(models.Model):
 
 class c0(models.Model):
     cluster_id = models.IntegerField(null=False, db_index=True)
+    cluster_size = models.IntegerField(null=False, db_index=False)
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     genres = models.CharField(max_length=512, null=False)
@@ -58,6 +59,7 @@ class c0(models.Model):
 
 class c1(models.Model):
     cluster_id = models.IntegerField(null=False, db_index=True)
+    cluster_size = models.IntegerField(null=False, db_index=False)
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     genres = models.CharField(max_length=512, null=False)
@@ -68,6 +70,7 @@ class c1(models.Model):
 
 class c2(models.Model):
     cluster_id = models.IntegerField(null=False, db_index=True)
+    cluster_size = models.IntegerField(null=False, db_index=False)
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     genres = models.CharField(max_length=512, null=False)
@@ -78,6 +81,7 @@ class c2(models.Model):
 
 class c3(models.Model):
     cluster_id = models.IntegerField(null=False, db_index=True)
+    cluster_size = models.IntegerField(null=False, db_index=False)
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     genres = models.CharField(max_length=512, null=False)
@@ -88,6 +92,7 @@ class c3(models.Model):
 
 class c4(models.Model):
     cluster_id = models.IntegerField(null=False, db_index=True)
+    cluster_size = models.IntegerField(null=False, db_index=False)
     x = models.FloatField(null=False)  # X value post t-SNE
     y = models.FloatField(null=False)  # Y value post t-SNE
     genres = models.CharField(max_length=512, null=False)

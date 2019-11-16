@@ -163,13 +163,18 @@ for level in range(5):
     means = means.rename(columns={f'L{level}':'ID'})
     counts = df_output.groupby(f'L{level}')[['genres','actors']].agg(mostCommon)
     counts = counts.applymap(lambda x: json.dumps(x))
-    tmp = pd.concat([means,counts],1).rename(columns={'L5x':'x','L5y':'y'}).fillna("null")
+    num_movies = df_movies.groupby(f'L{level}')['title'].count()
+    num_movies.name = 'cluster_size'    
+    tmp = pd.concat([means,counts,num_movies],1).rename(columns={'L5x':'x','L5y':'y'}).fillna("null")
+    tmp.index.name = 'cluster_id'
     with eng.begin() as con:
-        tmp.to_sql(f'move_edge_c{level}', con, if_exists='append')
+        tmp.to_sql(f'movie_edge_c{level}', con, if_exists='append')
 
     
     
-    
+tmp = df_output.copy()
+tmp['imdb_votes']=tmp['imdb_votes'].fillna(-1)
+tmp = tmp.fillna('N/A')
 tmp = df_output.copy().fillna("null")
 tmp['x'] = tmp.L5x;
 tmp['y'] = tmp.L5y;

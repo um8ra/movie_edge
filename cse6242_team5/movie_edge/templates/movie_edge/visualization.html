@@ -95,7 +95,7 @@
 
         .d3-tip {
             max-width: 300px;
-            max-height: 500px;
+            max-height: 600px;
             overflow: hidden;
 			border-radius: 10px;
         }
@@ -161,7 +161,20 @@
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
     const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
     //const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]); // I don't like the colors?
+	
 	const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
+	
+	const sizeScales = []
+	var i = 0;
+	for (i=0;i<5;i++){
+		let sizes = payload[i].map(x=>x.cluster_size)
+		//let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
+		let tmp = d3.scaleLinear().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
+		sizeScales.push(function (d) {return tmp(d.cluster_size)})	
+	}
+	sizeScales.push(function(d) {return zoomParams[5].r})
+	
+
 
     //Init
     let currentZoom = 0;

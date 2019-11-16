@@ -57,7 +57,7 @@ function drawGraph(data, toHighlight, layer) {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", zoomParams[layer]['r'])
+        .attr("r", sizeScales[layer])
         .attr("cx", d => xScale(d.x))
         .attr("cy", d => yScale(d.y))
         .attr("stroke-width", zoomParams[layer]['w'])
@@ -163,7 +163,8 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .data(filtered)
         .enter()
         .append("circle")
-        .attr("r", zoomParams[startLevel]['r'])
+        .attr("r", sizeScales[startLevel])
+		//zoomParams[startLevel]['r'])
         .attr("cx", function (d) {
             return xScale(d['L' + startLevel + 'x'])
         })
@@ -171,12 +172,12 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
             return yScale(d['L' + startLevel + 'y'])
         })
         .attr("class", "scatter")
-        .attr("stroke-width", zoomParams[endLevel]['w'])
+        .attr("stroke-width", zoomParams[startLevel]['w'])
         .style('fill', d => colorScale(d[IMDB_RATING]))
         .style('opacity', 1.0);
 
 
-    //Transition
+    //Transition to end points
     g.selectAll('.scatter').transition().duration(1000)
         .attr("cx", function (d) {
             return xScale(d['L' + endLevel + 'x'])
@@ -185,6 +186,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
             return yScale(d['L' + endLevel + 'y'])
         })
         .attr("r", zoomParams[endLevel]['r'])
+		//.attr("r",sizeScales[endLevel])
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()
@@ -328,7 +330,7 @@ function toolTipContentsCluster(d) {
     //console.log(d.ID)
     return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
         + array2list(d.actors).slice(0,5) + '</p><p>Frequent Genres (Frequency): '
-        + array2list(d.genres).slice(0,5) + '</p><p>Aveage IMDB rating: ' + d.imdb_rating.toFixed(2) + '</p>'
+        + array2list(d.genres).slice(0,5) + '</p><p>Average IMDB rating: ' + d.imdb_rating.toFixed(2) +'</p><p>Number of movies: ' + d.cluster_size + '</p>'
 }
 
 function toolTipContentsMovie(d) {

@@ -111,7 +111,7 @@ def index(request: HttpRequest) -> HttpResponse:
         movie[DIRECTOR] = urllib.parse.quote(movie[DIRECTOR])
         movie[ACTORS] = urllib.parse.quote(movie[ACTORS])
 
-    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id']
+    cols = ['x', 'y', 'metascore', 'imdb_rating', 'genres', 'actors', 'cluster_id','cluster_size']
 
     clusters0 = c0.objects.values(*cols)
     clusters1 = c1.objects.values(*cols)
