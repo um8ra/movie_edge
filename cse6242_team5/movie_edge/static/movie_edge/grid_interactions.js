@@ -86,7 +86,7 @@ function gridMovies(movieidList) {
 
     let poster_height = Math.min((divHeight/5) - 50, 150);
     let poster_width = (poster_height * 2 / 3);
-    // console.log("Thumbnails: ", divHeight, poster_height, poster_width)
+    console.log("Thumbnails: ", divHeight, poster_height, poster_width)
     // let poster_width = 100;
     // let poster_height = 150;
     // if (divHeightNormalized > divWidth) {
