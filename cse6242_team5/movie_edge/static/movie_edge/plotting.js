@@ -509,17 +509,7 @@ function drawArcs() {
             .data(links)
             .enter()
             .append("path")
-            .attr("d", function (d) {
-                let dx = xScale(d.target.x) - xScale(d.source.x),
-                    dy = yScale(d.target.y) - yScale(d.source.y),
-                    dr = Math.sqrt(dx * dx + dy * dy);
-                return "M" +
-                    xScale(d.source.x) + "," +
-                    yScale(d.source.y) + "A" +
-                    dr + "," + dr + " 0 0,1 " +
-                    xScale(d.target.x) + "," +
-                    yScale(d.target.y);
-            })
+            .attr("d", abstractPathDraw)
             .style("fill", "None")
             .style("stroke", "Black")
             .attr("class", "arc")
