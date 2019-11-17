@@ -71,7 +71,7 @@ function closurePlotGoTo(movieID) {
     // scope it was *created* in!
     function plotGoTo() {
         console.log('PlotGoTo Current Movie: ', movieID);
-        currentMovie = movieID;
+        currentMovie = parseInt(movieID);
         highlightAndCenterSingle(movieID);
     }
     return plotGoTo;
