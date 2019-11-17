@@ -13,7 +13,6 @@ import urllib.parse
 import random
 from typing import List, Set
 
-# from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -46,6 +45,7 @@ db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
           [f'L{i}' for i in range(6)]
 
 dict_gensim_models = dict()
+memcache = dict()
 base_path = Path(BASE_DIR)
 
 # You will probably need to update this
@@ -141,7 +141,6 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
 def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
                                movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
 
-
     model = get_gensim_model(embedder)
 
     # load movie_vectors learned from Word2vec emnbedding model
@@ -181,7 +180,7 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     return list(return_val)
 
 
-def index(request: HttpRequest) -> HttpResponse:
+def index_data() -> str:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
 
     for movie in movies:
@@ -224,11 +223,21 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     data_json = json.dumps(data)
+    return data_json
+
+
+def index(request: HttpRequest) -> HttpResponse:
+    key = 'index'
+    if memcache.get(key) is not None:
+        data_json = memcache[key]
+    else:
+        data_json = index_data()
+        memcache[key] = data_json
+
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
 
 
-# @csrf_exempt
 def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
 
