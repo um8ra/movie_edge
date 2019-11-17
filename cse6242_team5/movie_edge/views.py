@@ -56,19 +56,6 @@ df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
 df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
-def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
-    # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
-
-    # The imdb_votes column of db.sqlite3 has to be changed from lower case 'null' to upper case true 'NULL'
-    # otherwise django treat it a str -> ValueError: invalid literal for int() with base 10: 'null'
-    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
-    random_movies = random.sample(list(all_movie_ids), n)
-    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
-    # print('Random Movies!')
-    # print(return_val)
-    return list(return_val)
-
-
 def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     # Initial random sampling strategy now works as follows
     # 0. Exclude shown movies from SQL query
