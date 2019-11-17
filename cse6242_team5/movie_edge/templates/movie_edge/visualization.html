@@ -157,6 +157,11 @@
             color: white;
         }
 
+        .input-label {
+            white-space: nowrap;
+            font-size: 150%;
+        }
+
     </style>
 </head>
 <body>
@@ -177,11 +182,11 @@
 <div class="topR" id="searchbox">
     <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
         <p>
-            <label>
-                <input name="movieRegex" type="text">
-                Movie Name
-            </label>
-        </p>
+<!--            <label>-->
+                <input name="movieRegex" type="text" size="20">
+                <text class="input-label">Movie Name</text>
+<!--            </label>-->
+        </>
     </form>
 </div>
 
