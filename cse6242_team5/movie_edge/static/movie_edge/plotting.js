@@ -233,6 +233,8 @@ function applyLabelsClusters() {//  put labels on visible clusters
         return JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
     };
 	
+	g.selectAll('.labels').remove()
+	
     //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
     g.selectAll('.nodeLabels')
         .data(items)
@@ -243,7 +245,7 @@ function applyLabelsClusters() {//  put labels on visible clusters
         .attr("class", "labels lvl" + lvl)
         .text(clusterLabel1)
         .style("font-size", (zoomParams[lvl].r / 2) + 'px')
-        .attr('text-anchor', 'middle');
+        .attr('text-anchor', 'middle')		
 
     g.selectAll('.nodeLabels')
         .data(items)
@@ -265,6 +267,7 @@ function applyLabelsMovies() {//  put labels on visible movies
 	
 	const bbox = getBbox(transform); // viewable area
 	const items = mydat.filter(x=>inBbox(x,bbox));  //stuff to plot
+	g.selectAll('.labels').remove()
 console.log('applying ' + items.length + ' labels')
     g.selectAll('.nodeLabels')
         .data(items)
@@ -300,7 +303,7 @@ function applyLabelsMovies() {//  put labels on visible movies
 
 }*/
 
-function drawGraph(center) { //Redraw plot
+function drawGraph(center) { //Redraw plot. if center is truthy, highlight/center the current active points (gridMovies+currentMovie)
 	const transform = getTransform()
 	const lvl = zScale(transform.k)
 	const data = payload[lvl]
@@ -308,7 +311,7 @@ function drawGraph(center) { //Redraw plot
 	moviesToHighlight.push(currentMovie)
 	const clusters2Highlight = moviesToLevelID(moviesToHighlight,lvl)
 	
-	
+	console.log('reset graph',transform)
 	// remove current graph
     g.selectAll('.scatter').remove();
     g.selectAll('.labels').remove();
@@ -411,13 +414,13 @@ function animateClusters(startLevel, endLevel) { // Animates the cluster transit
 		})
 }
 
-function zoomEnd() {
+function zoomEnd() { // trigger events at end of zoom (aniamation and replotting labels)
 	//d3.event.stopPropagation();
 	const tx = getTransform()
 	const k = tx.k;
 	const newZoom = zScale(k)
     
-	//replot labels
+	
 	
 	
     if (newZoom !== lastZoomLevel) {// handle zoom changes
@@ -430,7 +433,7 @@ function zoomEnd() {
         lastZoomLevel = newZoom;
 		
     }
-	// seemed the best place for this. ugly, but trigger new labels after pan motion completes (NOT TICK BY TICK DURING PAN)
+	// REPOLOT LABELS seemed the best place for this. ugly, but trigger new labels after pan motion completes (NOT TICK BY TICK DURING PAN)
 	const lvl = zScale(k)
 	const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
 	applyLabels()
@@ -444,24 +447,29 @@ function zoomEnd() {
 	
 }
 
-
-function zoomed() {
+function zoomed() { // apply zoom
     d3.select(".d3-tip").remove();
     // actions to take when zoom events triggered (largely mangaging zoom animation calls)
     const tx = d3.event.transform;
+	//console.log(tx)
     g.attr("transform", tx);
 	svg.call(tip);
 	
 	
 }
 
-
-
-
-function resetZoom() {
-    //Gets us back to default zoom
-	g.attr("transform",d3.zoomIdentity)
-    drawGrapth();
+function resetZoom() {//Resets zoom level and replots
+    
+	//g.attr("transform",d3.zoomIdentity)
+	myzoom.transform(svg,d3.zoomIdentity)
+	const tx = getTransform()
+	console.log('trans',tx)
+	const k = tx.k;
+    drawGraph(true);
+	const lvl = zScale(k)
+	const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+	applyLabels()
+	
 }
 
 
