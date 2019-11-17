@@ -1,111 +1,109 @@
-function highlight(ids) {
-    //flags all movies in ids (or their clusters)
-    const k = d3.zoomTransform(svg.node()).k;
-    const lvl = 'L' + zScale(k);
-
-    d3.selectAll('.scatter')
-        .attr("class", function (d) {
-            if (zScale(k) < 5) {
-                let clusters = data.filter(x => ids.includes(x[MOVIE_ID])).map(y => y[lvl]);
-                if (clusters.includes(d.ID)) {
-                    return "scatter selected"
-                } else {
-                    return "scatter"
-                }
-            } else {
-                if (ids.includes(d.ID)) {
-                    return "scatter selected"
-                } else {
-                    return "scatter"
-                }
-
-            }
-        })
-
-    /*
-    if (zScale(k)<5) {
-        let rows = data.filter(x=>ids.includes(x.movie_id))
-        rows.forEach(function (d) {
-            let node = d3.selectAll('.scatter').filter( dd => dd.ID == d[lvl])
-            node.attr('class', 'scatter selected');
-    })
-    } else {
-        d3.selectAll('.scatter').filter( d => ids.includes(d.ID)).attr('class', 'scatter selected');
-
-    }
-    */
-}
-
-
-function drawGraph(data, toHighlight, layer) {
-    // Remove and redraw plot
-    // data: cluster or movie data
-    // highlight: ID of point to highlight
-    // layer: clustering level
-
-
-    // remove current graph
-    g.selectAll('.scatter').remove();
-    g.selectAll('.labels').remove();
-    g.selectAll('path').remove();
-    //Got the data, now draw it.
-    drawArcs();
-    g.selectAll('.scatter')
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("r", sizeScales[layer])
-        .attr("cx", d => xScale(d.x))
-        .attr("cy", d => yScale(d.y))
-        .attr("stroke-width", zoomParams[layer]['w'])
-        .style('fill', d => colorScale(d[IMDB_RATING]))
-        .attr("class", function (d) {
-
-            if (d.ID === toHighlight) {
-                return "selected scatter"
-            } else {
-                return "scatter"
-
-            }
-        })
-        .on("dblclick.zoom", selectHighlight);
-    g.selectAll('.scatter')
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
-    //labels
-    const k = d3.zoomTransform(svg.node()).k;
-    const lvl = zScale(k);
-    if (lvl < 5) {
-        applyLabelsClusters();
-    } else {
-        applyLabelsMovies();
-    }
-    //highlight grid
-    highlight(currentGrid);
-    highlightAndCenterSingle(currentMovie);
-}
-
-
-function inputFormatCluster(r) {
-    // like inputFormat in grid_interactions, only for cluster arrays
+function inputFormatCluster(r) { // Decodes cluster data    
     r[GENRES] = decodeURIComponent(r[GENRES]);
     r[ACTORS] = decodeURIComponent(r[ACTORS]);
     return r
 }
 
+function highlight(ids) { //flags all nodes associated with movie_ids in ids
+   
+    const H = getViewState()
+	const lvl = zScale(H.k)
+	const myids = lvl === 5 ? ids : moviesToLevelID(ids,lvl)
+    d3.selectAll('.scatter')
+        .attr("class", d=> myids.includes(d.ID) ? "scatter selected" : "scatter")
+}
 
+function getVisibleArea(transform) { // Given a transform, return the visible viewport, in pixels 
 //https://stackoverflow.com/questions/42695480/d3v4-zoom-coordinates-of-visible-area
-function getVisibleArea(t) {
-    // Given a current transform event, get the visible viewport, in pixel space
-    const ul = t.invert([0, 0]),
-        lr = t.invert([width, height]);
+    const uppper_left = transform.invert([0, 0]),
+        lower_right = transform.invert([width, height]);
     return {
-        left: Math.trunc(ul[0]),
-        bot: Math.trunc(ul[1]),
-        right: Math.trunc(lr[0]),
-        top: Math.trunc(lr[1])
+        left: Math.trunc(uppper_left[0]),
+        bot: Math.trunc(uppper_left[1]),
+        right: Math.trunc(lower_right[0]),
+        top: Math.trunc(lower_right[1])
     }
 }
+
+function getTransform(){ // returns a d3 zoom transform object representing current viewstate
+	const H = getViewState()
+	return transform = d3.zoomIdentity.translate(H.x, H.y).scale(H.k);
+}
+
+function getViewState() { //returns dict with current viewstate
+	return d3.zoomTransform(g.node())
+}
+
+function moviesToLevelID(movies,lvl) {// returns list of cluster ids at current lvl corresponding to movies
+	const lvl_name = 'L' + lvl;
+	const movie_info = payload[5];
+	const subset = movie_info.filter(m=>movies.includes(m.movie_id))
+	return subset.map(x=>x[lvl_name])
+}
+
+function clusterOrMovie(movieItm, clusterItm, lvl){ //returns movieItm if lvl == 5 else clusterItm
+	return lvl === 5 ? movieItm : clusterItm
+}
+
+function highlightAndCenterSingle(id) { //highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
+    
+	
+	
+    let itm = data.filter(x => x.ID === id)[0];
+    const k = d3.zoomTransform(svg.node()).k;
+    d3.selectAll('.scatter').attr('class', 'scatter');
+    let currID = itm['L' + zScale(k)];
+
+    let node = d3.selectAll('.scatter').filter(d => d.ID === currID);
+    node.attr('class', 'scatter selected');
+    const px = node.attr("cx");
+    const py = node.attr("cy");
+
+    centerOnElement(px, py, k);
+}
+
+
+
+function drawGraph() { //redraw plot. 
+	const H = getViewState()
+	const lvl = zScale(H.k)
+	const data = payload[lvl]
+	let moviesToHighlight = currentGrid.slice()
+	moviesToHighlight.push(currentMovie)
+	const clusters2Highlight = moviesToLevelID(moviesToHighlight,lvl)
+	const IDs2Highlight = clusterOrMovie(moviesToHighlight,clusters2Highlight,lvl)
+	
+	// remove current graph
+    g.selectAll('.scatter').remove();
+    g.selectAll('.labels').remove();
+    g.selectAll('path').remove();
+	
+    //Got the data, now draw it.
+    drawArcs(); ;// TODO refactor 
+    g.selectAll('.scatter')
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("r", sizeScales[lvl])
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => yScale(d.y))
+		.attr("class","scatter")
+        .attr("stroke-width", zoomParams[lvl]['w'])
+        .style('fill', d => colorScale(d[IMDB_RATING]))
+        .on("dblclick.zoom", selectHighlight);
+    g.selectAll('.scatter')
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+    //labels
+	const toCall = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+	toCall()
+    //highlight grid
+    highlight(IDs2Highlight); 
+    highlightAndCenterSingle(currentMovie); //XXX
+}
+
+
+
 
 
 function getBbox(t) {
@@ -387,20 +385,6 @@ function selectHighlight() {
 }
 
 
-function highlightAndCenterSingle(id) {
-    //highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
-    let itm = data.filter(x => x.ID === id)[0];
-    const k = d3.zoomTransform(svg.node()).k;
-    d3.selectAll('.scatter').attr('class', 'scatter');
-    let currID = itm['L' + zScale(k)];
-
-    let node = d3.selectAll('.scatter').filter(d => d.ID === currID);
-    node.attr('class', 'scatter selected');
-    const px = node.attr("cx");
-    const py = node.attr("cy");
-
-    centerOnElement(px, py, k);
-}
 
 
 function tipoff(d) {
@@ -481,16 +465,16 @@ function applyLabelsMovies() {
 
 }
 
-function abstractPathDraw(d) {
-    let dx = xScale(d.target.x) - xScale(d.source.x),
-        dy = yScale(d.target.y) - yScale(d.source.y),
+function abstractPathDraw(edge) {
+    let dx = xScale(edge.target.x) - xScale(edge.source.x),
+        dy = yScale(edge.target.y) - yScale(edge.source.y),
         dr = Math.sqrt(dx * dx + dy * dy);
     return "M" +
-        xScale(d.source.x) + "," +
-        yScale(d.source.y) + "A" +
+        xScale(edge.source.x) + "," +
+        yScale(edge.source.y) + "A" +
         dr + "," + dr + " 0 0,1 " +
-        xScale(d.target.x) + "," +
-        yScale(d.target.y);
+        xScale(edge.target.x) + "," +
+        yScale(edge.target.y);
 }
 
 function drawArcs() {

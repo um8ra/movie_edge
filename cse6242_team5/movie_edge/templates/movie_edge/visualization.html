@@ -204,6 +204,7 @@
 
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
     currentGrid = tableData[MOVIE_CHOICES];
+	//var currentMovie; 
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
@@ -241,11 +242,10 @@
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
 
-    let tmp = currentGrid;
-    let currentMovie = tmp[0]; //current movie selected
+    currentMovie = currentGrid[0]; //current movie selected
     drawGraph(payload[0], 0, 0);
     // tmp.push(currentMovie);
-    highlightAndCenter(tmp);
+    highlightAndCenter(currentMovie);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);
 

@@ -33,7 +33,7 @@ const IMDB_RATING = 'imdb_rating';
 const METASCORE = 'metascore';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = Array();
-
+let currentMovie = 0;
 const gridHistorySet = new Set();
 const moviesLikedOrdered = Array();
 const moviesDislikedOrdered = Array();
