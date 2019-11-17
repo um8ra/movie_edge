@@ -544,13 +544,19 @@ function toolTipContents(d) {
 function selectHighlight() {
     //selects node and centers
     d3.event.stopPropagation();
-    d3.selectAll('.scatter').attr('class', 'scatter');
-    d3.select(this).attr('class', 'scatter selected');
-    const px = d3.select(this).attr("cx");
-    const py = d3.select(this).attr("cy");
-    const k = d3.zoomTransform(svg.node()).k;
-    console.log(px, py, k);
-    centerOnElement(px, py, k * 1.3);
+    //d3.selectAll('.scatter').attr('class', 'scatter');
+	if (d3.select(this).attr('class').includes('scatter')) {
+		d3.select(this).attr('class', 'scatter selected');
+		const px = d3.select(this).attr("cx");
+		const py = d3.select(this).attr("cy");
+		const k = getTransform().k
+		console.log(px, py, k);
+		centerOnElement(px, py, k * 1.3);
+	}
+	/*
+	if ('movie_id' in d3.select(this)) {
+		currentMovie = d3.select(this).movie_id;
+	}*/
 
 }
 
