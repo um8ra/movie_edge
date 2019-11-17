@@ -367,7 +367,7 @@ function bboxFilter2Level(d, bbox, startLevel, endLevel) { // checks if coordina
     return (x_okS && y_okS) || (x_okE && y_okE);
 }
 
-function animateClusters(startLevel, endLevel) { // Animates the cluster transitions
+function animateClusters(startLevel, endLevel) { // Animates the cluster transitions between startLevel and endLevel
     
 	let transform = getTransform()
 	let lvl = zScale(transform.k);
