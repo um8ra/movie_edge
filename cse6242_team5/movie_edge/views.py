@@ -250,7 +250,7 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
         print('...No Liked Data: Random...')
         response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
         return JsonResponse(response)
-    elif len_movies_shown <= 10:
+    elif len_movies_shown < 10:
         print('...Not enough data: Random...')
         response = {MOVIE_CHOICES: random_popular_movie_ids(topn, movies_shown_int_set)}
         return JsonResponse(response)

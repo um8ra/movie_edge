@@ -277,16 +277,18 @@ function drawGraph(center) { //Redraw plot. if center is truthy, highlight/cente
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
-    //labels
-    const applyLabels = clusterOrMovie(applyLabelsMovies, applyLabelsClusters, lvl)
-    applyLabels();
-    //highlight grid
-
     toCenter = typeof center === 'undefined' ? true : center;
     console.log(toCenter);
     if (toCenter) {
+        // highlight and center grid
+        // it also applies labels via centerOnElement -> clusterOrMovie
         //console.log('x',clusters2Highlight)
         highlightAndCenter(moviesToHighlight)
+    }
+    else {
+        //labels
+        const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+        applyLabels()
     }
     svg.call(tip)
 }

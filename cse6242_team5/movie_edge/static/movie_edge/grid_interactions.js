@@ -78,10 +78,10 @@ function closurePlotGoTo(movieID) {
 }
 
 function gridMovies(movieidList) {
-    const k = d3.zoomTransform(svg.node()).k;
-    const lvl = zScale(k);
+    // const k = d3.zoomTransform(svg.node()).k;
+    // const lvl = zScale(k);
     drawGraph(true);
-	svg.call(tip);
+    svg.call(tip);
     // highlightAndCenter(movieidList);
     // highlightAndCenter(movieidList.concat([currentMovie]));
 
