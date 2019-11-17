@@ -221,7 +221,7 @@
     let ydr = new Bokeh.Range1d({start: y_min, end: y_max});
 
     // https://stackoverflow.com/questions/31684523/use-the-hovertool-in-bokehjs
-    const tooltip = ("<div><p>Title: @title</p> " +
+    const tooltip = ("<div><p>Title: @movie_title</p> " +
         "<p>Rating: @rating</p>" +
         "<p><img src='@poster' height='150' width='100'></p></div>" +
         "<p>===</p>");
@@ -254,7 +254,7 @@
     const text = p.text(
         {field: "x"},
         {field: "y"},
-        {field: 'title'},
+        {field: MOVIE_TITLE},
         {
             source: source,
         },
