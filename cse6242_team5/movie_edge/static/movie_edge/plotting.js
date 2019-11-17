@@ -147,13 +147,18 @@ function centerOnElement(px, py, k, now) { //Transition to center on x/y (pixel 
             .translate(width / 2, height / 2) // center to origin
             .scale(k) // scale
             .translate(-px, -py) // origin back to center
+	const lvl = zScale(k)
+	const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
 	if (instant){
 		g.attr("transform",mytransform)
 	} else {
-		g.transition().duration(750).call(
-        myzoom.transform,mytransform);
+		svg.transition().duration(750)
+		.call(myzoom.transform,mytransform)
+		.end(applyLabels)
+		
 	}
-    
+	
+	applyLabels()
 }
 
 function highlightAndCenter(pts) { //given a list of movie IDs in points, highlight the clusters containing these things and center screen on them
@@ -165,6 +170,8 @@ function highlightAndCenter(pts) { //given a list of movie IDs in points, highli
 
     centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
     highlight(clusters);
+	
+	
 	/* TODO: DELETE ME
 	if (level < 5) { 
         d3.selectAll('.scatter')
@@ -202,6 +209,7 @@ function highlightAndCenterSingle(id) { //highlights a movie (not toggle) and ce
 	const row = payload[5][decoder[id]] // information 
 	const px = xScale(row['L'+lvl+'x'])
 	const py = yScale(row['L'+lvl+'y'])
+	
 	
 	/* TODO: DELETE ME
     let itm = data.filter(x => x.ID === id)[0];
@@ -533,8 +541,8 @@ function toolTipContents(d) { // selects contents of tooltip
     }
 }
 
-function selectHighlight() {
-    //selects node and centers
+function selectHighlight() {//selects node and centers
+    
     d3.event.stopPropagation();
     //d3.selectAll('.scatter').attr('class', 'scatter');
 	if (d3.select(this).attr('class').includes('scatter')) {
