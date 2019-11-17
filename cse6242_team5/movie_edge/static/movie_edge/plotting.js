@@ -188,10 +188,18 @@ function applyLabelsClusters() {//  put labels on visible clusters
     console.log('applying ' + items.length + ' labels');
 
     let clusterLabel1 = function (d) { // 1st part of cluster label
-        return JSON.parse(d[GENRES]).filter(d => d[0] !== '(no genres listed)').slice(0, 2).map(x => x[0]).join('/') + ', with';
+        try {
+            return JSON.parse(d[GENRES]).filter(d => d[0] !== '(no genres listed)').slice(0, 2).map(x => x[0]).join('/') + ', with';
+        } catch (e) {
+            return 'Unknown Genre(s), with'
+        }
     };
     let clusterLabel2 = function (d) { // 2nd part of cluster label
-        return JSON.parse(d[ACTORS]).filter(d => d[0] !== 'N/A').slice(0, 2).map(x => x[0]).join(' & ');
+        try {
+            return JSON.parse(d[ACTORS]).filter(d => d[0] !== 'N/A').slice(0, 2).map(x => x[0]).join(' & ');
+        } catch (e) {
+            return ' unknown performers'
+        }
     };
 
     g.selectAll('.labels').remove();
@@ -284,10 +292,9 @@ function drawGraph(center) { //Redraw plot. if center is truthy, highlight/cente
         // it also applies labels via centerOnElement -> clusterOrMovie
         //console.log('x',clusters2Highlight)
         highlightAndCenter(moviesToHighlight)
-    }
-    else {
+    } else {
         //labels
-        const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+        const applyLabels = clusterOrMovie(applyLabelsMovies, applyLabelsClusters, lvl)
         applyLabels()
     }
     svg.call(tip)
