@@ -192,7 +192,7 @@
     payload[2] = payload[2].map(inputFormatCluster);
     payload[3] = payload[3].map(inputFormatCluster);
     payload[4] = payload[4].map(inputFormatCluster);
-    let currentMovie = 1; //current movie selected
+
     //DELETE ME
     {#const q = tableData[MOVIE_CHOICES];#}
     {#const qq = [ 280, 704, 1609, 3334, 3811, 31930, 33463, 80398, 98154, 109483 ];#}
@@ -235,9 +235,11 @@
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
-    drawGraph(payload[0], 0, 0);
+
     let tmp = currentGrid;
-    tmp.push(currentMovie);
+    let currentMovie = tmp[0]; //current movie selected
+    drawGraph(payload[0], 0, 0);
+    // tmp.push(currentMovie);
     highlightAndCenter(tmp);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     g.call(tip);
