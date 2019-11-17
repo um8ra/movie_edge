@@ -122,7 +122,7 @@
         }
 
         .bk-root {
-            width: 70%;
+            width: 80%;
             top: 90px;
             float: right;
             background: darkgray;
@@ -228,13 +228,16 @@
     const hover = new Bokeh.HoverTool({
         tooltips: tooltip
     });
+
+    plotWidth = document.getElementById("graph").scrollWidth;
+    plotHeight = document.getElementById("graph").scrollHeight;
     const p = plt.figure({
-        title: "Colorful Scatter",
+        title: "Movie Taste Space",
         tools: tools,
         x_range: xdr,
         y_range: ydr,
-        plot_width: 800,
-        plot_height: 800,
+        plot_width: plotWidth - 30,
+        plot_height: plotHeight - 120,
     });
     p.add_tools(hover);
 
