@@ -533,7 +533,6 @@ function toolTipContents(d) { // selects contents of tooltip
     }
 }
 
-
 function selectHighlight() {
     //selects node and centers
     d3.event.stopPropagation();
@@ -552,9 +551,6 @@ function selectHighlight() {
 	}*/
 
 }
-
-
-
 
 function tipoff(d) {
     // offset calculator for tip
