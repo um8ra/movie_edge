@@ -188,7 +188,7 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()
-        .then(() => drawGraph(payload[endLevel], 0, endLevel)); //don't forget to redraw when done!
+        .then(() => drawGraph(payload[endLevel], -1, endLevel)); //don't forget to redraw when done!
 
 }
 

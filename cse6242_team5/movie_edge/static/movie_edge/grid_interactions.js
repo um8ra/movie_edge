@@ -70,6 +70,7 @@ function closurePlotGoTo(movieID) {
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
     function plotGoTo() {
+        currentMovie = movieID;
         highlightAndCenterSingle(movieID);
     }
 
@@ -77,7 +78,12 @@ function closurePlotGoTo(movieID) {
 }
 
 function gridMovies(movieidList) {
-    highlightAndCenter(movieidList);
+    const k = d3.zoomTransform(svg.node()).k;
+    const lvl = zScale(k);
+    drawGraph(payload[lvl], -1, lvl)
+    // highlightAndCenter(movieidList);
+    highlightAndCenter(movieidList.concat([currentMovie]));
+
     // const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
     // const divHeightNormalized = (divHeight - 128) / 5 / ratio;
