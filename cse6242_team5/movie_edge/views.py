@@ -103,16 +103,7 @@ def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     return list(return_val)
 
 
-def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
-                                    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-    gensim_model_str = embedder
-    # print('Likes:')
-    # print(movies_liked)
-    # print(df_movies.loc[movies_liked_int])
-    # print('Dislikes:')
-    # print(movies_disliked)
-    # print(df_movies.loc[movies_disliked_int])
-
+def get_gensim_model(gensim_model_str):
     if gensim_model_str in dict_gensim_models.keys():
         model = dict_gensim_models[gensim_model_str]
     else:
@@ -122,6 +113,13 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
             raise FileNotFoundError
         model = Word2Vec.load(str(gensim_model_path))
         dict_gensim_models[gensim_model_str] = model
+    return model
+
+
+def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
+                                    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
+
+    model = get_gensim_model(embedder)
 
     # This prevents re-showing of movies, while preserving score order
     movies_similar = model.wv.most_similar(positive=movies_liked,
@@ -142,16 +140,9 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
 
 def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
                                movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-    gensim_model_str = embedder
-    if gensim_model_str in dict_gensim_models.keys():
-        model = dict_gensim_models[gensim_model_str]
-    else:
-        assert gensim_path.is_dir(), "Gensim Directory Not Correct"
-        gensim_model_path = gensim_path / gensim_model_str
-        if not gensim_model_path.is_file():
-            raise FileNotFoundError
-        model = Word2Vec.load(str(gensim_model_path))
-        dict_gensim_models[gensim_model_str] = model
+
+
+    model = get_gensim_model(embedder)
 
     # load movie_vectors learned from Word2vec emnbedding model
     movies_embedded = list(model.wv.vocab.keys())
