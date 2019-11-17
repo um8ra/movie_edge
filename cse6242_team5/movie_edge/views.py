@@ -13,7 +13,6 @@ import urllib.parse
 import random
 from typing import List, Set
 
-# from django.views.decorators.csrf import csrf_exempt
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -46,6 +45,7 @@ db_cols = [MOVIE_ID, MOVIE_TITLE, TITLE, GENRES] + \
           [f'L{i}' for i in range(6)]
 
 dict_gensim_models = dict()
+memcache = dict()
 base_path = Path(BASE_DIR)
 
 # You will probably need to update this
@@ -54,19 +54,6 @@ movie_df_path = base_path / '..' / 'ml-20m' / 'movies.csv'
 
 df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
 df_movies.index.rename(MOVIE_ID, inplace=True)
-
-
-def random_movie_ids(n: int, imdb_votes=10000) -> List[int]:
-    # https://stackoverflow.com/questions/1731346/how-to-get-two-random-records-with-django
-
-    # The imdb_votes column of db.sqlite3 has to be changed from lower case 'null' to upper case true 'NULL'
-    # otherwise django treat it a str -> ValueError: invalid literal for int() with base 10: 'null'
-    all_movie_ids = Movie.objects.filter(embedder=EMBEDDER, imdb_votes__gte=imdb_votes).values_list('id', flat=True)
-    random_movies = random.sample(list(all_movie_ids), n)
-    return_val = Movie.objects.filter(id__in=random_movies).values_list(MOVIE_ID, flat=True)
-    # print('Random Movies!')
-    # print(return_val)
-    return list(return_val)
 
 
 def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
@@ -103,17 +90,7 @@ def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     return list(return_val)
 
 
-def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set, 
-    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-
-    gensim_model_str = embedder
-    # print('Likes:')
-    # print(movies_liked)
-    # print(df_movies.loc[movies_liked_int])
-    # print('Dislikes:')
-    # print(movies_disliked)
-    # print(df_movies.loc[movies_disliked_int])
-
+def get_gensim_model(gensim_model_str):
     if gensim_model_str in dict_gensim_models.keys():
         model = dict_gensim_models[gensim_model_str]
     else:
@@ -123,6 +100,13 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
             raise FileNotFoundError
         model = Word2Vec.load(str(gensim_model_path))
         dict_gensim_models[gensim_model_str] = model
+    return model
+
+
+def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
+                                    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
+
+    model = get_gensim_model(embedder)
 
     # This prevents re-showing of movies, while preserving score order
     movies_similar = model.wv.most_similar(positive=movies_liked,
@@ -141,21 +125,12 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
     return list(return_val)
 
 
-def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set, 
-    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
+def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
+                               movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
 
-    gensim_model_str = embedder
-    if gensim_model_str in dict_gensim_models.keys():
-        model = dict_gensim_models[gensim_model_str]
-    else:
-        assert gensim_path.is_dir(), "Gensim Directory Not Correct"
-        gensim_model_path = gensim_path / gensim_model_str
-        if not gensim_model_path.is_file():
-            raise FileNotFoundError
-        model = Word2Vec.load(str(gensim_model_path))
-        dict_gensim_models[gensim_model_str] = model
+    model = get_gensim_model(embedder)
 
-    ## load movie_vectors learned from Word2vec emnbedding model
+    # load movie_vectors learned from Word2vec emnbedding model
     movies_embedded = list(model.wv.vocab.keys())
     movie_vectors_dict = dict()
     for _movie_id in movies_embedded:
@@ -163,9 +138,9 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     movie_vectors = np.array(list(movie_vectors_dict.values()))
     movie_vectors_df = pd.DataFrame(movie_vectors, index=movies_embedded)
 
-    ## train RidgeCV user model with insurance check on embedding vocab
+    # train RidgeCV user model with insurance check on embedding vocab
     movies_rated = movies_liked + movies_disliked
-    movies_rated = [str(m) for m in movies_rated] # str(m) as insurance check
+    movies_rated = [str(m) for m in movies_rated]  # str(m) as insurance check
     liked = np.zeros(len(movies_rated), dtype=int)
     liked[:len(movies_liked)] = 1
 
@@ -179,10 +154,10 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     print(_liked)
     user_model = RidgeCV(alphas=[8.]).fit(_movie_vectors, _liked)
 
-    ## predict recommendation based on RidgeCV user model
+    # predict recommendation based on RidgeCV user model
     new_idx = [i for i, m in enumerate(movies_embedded) if m not in movies_shown_str_set]
     new_movie_vectors = movie_vectors[new_idx]
-    new_movie_scores = user_model.predict(new_movie_vectors).clip(0,1)
+    new_movie_scores = user_model.predict(new_movie_vectors).clip(0, 1)
 
     new_topn_idx = new_movie_scores.argsort()[::-1][:topn]
     new_movies = [movies_embedded[i] for i in new_idx]
@@ -192,7 +167,7 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     return list(return_val)
 
 
-def index(request: HttpRequest) -> HttpResponse:
+def index_data() -> str:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
 
     for movie in movies:
@@ -235,11 +210,21 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     data_json = json.dumps(data)
+    return data_json
+
+
+def index(request: HttpRequest) -> HttpResponse:
+    key = 'index'
+    if memcache.get(key) is not None:
+        data_json = memcache[key]
+    else:
+        data_json = index_data()
+        memcache[key] = data_json
+
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
 
 
-# @csrf_exempt
 def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
 
@@ -272,11 +257,13 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
         return JsonResponse(response)
     elif len_movies_liked > 30 and len_movies_disliked > 30:
         print('...Have Data: Calculating RidgeCV predictions...')
-        ## Require enough training samples from both classes for statistical significance
-        ## More serendippity once enough like and dislike data are collected
-        response = {MOVIE_CHOICES: ridge_regression_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
+        # Require enough training samples from both classes for statistical significance
+        # More serendippity once enough like and dislike data are collected
+        response = {
+            MOVIE_CHOICES: ridge_regression_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked)}
         return JsonResponse(response)
     else:
         print('...Have Data: Calculating word2vec most_similar...')
-        response = {MOVIE_CHOICES: word2vec_most_similar_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
+        response = {
+            MOVIE_CHOICES: word2vec_most_similar_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked)}
         return JsonResponse(response)
