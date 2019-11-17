@@ -80,10 +80,11 @@ function highlightAndCenterSingle(movieId) {
     const movieData = data[movieIndex];
     const movieX = movieData[X];
     const movieY = movieData[Y];
-    xdr.start = movieX - 2;
-    xdr.end = movieX + 2;
-    ydr.start = movieY - 2;
-    ydr.end = movieY + 2;
+    console.log(movieData);
+    xdr.start = movieX - 1;
+    xdr.end = movieX + 1;
+    ydr.start = movieY - 1;
+    ydr.end = movieY + 1;
     if (!text.visible) { // not needed, but perhaps prevents a redraw
         text.visible = true;
     }
@@ -202,7 +203,9 @@ function buttonClickDislike(data) {
 }
 
 function findMovie(formBox) {
-    matchString = formBox.children[0].value;
+    console.log(formBox);
+    console.log(formBox.children[0].children[0].children[0].value);
+    matchString = formBox.children[0].children[0].children[0].value;
     const re = new RegExp(matchString, 'i');
     stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
     console.log('Matches in SearchBox: ');
