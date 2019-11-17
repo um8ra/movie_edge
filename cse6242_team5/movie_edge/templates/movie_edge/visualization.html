@@ -219,7 +219,7 @@
     // https://stackoverflow.com/questions/31684523/use-the-hovertool-in-bokehjs
     const tooltip = ("<div><p>Title: @movie_title</p> " +
         "<p>Rating: @rating</p>" +
-        "<p><img src='@poster' height='150' width='100'></p></div>" +
+        "<p><img class='smallImg' src='@poster'></p></div>" +
         "<p>===</p>");
     const hover = new Bokeh.HoverTool({
         tooltips: tooltip
