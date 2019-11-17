@@ -431,6 +431,7 @@ function zoomEnd() { // trigger events at end of zoom (aniamation and replotting
         //animateClusters(data, bbox, currentZoom, newZoom);
 		animateClusters(lastZoomLevel, newZoom);
         lastZoomLevel = newZoom;
+		return
 		
     }
 	// REPOLOT LABELS seemed the best place for this. ugly, but trigger new labels after pan motion completes (NOT TICK BY TICK DURING PAN)
@@ -472,27 +473,26 @@ function resetZoom() {//Resets zoom level and replots
 	
 }
 
-function clusterToolTipHelperArray2list(str) {
+function clusterToolTipHelperArray2list(str) { //string processing for cluster tooltips
     const arr = JSON.parse(str);
     return arr.filter(d=> d[0] != 'N/A').filter(d=> d[0] !== '(no genres listed)').map(itm => itm[0] + " (" + itm[1] + ")")
 }
 
-function str2arrayList(str) {
+function str2arrayList(str) {//string processing for movie tooltips
     let tmp = str.split('|');
     return tmp.join(', ')
 
 
 }
 
-
-function toolTipContentsCluster(d) {
+function toolTipContentsCluster(d) { //html generator for cluster tooltips
     //console.log(d.ID)
     return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
         + clusterToolTipHelperArray2list(d[ACTORS]).slice(0, 5) + '</p><p>Frequent Genres (Frequency): '
         + clusterToolTipHelperArray2list(d[GENRES]).slice(0, 5) + '</p><p>Average IMDB rating: ' + d[IMDB_RATING].toFixed(2) + '</p><p>Number of movies: ' + d[CLUSTER_SIZE] + '</p>'
 }
 
-function toolTipContentsMovie(d) {
+function toolTipContentsMovie(d) {//html generator for movie tooltips
     return '<p>Title: ' + d[MOVIE_TITLE] + '</p>' + '<p>Actors: '
         + str2arrayList(d[ACTORS]) + '</p><p>Genres: '
         + str2arrayList(d[GENRES]) + '</p><p>IMDB rating: ' + d[IMDB_RATING] + '</p>'
@@ -500,8 +500,8 @@ function toolTipContentsMovie(d) {
         + '<img alt="" src=' + d[POSTER_URL] + ' class="smallImg"/>'
 }
 
-function tipdir(d) {
-    const tx = d3.zoomTransform(d3.select(".holder").node());
+function tipdir(d) { 
+    const tx = getTransform();
     const cx = +this.attributes.cx.value;
     const cy = +this.attributes.cy.value;
     let tmp = tx.apply([cx, cy]);
@@ -523,7 +523,7 @@ function tipdir(d) {
     return out
 }
 
-function toolTipContents(d) {
+function toolTipContents(d) { // selects contents of tooltip
     //console.log(d)
     if ('movie_title' in d) {
         return toolTipContentsMovie(d);
