@@ -67,14 +67,14 @@
             stroke: grey;
         }
 
-        .selected.scatter { 
+        .selected.scatter {
             stroke: red;
         }
-		
-		.selected2 { 
-			stroke: orange
-		}
-		
+
+        .selected2 {
+            stroke: orange
+        }
+
         .box {
             display: flex;
             flex-flow: column;
@@ -114,6 +114,7 @@
             vertical-align: center;
             horiz-align: center;
         }
+
         .left-half {
             background-color: black;
             position: absolute;
@@ -124,7 +125,7 @@
         }
 
         .right-half {
-           /* background-color: rgb(39, 40, 34); */
+            /* background-color: rgb(39, 40, 34); */
             background-color: white;
             position: absolute;
             right: 0;
@@ -182,10 +183,10 @@
 <div class="topR" id="searchbox">
     <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
         <p>
-<!--            <label>-->
-                <input name="movieRegex" type="text" size="20">
-                <text class="input-label">Movie Name</text>
-<!--            </label>-->
+            <!--            <label>-->
+            <input name="movieRegex" type="text" size="20">
+            <text class="input-label">Movie Name</text>
+            <!--            </label>-->
         </p>
     </form>
 </div>
@@ -202,6 +203,12 @@
 {% csrf_token %}
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
 <script>
+
+    //stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-mobile-device
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        alert('This site is optimized for laptop/desktop computers, we strongly recommend against a mobile device browser')
+    }
+
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
     const tableData = JSON.parse('{{ table_data|safe }}');
     const payload = tableData.payload;
@@ -228,7 +235,7 @@
 
     const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
     currentGrid = tableData[MOVIE_CHOICES];
-	//var currentMovie; 
+    //var currentMovie;
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
@@ -262,7 +269,7 @@
         .extent([[0, 0], [width, height]])
         .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
         .on("zoom", zoomed)
-		.on("end",zoomEnd);
+        .on("end", zoomEnd);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
@@ -273,10 +280,10 @@
     //highlightAndCenter(currentMovie);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
     //g.call(tip);
-	/*drawGraph();
-	console.log('g done, calling tt')
-	svg.call(tip);
-	console.log('tip called')*/
+    /*drawGraph();
+    console.log('g done, calling tt')
+    svg.call(tip);
+    console.log('tip called')*/
     tip.offset(tipoff);
     tip.direction(tipdir);
 
