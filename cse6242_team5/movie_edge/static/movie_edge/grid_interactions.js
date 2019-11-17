@@ -65,6 +65,30 @@ function buttonClickSubmit(fetchURL) {
     abstractFetch(fetchPayload, fetchURL, MOVIE_CHOICES, gridMovies);
 }
 
+function resetZoom() {
+    xdr.start = x_min;
+    xdr.end = x_max;
+    ydr.start = y_min;
+    ydr.end = y_max;
+    if (text.visible) { // not needed, but perhaps prevents a redraw
+        text.visible = false;
+    }
+}
+
+function highlightAndCenterSingle(movieId) {
+    const movieIndex = decoder[movieId];
+    const movieData = data[movieIndex];
+    const movieX = movieData[X];
+    const movieY = movieData[Y];
+    xdr.start = movieX - 2;
+    xdr.end = movieX + 2;
+    ydr.start = movieY - 2;
+    ydr.end = movieY + 2;
+    if (!text.visible) { // not needed, but perhaps prevents a redraw
+        text.visible = true;
+    }
+}
+
 function closurePlotGoTo(movieID) {
     // movieID isn't actually passed to plotGoTo
     // but since it's a closure, plotGoTo understands the
