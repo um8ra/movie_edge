@@ -208,22 +208,21 @@ def index_data() -> str:
         **movies_y_max,
     }
 
-    data_json = json.dumps(data)
-    return data_json
+    return data
 
 
 def index(request: HttpRequest) -> HttpResponse:
     # caching prevents index page reload to get new movies in grid
 
-    # key = 'index'
-    # if memcache.get(key) is not None:
-    #     data_json = memcache[key]
-    # else:
-    #     data_json = index_data()
-    #     memcache[key] = data_json
+    key = 'index'
+    if memcache.get(key) is not None:
+        data = memcache[key]
+        data[MOVIE_CHOICES] = random_popular_movie_ids(10, set())
+    else:
+        data = index_data()
+        memcache[key] = data
 
-    data_json = index_data()
-
+    data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
 
