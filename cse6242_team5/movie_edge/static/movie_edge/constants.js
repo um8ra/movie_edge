@@ -33,7 +33,8 @@ const IMDB_RATING = 'imdb_rating';
 const METASCORE = 'metascore';
 const QUEUE_MAX_LENGTH = 10;
 let currentGrid = Array();
-
+let currentMovie = 0;
+let lastZoomLevel = 0; // global zoom level, used to detect changes (to trigger animations)
 const gridHistorySet = new Set();
 const moviesLikedOrdered = Array();
 const moviesDislikedOrdered = Array();
