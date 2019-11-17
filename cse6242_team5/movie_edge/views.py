@@ -13,7 +13,6 @@ import urllib.parse
 import random
 from typing import List, Set
 
-
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
 TITLE = 'movie_title'
@@ -56,7 +55,7 @@ df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
 df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
-def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
+def random_popular_movie_ids(topn: int, movies_shown_int_set: Set[int]) -> List[int]:
     # Initial random sampling strategy now works as follows
     # 0. Exclude shown movies from SQL query
     # 1. Order L0 clusters by max(imdb_votes) desc
@@ -90,7 +89,7 @@ def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     return list(return_val)
 
 
-def get_gensim_model(gensim_model_str):
+def get_gensim_model(gensim_model_str: str):
     if gensim_model_str in dict_gensim_models.keys():
         model = dict_gensim_models[gensim_model_str]
     else:
@@ -103,9 +102,9 @@ def get_gensim_model(gensim_model_str):
     return model
 
 
-def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
-                                    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-
+def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set[str],
+                                    movies_liked: List[str], movies_disliked: List[str], embedder: str = EMBEDDER
+                                    ) -> List[int]:
     model = get_gensim_model(embedder)
 
     # This prevents re-showing of movies, while preserving score order
@@ -125,9 +124,9 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
     return list(return_val)
 
 
-def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
-                               movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-
+def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set[str],
+                               movies_liked: List[str], movies_disliked: List[str], embedder: str = EMBEDDER
+                               ) -> List[int]:
     model = get_gensim_model(embedder)
 
     # load movie_vectors learned from Word2vec emnbedding model
