@@ -103,9 +103,8 @@ def random_popular_movie_ids(topn: int, movies_shown_int_set: Set) -> List[int]:
     return list(return_val)
 
 
-def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set, 
-    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-
+def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
+                                    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
     gensim_model_str = embedder
     # print('Likes:')
     # print(movies_liked)
@@ -141,9 +140,8 @@ def word2vec_most_similar_movie_ids(topn: int, movies_shown_str_set: Set,
     return list(return_val)
 
 
-def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set, 
-    movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
-
+def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
+                               movies_liked: List, movies_disliked: List, embedder=EMBEDDER) -> List[int]:
     gensim_model_str = embedder
     if gensim_model_str in dict_gensim_models.keys():
         model = dict_gensim_models[gensim_model_str]
@@ -155,7 +153,7 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
         model = Word2Vec.load(str(gensim_model_path))
         dict_gensim_models[gensim_model_str] = model
 
-    ## load movie_vectors learned from Word2vec emnbedding model
+    # load movie_vectors learned from Word2vec emnbedding model
     movies_embedded = list(model.wv.vocab.keys())
     movie_vectors_dict = dict()
     for _movie_id in movies_embedded:
@@ -163,9 +161,9 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     movie_vectors = np.array(list(movie_vectors_dict.values()))
     movie_vectors_df = pd.DataFrame(movie_vectors, index=movies_embedded)
 
-    ## train RidgeCV user model with insurance check on embedding vocab
+    # train RidgeCV user model with insurance check on embedding vocab
     movies_rated = movies_liked + movies_disliked
-    movies_rated = [str(m) for m in movies_rated] # str(m) as insurance check
+    movies_rated = [str(m) for m in movies_rated]  # str(m) as insurance check
     liked = np.zeros(len(movies_rated), dtype=int)
     liked[:len(movies_liked)] = 1
 
@@ -179,10 +177,10 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set,
     print(_liked)
     user_model = RidgeCV(alphas=[8.]).fit(_movie_vectors, _liked)
 
-    ## predict recommendation based on RidgeCV user model
+    # predict recommendation based on RidgeCV user model
     new_idx = [i for i, m in enumerate(movies_embedded) if m not in movies_shown_str_set]
     new_movie_vectors = movie_vectors[new_idx]
-    new_movie_scores = user_model.predict(new_movie_vectors).clip(0,1)
+    new_movie_scores = user_model.predict(new_movie_vectors).clip(0, 1)
 
     new_topn_idx = new_movie_scores.argsort()[::-1][:topn]
     new_movies = [movies_embedded[i] for i in new_idx]
@@ -272,11 +270,13 @@ def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
         return JsonResponse(response)
     elif len_movies_liked > 30 and len_movies_disliked > 30:
         print('...Have Data: Calculating RidgeCV predictions...')
-        ## Require enough training samples from both classes for statistical significance
-        ## More serendippity once enough like and dislike data are collected
-        response = {MOVIE_CHOICES: ridge_regression_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
+        # Require enough training samples from both classes for statistical significance
+        # More serendippity once enough like and dislike data are collected
+        response = {
+            MOVIE_CHOICES: ridge_regression_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked)}
         return JsonResponse(response)
     else:
         print('...Have Data: Calculating word2vec most_similar...')
-        response = {MOVIE_CHOICES: word2vec_most_similar_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked) }
+        response = {
+            MOVIE_CHOICES: word2vec_most_similar_movie_ids(topn, movies_shown_str_set, movies_liked, movies_disliked)}
         return JsonResponse(response)
