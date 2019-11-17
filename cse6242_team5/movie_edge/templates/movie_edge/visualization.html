@@ -211,7 +211,7 @@
     const posters = data.map(x => x[POSTER_URL]);
     const source = new Bokeh.ColumnDataSource({
         data: {
-            'x': x, 'y': y, 'color': colors, 'title': titles,
+            'x': x, 'y': y, 'color': colors, 'movie_title': titles,
             'rating': ratings, 'poster': posters
         }
     });
