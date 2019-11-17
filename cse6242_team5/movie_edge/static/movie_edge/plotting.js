@@ -227,10 +227,10 @@ function applyLabelsClusters() {//  put labels on visible clusters
 	console.log('applying ' + items.length + ' labels')
 	
     let clusterLabel1 = function (d) { // 1st part of cluster label
-        return JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/') + ', with';
+        return JSON.parse(d[GENRES]).filter(d=> d[0] !== '(no genres listed)').slice(0, 2).map(x => x[0]).join('/') + ', with';
     };
     let clusterLabel2 = function (d) { // 2nd part of cluster label
-        return JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
+        return JSON.parse(d[ACTORS]).filter(d=> d[0] !== 'N/A').slice(0, 2).map(x => x[0]).join(' & ');
     };
 	
 	g.selectAll('.labels').remove()
@@ -472,16 +472,9 @@ function resetZoom() {//Resets zoom level and replots
 	
 }
 
-
-
-
-
-
-
-
-function array2list(str) {
+function clusterToolTipHelperArray2list(str) {
     const arr = JSON.parse(str);
-    return arr.map(itm => itm[0] + " (" + itm[1] + ")")
+    return arr.filter(d=> d[0] != 'N/A').filter(d=> d[0] !== '(no genres listed)').map(itm => itm[0] + " (" + itm[1] + ")")
 }
 
 function str2arrayList(str) {
@@ -495,8 +488,8 @@ function str2arrayList(str) {
 function toolTipContentsCluster(d) {
     //console.log(d.ID)
     return '<p>Cluster: ' + (d.ID.toString()) + ' </p>' + '<p>Frequent Actors (Frequency): '
-        + array2list(d[ACTORS]).slice(0, 5) + '</p><p>Frequent Genres (Frequency): '
-        + array2list(d[GENRES]).slice(0, 5) + '</p><p>Average IMDB rating: ' + d[IMDB_RATING].toFixed(2) + '</p><p>Number of movies: ' + d[CLUSTER_SIZE] + '</p>'
+        + clusterToolTipHelperArray2list(d[ACTORS]).slice(0, 5) + '</p><p>Frequent Genres (Frequency): '
+        + clusterToolTipHelperArray2list(d[GENRES]).slice(0, 5) + '</p><p>Average IMDB rating: ' + d[IMDB_RATING].toFixed(2) + '</p><p>Number of movies: ' + d[CLUSTER_SIZE] + '</p>'
 }
 
 function toolTipContentsMovie(d) {
