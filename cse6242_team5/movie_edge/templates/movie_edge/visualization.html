@@ -67,10 +67,14 @@
             stroke: grey;
         }
 
-        .selected {
+        .selected { 
             stroke: red;
         }
-
+		
+		.selected2 { 
+			stroke: orange
+		}
+		
         .box {
             display: flex;
             flex-flow: column;
@@ -237,18 +241,22 @@
         .duration(1000)
         .extent([[0, 0], [width, height]])
         .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
-        .on("zoom", zoomed);
+        .on("zoom", zoomed)
+		.on("end",zoomEnd)
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
 
     currentMovie = currentGrid[0]; //current movie selected
-    drawGraph(payload[0], 0, 0);
+    //drawGraph(payload[0], 0, 0);
     // tmp.push(currentMovie);
-    highlightAndCenter(currentMovie);
+    //highlightAndCenter(currentMovie);
     gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
-    g.call(tip);
-
+    //g.call(tip);
+	/*drawGraph();
+	console.log('g done, calling tt')
+	svg.call(tip);
+	console.log('tip called')*/
     tip.offset(tipoff);
     tip.direction(tipdir);
 

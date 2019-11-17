@@ -4,13 +4,21 @@ function inputFormatCluster(r) { // Decodes cluster data
     return r
 }
 
-function highlight(ids) { //flags all nodes associated with movie_ids in ids
-   
-    const H = getViewState()
+function highlight(ids) { //flags all nodes with ID in ids
+    const H = getTransform()
 	const lvl = zScale(H.k)
-	const myids = lvl === 5 ? ids : moviesToLevelID(ids,lvl)
     d3.selectAll('.scatter')
-        .attr("class", d=> myids.includes(d.ID) ? "scatter selected" : "scatter")
+        .attr("class", d=> ids.includes(d.ID) ? "scatter selected" : "scatter")
+}
+
+function toggleHighlight(){ // if node is selected unselect, else select
+	const me = d3.select(this)
+	if (me.attr("class") === "scatter selected") {
+		me.attr("class",'scatter')
+		
+	} else {
+		me.attr("class",'scatter selected')
+	}
 }
 
 function getVisibleArea(transform) { // Given a transform, return the visible viewport, in pixels 
@@ -26,29 +34,176 @@ function getVisibleArea(transform) { // Given a transform, return the visible vi
 }
 
 function getTransform(){ // returns a d3 zoom transform object representing current viewstate
-	const H = getViewState()
-	return transform = d3.zoomIdentity.translate(H.x, H.y).scale(H.k);
+	return d3.zoomTransform(svg.node()) // dunno why but it can't do this on g.
 }
 
-function getViewState() { //returns dict with current viewstate
-	return d3.zoomTransform(g.node())
-}
-
-function moviesToLevelID(movies,lvl) {// returns list of cluster ids at current lvl corresponding to movies
+function moviesToLevelID(movies,lvl) {// returns list of cluster ids at lvl corresponding to movies
 	const lvl_name = 'L' + lvl;
 	const movie_info = payload[5];
-	const subset = movie_info.filter(m=>movies.includes(m.movie_id))
-	return subset.map(x=>x[lvl_name])
+	return movies.map(x=>movie_info[decoder[x]][lvl_name])  // decoder[x] => index of element, movie_info[?] => row of movie , we're getting the element L<lvl>
 }
 
 function clusterOrMovie(movieItm, clusterItm, lvl){ //returns movieItm if lvl == 5 else clusterItm
 	return lvl === 5 ? movieItm : clusterItm
 }
 
-function highlightAndCenterSingle(id) { //highlights a movie and centers on it. Does not change zoom level (so a cluster could be highlighted)
+function getBbox(t) {// Given a  transform, get the bounding box in x/y space
     
+    const pixel_bbox = getVisibleArea(t);
+    const tmp = {
+        top: yScale.invert(pixel_bbox.bot),
+        bot: yScale.invert(pixel_bbox.top),
+        left: xScale.invert(pixel_bbox.left),
+        right: xScale.invert(pixel_bbox.right)
+    };
+    const height_ = tmp.top - tmp.bot;
+    const width_ = tmp.right - tmp.left;
+    return {
+        top: tmp.top + height_ * bbox_pad,
+        bot: tmp.bot - height_ * bbox_pad,
+        left: tmp.left - width_ * bbox_pad,
+        right: tmp.right + width_ * bbox_pad
+    }
+}
+
+function getViewport(center, k) {// gets bbox (in x/y) of viewport centered on x,y, at zoom level k    
+    const px = xScale(center.x);
+    const py = yScale(center.y);
+	// make transform and call getBbox
+    const t = d3.zoomIdentity
+        .translate(width / 2, height / 2)
+        .scale(k)
+        .translate(-px, -py);
+    //console.log(t)
+    return getBbox(t);
+
+}
+
+function inBbox(d, bbox) { // tests if point d is in bbox. Make sure both d and bbox are pixel or x/y  
+    const x_ok = (d.x >= bbox.left) && (d.x <= bbox.right);
+    const y_ok = (d.y >= bbox.bot) && (d.y <= bbox.top);
+    return x_ok && y_ok;
+}
+
+function getPtBbox(pts) { //given list pts (as movie_ids), find a bounding box for them at each level of zoom, return x,y,k (x/y space) of center
+
+    // Start with getting a bbox in x/y
+    const movies = payload[5];
+    const indices = pts.map(x => decoder[x]);
+    const objs = [];
+    indices.forEach(i => objs.push(movies[i]));
+    const levelCoords = {};
+    const centers = {};
 	
+    for (let lvl = 0; lvl < 6; lvl++) {
+        levelCoords[lvl] = objs.map(function (d) {
+            return {x: d['L' + lvl + 'x'], y: d['L' + lvl + 'y']}
+        });
+        let xs = levelCoords[lvl].map(d => d.x);
+        let ys = levelCoords[lvl].map(d => d.y);
+        centers[lvl] = {x: (d3.max(xs) + d3.min(xs)) / 2, y: (d3.max(ys) + d3.min(ys)) / 2}
+    }
+
+//    console.log(levelCoords);
+  //  console.log(centers);
+  
+  // Test zoom levels
+    let best = {x: centers[0].x, y: centers[0].y, k: 1};
+    for (let k = 1.5; k < zoomParams.maxZoom; k++) {
+
+        let zoomLevel = zScale(k);
+        //console.log('checking k='+k+' zoomlevel='+zoomLevel)
+        let levelCoord = levelCoords[zoomLevel];
+        let center = centers[zoomLevel];
+        let bbox = getViewport(center, k);
+        //console.log(bbox)
+        //console.log(levelCoord)
+        // let debug = levelCoord.forEach(foo => inBbox(foo, bbox));
+        //console.log(debug)
+        if (levelCoord.every(d => inBbox(d, bbox))) {
+            best = {x: center.x, y: center.y, k: k}
+        }
+
+    }
+    return best;
+}
+
+/* TODO: DELETE ME
+function getPtsClusterIDatLevel(pts, level) {
+    //at a given zoom level, get the cluster IDs for each point in pts
+    const tmp = getPtBbox(pts);
+    const movies = payload[5];
+    const levelStr = 'L' + zScale(tmp.k);
+    const indices = pts.map(x => decoder[x]);
+    const objs = [];
+    indices.forEach(i => objs.push(movies[i]));
+    return objs.map(d => d[levelStr]);
+}*/
+
+function centerOnElement(px, py, k, now) { //Transition to center on x/y (pixel coords) at scale level k
+	//https://observablehq.com/@d3/zoom-to-bounding-box
+    const instant = typeof now !== 'undefined' ? now : false;
+	const mytransform = d3.zoomIdentity
+            .translate(width / 2, height / 2) // center to origin
+            .scale(k) // scale
+            .translate(-px, -py) // origin back to center
+	if (instant){
+		g.attr("transform",mytransform)
+	} else {
+		g.transition().duration(750).call(
+        myzoom.transform,mytransform);
+	}
+    
+}
+
+function highlightAndCenter(pts) { //given a list of movie IDs in points, highlight the clusters containing these things and center screen on them
+    
+    const ptBox = getPtBbox(pts); //coords in x/y
+    const level = zScale(ptBox.k);
+    const clusters = moviesToLevelID(pts, level);
+    console.log('ptbox', ptBox);
+
+    centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
+    highlight(clusters);
+	/* TODO: DELETE ME
+	if (level < 5) { 
+        d3.selectAll('.scatter')
+            .attr('class', function (d) {
+                if (clusters.includes(d.ID)) {
+                    return "scatter selected"
+                } else {
+                    return "scatter"
+                }
+            })
+    } else {
+        d3.selectAll('.scatter')
+            .attr('class', function (d) {
+                if (pts.includes(d[MOVIE_ID])) {
+                    return "scatter selected"
+                } else {
+                    return "scatter"
+                }
+            })
+
+    }*/
+
+
+}
+
+function highlightAndCenterSingle(id) { //highlights a movie (not toggle) and centers on it. Does not change zoom level (so a cluster could be highlighted). Does not change any other highlighting
+    const transform = getTransform()
+	const k = transform.k
+	const lvl = zScale(k)
+	const centerID = moviesToLevelID([id],lvl)[0]
 	
+	// mark the point
+	d3.selectAll('.scatter').attr("class", d=> d.ID===centerID ? "scatter selected" : 'scatter');
+	
+	const row = payload[5][decoder[id]] // information 
+	const px = xScale(row['L'+lvl+'x'])
+	const py = yScale(row['L'+lvl+'y'])
+	
+	/* TODO: DELETE ME
     let itm = data.filter(x => x.ID === id)[0];
     const k = d3.zoomTransform(svg.node()).k;
     d3.selectAll('.scatter').attr('class', 'scatter');
@@ -57,21 +212,102 @@ function highlightAndCenterSingle(id) { //highlights a movie and centers on it. 
     let node = d3.selectAll('.scatter').filter(d => d.ID === currID);
     node.attr('class', 'scatter selected');
     const px = node.attr("cx");
-    const py = node.attr("cy");
-
+    const py = node.attr("cy");*/
+	// center us up
     centerOnElement(px, py, k);
 }
 
+function applyLabelsClusters() {//  put labels on visible clusters
+    const transform = getTransform();
+    const lvl = zScale(transform.k);
+	const mydat = payload[lvl]; // data for this clustering level
+	
+	const bbox = getBbox(transform); // viewable area
+	const items = mydat.filter(x=>inBbox(x,bbox));  //stuff to plot
+	console.log('applying ' + items.length + ' labels')
+	
+    let clusterLabel1 = function (d) { // 1st part of cluster label
+        return JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/') + ', with';
+    };
+    let clusterLabel2 = function (d) { // 2nd part of cluster label
+        return JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
+    };
+	
+    //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
+    g.selectAll('.nodeLabels')
+        .data(items)
+        .enter()
+        .append("svg:text")
+        .attr("x", d => xScale(d.x))
+        .attr("y", d => yScale(d.y) - (zoomParams[lvl].r * 1.5))
+        .attr("class", "labels lvl" + lvl)
+        .text(clusterLabel1)
+        .style("font-size", (zoomParams[lvl].r / 2) + 'px')
+        .attr('text-anchor', 'middle');
+
+    g.selectAll('.nodeLabels')
+        .data(items)
+        .enter()
+        .append("svg:text")
+        .attr("x", d => xScale(d.x))
+        .attr("y", d => yScale(d.y) - (zoomParams[lvl].r * 1))
+        .attr("class", "labels lvl" + lvl)
+        .text(clusterLabel2)
+        .style("font-size", (zoomParams[lvl].r / 2) + 'px')
+        .attr('text-anchor', 'middle')
+
+}
+
+function applyLabelsMovies() {//  put labels on visible movies
+    const transform = getTransform();
+    const lvl = 5;
+	const mydat = payload[lvl]; // data for this clustering level
+	
+	const bbox = getBbox(transform); // viewable area
+	const items = mydat.filter(x=>inBbox(x,bbox));  //stuff to plot
+console.log('applying ' + items.length + ' labels')
+    g.selectAll('.nodeLabels')
+        .data(items)
+        .enter()
+        .append("svg:text")
+        .attr("x", d => xScale(d.x))
+        .attr("y", d => yScale(d.y) - (zoomParams[5].r * 1.5))
+        .text(d => d[MOVIE_TITLE])
+        .attr("class", "labels lvl5")
+        .style("font-size", (zoomParams[5].r / 2) + 'px')
+        .attr('text-anchor', 'middle')
 
 
-function drawGraph() { //redraw plot. 
-	const H = getViewState()
-	const lvl = zScale(H.k)
+}
+
+/* TODO: DELETE ME
+
+function applyLabelsMovies() {//  put labels on visible movies
+    // hack to just put labels on all nodes
+
+    //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
+    g.selectAll('nodeLabels')
+        .data(data)
+        .enter()
+        .append("svg:text")
+        .attr("x", d => xScale(d.x))
+        .attr("y", d => yScale(d.y) - (zoomParams[5].r * 1.5))
+        .text(d => d[MOVIE_TITLE])
+        .attr("class", "labels lvl5")
+        .style("font-size", (zoomParams[5].r / 2) + 'px')
+        .attr('text-anchor', 'middle')
+
+
+}*/
+
+function drawGraph(center) { //Redraw plot
+	const transform = getTransform()
+	const lvl = zScale(transform.k)
 	const data = payload[lvl]
 	let moviesToHighlight = currentGrid.slice()
 	moviesToHighlight.push(currentMovie)
 	const clusters2Highlight = moviesToLevelID(moviesToHighlight,lvl)
-	const IDs2Highlight = clusterOrMovie(moviesToHighlight,clusters2Highlight,lvl)
+	
 	
 	// remove current graph
     g.selectAll('.scatter').remove();
@@ -79,7 +315,7 @@ function drawGraph() { //redraw plot.
     g.selectAll('path').remove();
 	
     //Got the data, now draw it.
-    drawArcs(); ;// TODO refactor 
+    drawArcs(); ;// TODO: XXX 
     g.selectAll('.scatter')
         .data(data)
         .enter()
@@ -91,49 +327,27 @@ function drawGraph() { //redraw plot.
         .attr("stroke-width", zoomParams[lvl]['w'])
         .style('fill', d => colorScale(d[IMDB_RATING]))
         .on("dblclick.zoom", selectHighlight);
+	
     g.selectAll('.scatter')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
+	
     //labels
-	const toCall = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
-	toCall()
+	const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+	applyLabels()
     //highlight grid
-    highlight(IDs2Highlight); 
-    highlightAndCenterSingle(currentMovie); //XXX
-}
-
-
-
-
-
-function getBbox(t) {
-    // Given a current transform event, get the bounding box in x/y space
-    const pixel_bbox = getVisibleArea(t);
-    const tmp = {
-        top: yScale.invert(pixel_bbox.bot),
-        bot: yScale.invert(pixel_bbox.top),
-        left: xScale.invert(pixel_bbox.left),
-        right: xScale.invert(pixel_bbox.right)
-    };
-    const height = tmp.top - tmp.bot;
-    const width = tmp.right - tmp.left;
-    return {
-        top: tmp.top + height * bbox_pad,
-        bot: tmp.bot - height * bbox_pad,
-        left: tmp.left - width * bbox_pad,
-        right: tmp.right + width * bbox_pad
+	
+	toCenter = typeof center === 'undefined' ? true : center
+	console.log(toCenter)
+    if (toCenter) {
+		//console.log('x',clusters2Highlight)
+		highlightAndCenter(moviesToHighlight)
     }
+	svg.call(tip)
 }
 
-
-function inBbox(d, bbox) {
-    const x_ok = (d.x >= bbox.left) && (d.x <= bbox.right);
-    const y_ok = (d.y >= bbox.bot) && (d.y <= bbox.top);
-    return x_ok && y_ok;
-}
-
-function bboxFilter2Level(d, bbox, startLevel, endLevel) {
-    // checks if coordinates of each d at startLevel or endLevel lie inside bbox
+function bboxFilter2Level(d, bbox, startLevel, endLevel) { // checks if coordinates of each d at startLevel or endLevel lie inside bbox
+    
     const x_okS = (d['L' + startLevel + 'x'] >= bbox.left) && (d['L' + startLevel + 'x'] <= bbox.right);
     const x_okE = (d['L' + endLevel + 'x'] >= bbox.left) && (d['L' + endLevel + 'x'] <= bbox.right);
     const y_okS = (d['L' + startLevel + 'y'] >= bbox.bot) && (d['L' + startLevel + 'y'] <= bbox.top);
@@ -142,10 +356,12 @@ function bboxFilter2Level(d, bbox, startLevel, endLevel) {
     return (x_okS && y_okS) || (x_okE && y_okE);
 }
 
-
-function animateClusters(movieData, bbox, startLevel, endLevel) {
-    // Animates the cluster transitions
-
+function animateClusters(startLevel, endLevel) { // Animates the cluster transitions
+    
+	let transform = getTransform()
+	let lvl = zScale(transform.k);
+	let movieData = payload[5]
+	let bbox = getBbox(transform)
 
     const filtered = movieData.filter(d => bboxFilter2Level(d, bbox, startLevel, endLevel));
     //start with removing
@@ -186,128 +402,74 @@ function animateClusters(movieData, bbox, startLevel, endLevel) {
         .attr("stroke-width", zoomParams[endLevel]['w'])
         .style('opacity', 1.0)
         .end()
-        .then(() => drawGraph(payload[endLevel], -1, endLevel)); //don't forget to redraw when done!
-
+        .then(() => drawGraph(false)) //don't forget to redraw when done, but don't center
+		.then(function () {
+				let moviesToHighlight = currentGrid.slice()
+				moviesToHighlight.push(currentMovie)
+				const clusters2Highlight = moviesToLevelID(moviesToHighlight,lvl)
+				highlight(clusters2Highlight)
+		})
 }
 
-//https://observablehq.com/@d3/zoom-to-bounding-box
-function centerOnElement(px, py, k) {
-    //Transition to center on x/y (pixel coords) at scale level k
-    svg.transition().duration(750).call(
-        myzoom.transform,
-        d3.zoomIdentity
-            .translate(width / 2, height / 2)
-            .scale(k)
-            .translate(-px, -py));
+function zoomEnd() {
+	//d3.event.stopPropagation();
+	const tx = getTransform()
+	const k = tx.k;
+	const newZoom = zScale(k)
+    
+	//replot labels
+	
+	
+    if (newZoom !== lastZoomLevel) {// handle zoom changes
+        const bbox = getBbox(tx);
+        // var data = payload[newZoom];
+        console.log('Setting new zoom level ' + newZoom + ' ' + k);
+
+        //animateClusters(data, bbox, currentZoom, newZoom);
+		animateClusters(lastZoomLevel, newZoom);
+        lastZoomLevel = newZoom;
+		
+    }
+	// seemed the best place for this. ugly, but trigger new labels after pan motion completes (NOT TICK BY TICK DURING PAN)
+	const lvl = zScale(k)
+	const applyLabels = clusterOrMovie(applyLabelsMovies,applyLabelsClusters,lvl)
+	applyLabels()
+	
+	/* TODO: DELETE ME
+    g.call(tip);
+    g.selectAll('.scatter')
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+	*/
+	
 }
+
+
+function zoomed() {
+    d3.select(".d3-tip").remove();
+    // actions to take when zoom events triggered (largely mangaging zoom animation calls)
+    const tx = d3.event.transform;
+    g.attr("transform", tx);
+	svg.call(tip);
+	
+	
+}
+
+
+
 
 function resetZoom() {
     //Gets us back to default zoom
-    centerOnElement(width / 2, height / 2, 1)
+	g.attr("transform",d3.zoomIdentity)
+    drawGrapth();
 }
 
 
-function getViewport(center, k) {
-    // gets bbox of viewport centered on x,y, at zoom level k
-    //returns bbox in x/y space
-    const x = center.x;
-    const y = center.y;
-    const px = xScale(x);
-    const py = yScale(y);
-    const t = d3.zoomIdentity
-        .translate(width / 2, height / 2)
-        .scale(k)
-        .translate(-px, -py);
-    //console.log(t)
-    return getBbox(t);
-
-}
-
-function getPtBbox(pts) {
-    //given list pts (as IDs), find a bounding box for them at each level of zoom
-    //returns x,y,k to center on the target points, in pixel space
-
-    // Start with getting a bbox in x/y
-    const movies = payload[5];
-    const indices = pts.map(x => decoder[x]);
-    const objs = [];
-    indices.forEach(i => objs.push(movies[i]));
-    const levelCoords = {};
-    const centers = {};
-    for (let lvl = 0; lvl < 6; lvl++) {
-        levelCoords[lvl] = objs.map(function (d) {
-            return {x: d['L' + lvl + 'x'], y: d['L' + lvl + 'y']}
-        });
-        let xs = levelCoords[lvl].map(d => d.x);
-        let ys = levelCoords[lvl].map(d => d.y);
-        centers[lvl] = {x: (d3.max(xs) + d3.min(xs)) / 2, y: (d3.max(ys) + d3.min(ys)) / 2}
-    }
-
-    console.log(levelCoords);
-    console.log(centers);
-    // Test zoom levels
-    let best = {x: centers[0].x, y: centers[0].y, k: 1};
-    for (let k = 1.5; k < zoomParams.maxZoom; k++) {
-
-        let zoomLevel = zScale(k);
-        //console.log('checking k='+k+' zoomlevel='+zoomLevel)
-        let levelCoord = levelCoords[zoomLevel];
-        let center = centers[zoomLevel];
-        let bbox = getViewport(center, k);
-        //console.log(bbox)
-        //console.log(levelCoord)
-        // let debug = levelCoord.forEach(foo => inBbox(foo, bbox));
-        //console.log(debug)
-        if (levelCoord.every(d => inBbox(d, bbox))) {
-            best = {x: center.x, y: center.y, k: k}
-        }
-
-    }
-    return best;
-}
-
-function getPtsClusterIDatLevel(pts, level) {
-    //at a given zoom level, get the cluster IDs for each point in pts
-    const tmp = getPtBbox(pts);
-    const movies = payload[5];
-    const levelStr = 'L' + zScale(tmp.k);
-    const indices = pts.map(x => decoder[x]);
-    const objs = [];
-    indices.forEach(i => objs.push(movies[i]));
-    return objs.map(d => d[levelStr]);
-}
-
-function highlightAndCenter(pts) {
-    //given a list of movie IDs in points, highlight the clusters containing these things and center screen on them
-    const ptBox = getPtBbox(pts);
-    const level = zScale(ptBox.k);
-    const clusters = getPtsClusterIDatLevel(pts, level);
-    console.log('ptbox', ptBox);
-
-    centerOnElement(xScale(ptBox.x), yScale(ptBox.y), ptBox.k);
-    if (level < 5) {
-        d3.selectAll('.scatter')
-            .attr('class', function (d) {
-                if (clusters.includes(d.ID)) {
-                    return "scatter selected"
-                } else {
-                    return "scatter"
-                }
-            })
-    } else {
-        d3.selectAll('.scatter')
-            .attr('class', function (d) {
-                if (pts.includes(d[MOVIE_ID])) {
-                    return "scatter selected"
-                } else {
-                    return "scatter"
-                }
-            })
-
-    }
 
 
-}
+
+
+
 
 function array2list(str) {
     const arr = JSON.parse(str);
@@ -412,58 +574,6 @@ function tipoff(d) {
 
 }
 
-function applyLabelsClusters() {
-    // hack to just put labels on all nodes
-    const k = d3.zoomTransform(svg.node()).k;
-    const lvl = zScale(k);
-    let clusterLabel1 = function (d) {
-        return JSON.parse(d[GENRES]).slice(0, 2).map(x => x[0]).join('/') + ', with';
-    };
-    let clusterLabel2 = function (d) {
-        return JSON.parse(d[ACTORS]).slice(0, 2).map(x => x[0]).join(' & ');
-    };
-    //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
-    g.selectAll('nodeLabels')
-        .data(payload[lvl])
-        .enter()
-        .append("svg:text")
-        .attr("x", d => xScale(d.x))
-        .attr("y", d => yScale(d.y) - (zoomParams[lvl].r * 1.5))
-        .attr("class", "labels lvl" + lvl)
-        .text(clusterLabel1)
-        .style("font-size", (zoomParams[lvl].r / 2) + 'px')
-        .attr('text-anchor', 'middle');
-
-    g.selectAll('nodeLabels')
-        .data(payload[lvl])
-        .enter()
-        .append("svg:text")
-        .attr("x", d => xScale(d.x))
-        .attr("y", d => yScale(d.y) - (zoomParams[lvl].r * 1))
-        .attr("class", "labels lvl" + lvl)
-        .text(clusterLabel2)
-        .style("font-size", (zoomParams[lvl].r / 2) + 'px')
-        .attr('text-anchor', 'middle')
-
-}
-
-function applyLabelsMovies() {
-    // hack to just put labels on all nodes
-
-    //https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
-    g.selectAll('nodeLabels')
-        .data(data)
-        .enter()
-        .append("svg:text")
-        .attr("x", d => xScale(d.x))
-        .attr("y", d => yScale(d.y) - (zoomParams[5].r * 1.5))
-        .text(d => d[MOVIE_TITLE])
-        .attr("class", "labels lvl5")
-        .style("font-size", (zoomParams[5].r / 2) + 'px')
-        .attr('text-anchor', 'middle')
-
-
-}
 
 function abstractPathDraw(edge) {
     let dx = xScale(edge.target.x) - xScale(edge.source.x),
@@ -594,28 +704,3 @@ function drawHistory() {
     }
 }
 
-
-function zoomed() {
-    d3.select(".d3-tip").remove();
-    // actions to take when zoom events triggered (largely mangaging zoom animation calls)
-    const tx = d3.event.transform;
-    g.attr("transform", tx);
-    const k = d3.event.transform.k;
-    const newZoom = zScale(k);
-    // var r;
-    // tmp = newZoom;
-
-    // handle zoom changes
-    if (newZoom !== currentZoom) {
-        const bbox = getBbox(tx);
-        // var data = payload[newZoom];
-        console.log('Setting new zoom level ' + newZoom + ' ' + k);
-
-        animateClusters(data, bbox, currentZoom, newZoom);
-        currentZoom = newZoom;
-    }
-    g.call(tip);
-    g.selectAll('.scatter')
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide)
-}
