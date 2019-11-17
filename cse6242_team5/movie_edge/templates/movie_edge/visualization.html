@@ -262,7 +262,7 @@
         .extent([[0, 0], [width, height]])
         .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
         .on("zoom", zoomed)
-		.on("end",zoomEnd)
+		.on("end",zoomEnd);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
     tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');

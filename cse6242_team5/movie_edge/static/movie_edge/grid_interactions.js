@@ -80,7 +80,7 @@ function closurePlotGoTo(movieID) {
 function gridMovies(movieidList) {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
-    drawGraph(true)
+    drawGraph(true);
 	svg.call(tip);
     // highlightAndCenter(movieidList);
     // highlightAndCenter(movieidList.concat([currentMovie]));
@@ -110,7 +110,7 @@ function gridMovies(movieidList) {
         grid.removeChild(grid.firstChild);
     }
     // https://stackoverflow.com/questions/2735881/adding-images-to-an-html-document-with-javascript
-    currentGrid = movieidList;
+    currentGrid = movieidList.map(x => parseInt(x));
     movieidList.map(x => gridHistorySet.add(x));
     movieidList.forEach(function (movieId) {
             const dataIndex = decoder[movieId];
