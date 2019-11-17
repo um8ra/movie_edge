@@ -213,12 +213,16 @@ def index_data() -> str:
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    key = 'index'
-    if memcache.get(key) is not None:
-        data_json = memcache[key]
-    else:
-        data_json = index_data()
-        memcache[key] = data_json
+    # caching prevents index page reload to get new movies in grid
+
+    # key = 'index'
+    # if memcache.get(key) is not None:
+    #     data_json = memcache[key]
+    # else:
+    #     data_json = index_data()
+    #     memcache[key] = data_json
+
+    data_json = index_data()
 
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
