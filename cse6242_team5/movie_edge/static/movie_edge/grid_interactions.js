@@ -80,7 +80,6 @@ function closurePlotGoTo(movieID) {
 function gridMovies(movieidList) {
     // const k = d3.zoomTransform(svg.node()).k;
     // const lvl = zScale(k);
-    drawGraph(true);
     svg.call(tip);
     // highlightAndCenter(movieidList);
     // highlightAndCenter(movieidList.concat([currentMovie]));
@@ -145,7 +144,8 @@ function gridMovies(movieidList) {
             // divNode.appendChild(buttonShowMe);
             // console.log(movieId);
         }
-    )
+    );
+    drawGraph(true);
 }
 
 function buttonClickLike(data) {
@@ -197,9 +197,9 @@ function buttonClickDislike(data) {
 }
 
 function findMovie(formBox) {
-    matchString = formBox[0].value;
+    const matchString = formBox[0].value;
     const re = new RegExp(matchString, 'i');
-    stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
+    const stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
     if (Array.isArray(stringMatches) && stringMatches.length > 0){
         highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
     }
