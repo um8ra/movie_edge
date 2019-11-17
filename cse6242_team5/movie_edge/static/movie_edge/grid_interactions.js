@@ -70,10 +70,10 @@ function closurePlotGoTo(movieID) {
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
     function plotGoTo() {
+        console.log('PlotGoTo Current Movie: ', movieID);
         currentMovie = movieID;
         highlightAndCenterSingle(movieID);
     }
-
     return plotGoTo;
 }
 
@@ -197,11 +197,11 @@ function buttonClickDislike(data) {
 }
 
 function findMovie(formBox) {
-    matchString = formBox.children[0].value;
+    matchString = formBox[0].value;
     const re = new RegExp(matchString, 'i');
     stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
-    console.log('Matches in SearchBox: ');
-    console.log(stringMatches);
-    highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
+    if (Array.isArray(stringMatches) && stringMatches.length > 0){
+        highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
+    }
     formBox.reset();
 }
