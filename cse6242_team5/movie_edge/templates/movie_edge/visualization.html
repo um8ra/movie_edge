@@ -240,7 +240,6 @@
         plot_height: plotHeight - 120,
     });
     p.add_tools(hover);
-
     p.legend.click_policy = 'hide';
 
     // call the circle glyph method to add some circle glyphs
@@ -257,6 +256,7 @@
         {field: MOVIE_TITLE},
         {
             source: source,
+            legend: 'Click to enable movie titles'
         },
     );
     text.visible = false;
