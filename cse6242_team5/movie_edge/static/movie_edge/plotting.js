@@ -601,7 +601,7 @@ function abstractPathDraw(edge) {
 function drawArcs() {
     // draws arcs from current movie to each item in curerntGrid
 
-    const k = d3.zoomTransform(svg.node()).k;
+    const k = getTransform().k;
     const lvl = zScale(k);
 
     function innerDrawArcs(currentMovieLoc, currentGridLoc) {

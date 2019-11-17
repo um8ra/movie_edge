@@ -80,10 +80,10 @@ function closurePlotGoTo(movieID) {
 function gridMovies(movieidList) {
     const k = d3.zoomTransform(svg.node()).k;
     const lvl = zScale(k);
-    drawGraph()
+    drawGraph(true)
 	svg.call(tip);
     // highlightAndCenter(movieidList);
-    highlightAndCenter(movieidList.concat([currentMovie]));
+    // highlightAndCenter(movieidList.concat([currentMovie]));
 
     // const ratio = 1.48;
     const divHeight = document.getElementById("grid").offsetHeight;
