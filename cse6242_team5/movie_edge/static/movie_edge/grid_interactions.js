@@ -202,7 +202,9 @@ function findMovie(formBox) {
     const re = new RegExp(matchString, 'i');
     const stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
     if (Array.isArray(stringMatches) && stringMatches.length > 0) {
-        highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
+        movieID = stringMatches[0][MOVIE_ID]
+        currentMovie = parseInt(movieID);
+        highlightAndCenterSingle(movieID);
     }
     formBox.reset();
 }

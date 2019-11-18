@@ -7,8 +7,20 @@ function inputFormatCluster(r) { // Decodes cluster data
 function highlight(ids) { //flags all nodes with ID in ids
     const H = getTransform();
     const lvl = zScale(H.k);
-    d3.selectAll('.scatter')
-        .attr("class", d => ids.includes(d.ID) ? "scatter selected" : "scatter")
+    const centerID = moviesToLevelID([currentMovie], lvl)[0];
+
+    // d3.selectAll('.scatter')
+    //     .attr("class", d => ids.includes(d.ID) ? "scatter selected" : "scatter")
+
+    d3.selectAll('.scatter').attr("class", function(d) {
+        if (d.ID === centerID) {
+            return "scatter selected2";
+        } else if (ids.includes(d.ID)) {
+            return "scatter selected";
+        } else {
+            return 'scatter';
+        }
+    });
 }
 
 function toggleHighlight() { // if node is selected unselect, else select
@@ -171,9 +183,20 @@ function highlightAndCenterSingle(id) { //highlights a movie (not toggle) and ce
     const k = transform.k;
     const lvl = zScale(k);
     const centerID = moviesToLevelID([id], lvl)[0];
+    const gridIDs = moviesToLevelID(currentGrid, lvl);
 
-    // mark the point
-    d3.selectAll('.scatter').attr("class", d => d.ID === centerID ? "scatter selected" : 'scatter');
+    // mark the point, keep others in currentGrid in original highlight
+    // d3.selectAll('.scatter').attr("class", d => d.ID === centerID ? "scatter selected2" : 'scatter');
+
+    d3.selectAll('.scatter').attr("class", function(d) {
+        if (d.ID === centerID) {
+            return "scatter selected2";
+        } else if (gridIDs.includes(d.ID)) {
+            return "scatter selected";
+        } else {
+            return 'scatter';
+        }
+    });
 
     const row = payload[5][decoder[id]]; // information
     const px = xScale(row['L' + lvl + 'x']);
