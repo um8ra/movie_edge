@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Edge</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png"/>
+    <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/grid_interactions_no_graphic.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
+    <style>
+        .grid {
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat(5, 17%);
+            grid-template-rows: repeat(2, 40%);
+            grid-auto-flow: column;
+            width: 100%;
+            height: 100%;
+            float: left;
+            position: relative;
+        }
+
+        .buttonSubmit {
+            height: 80px;
+            width: 150px;
+        }
+
+        .buttonGetRandom {
+            height: 80px;
+            width: 150px;
+        }
+
+        .buttonReset {
+            height: 80px;
+            width: 75px;
+        }
+
+        .searchForm {
+            height: 80px;
+            width: 200px;
+            color: white;
+        }
+
+        .graph {
+            width: calc(100% - 150px);
+            height: 100%;
+            float: right;
+            background: darkgray;
+            position: relative;
+        }
+
+        .history {
+            stroke: orange;
+
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden
+        }
+
+        .scatter {
+            stroke: grey;
+        }
+
+        .selected.scatter {
+            stroke: red;
+        }
+
+        .selected2 {
+            stroke: orange
+        }
+
+        .box {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+            background: red;
+        }
+
+        .topL {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 90px;
+            width: 400px;
+            vertical-align: center;
+            horiz-align: center;
+        }
+
+        .topR {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            left: 400px;
+            height: 90px;
+            width: calc(100% - 400px);
+            vertical-align: center;
+            horiz-align: center;
+        }
+
+        .left-half {
+            background-color: black;
+            position: absolute;
+            left: 0;
+            top: 90px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .d3-tip {
+            max-width: 300px;
+            max-height: 600px;
+            overflow: hidden;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .smallImg {
+            height: 33%;
+            width: 33%;
+        }
+
+        button {
+            background-color: white;
+        }
+
+        .screen-title {
+            /*vertical-align: center;*/
+            text-align: center;
+            font-size: 200%;
+            color: white;
+        }
+
+        .input-label {
+            white-space: nowrap;
+            font-size: 125%;
+        }
+
+    </style>
+</head>
+<body>
+<div class="topL" id="buttons">
+    <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
+        Click for recommendations
+    </button>
+    <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
+        Click for random suggestions
+    </button>
+</div>
+<div class="topR" id="title">
+    <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
+</div>
+
+<!--https://gridbyexample.com/examples/code/example18.html-->
+<div class="container">
+    <div class="box">
+        <div class="left-half grid" id="grid"></div>
+    </div>
+</div>
+
+{#Begin: super necessary! Else, disable CSRF Protection in views.py #}
+{% csrf_token %}
+{#End: super necessary! Else, disable CSRF Protection in views.py #}
+<script>
+
+    //stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-mobile-device
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        alert('This site is optimized for laptop/desktop computers, we strongly recommend against a mobile device browser')
+    }
+
+    // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
+    const tableData = JSON.parse('{{ table_data|safe }}');
+    const payload = tableData.payload;
+
+    console.log(tableData);
+    const x_min = parseFloat(tableData['x__min']);
+    const x_max = parseFloat(tableData['x__max']);
+    const y_min = parseFloat(tableData['y__min']);
+    const y_max = parseFloat(tableData['y__max']);
+    const decoder = tableData['decoder'];
+    const width = window.innerWidth; //0.7 *
+    const height = window.innerHeight;
+    const data = payload[5].map(inputFormat);
+
+    const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+    currentGrid = tableData[MOVIE_CHOICES];
+    //var currentMovie;
+
+    gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
+
+</script>
+</body>
+</html>

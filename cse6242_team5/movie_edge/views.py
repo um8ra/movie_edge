@@ -226,6 +226,19 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
 
+def index_no_graphic(request: HttpRequest) -> HttpResponse:
+    key = 'index'
+    if memcache.get(key) is not None:
+        data = memcache[key]
+        data[MOVIE_CHOICES] = random_popular_movie_ids(10, set())
+    else:
+        data = index_data()
+        memcache[key] = data
+
+    data_json = json.dumps(data)
+    return render(request, 'movie_edge/grid_only.html',
+                  {'table_data': data_json})
+
 
 def query_recommendations(request: HttpRequest, topn=10) -> JsonResponse:
     # Making sure model data is fine
