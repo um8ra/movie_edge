@@ -74,6 +74,7 @@ function closurePlotGoTo(movieID) {
         currentMovie = parseInt(movieID);
         highlightAndCenterSingle(movieID);
     }
+
     return plotGoTo;
 }
 
@@ -84,9 +85,14 @@ function closurePlotGoToDeep(movieID) {
     function plotGoTo() {
         console.log('PlotGoTo Current Movie: ', movieID);
         currentMovie = parseInt(movieID);
-        lastZoomLevel = 5;
-        highlightAndCenter([movieID]);
+        if (lastZoomLevel === 5) {
+            highlightAndCenterSingle(movieID);
+        } else {
+            lastZoomLevel = 5;
+            highlightAndCenter([movieID]);
+        }
     }
+
     return plotGoTo;
 }
 
@@ -214,7 +220,7 @@ function findMovie(formBox) {
     const matchString = formBox[0].value;
     const re = new RegExp(matchString, 'i');
     const stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
-    if (Array.isArray(stringMatches) && stringMatches.length > 0){
+    if (Array.isArray(stringMatches) && stringMatches.length > 0) {
         highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
     }
     formBox.reset();
