@@ -38,7 +38,11 @@ function getTransform() { // returns a d3 zoom transform object representing cur
 }
 
 function moviesToLevelID(movies, lvl) {// returns list of cluster ids at lvl corresponding to movies
-    const lvl_name = 'L' + lvl;
+    // const lvl_name = 'L' + lvl;
+
+    // sample check: 'ID' does not match with 'L5' attr for payload[5][0]
+    // Changing to next line fixes node highlights at L5.
+    const lvl_name = lvl === 5 ? 'ID' : 'L' + lvl;
     const movie_info = payload[5];
     return movies.map(x => movie_info[decoder[x]][lvl_name])  // decoder[x] => index of element, movie_info[?] => row of movie , we're getting the element L<lvl>
 }
@@ -258,7 +262,8 @@ function drawGraph(center) { //Redraw plot. if center is truthy, highlight/cente
     const data = payload[lvl];
     let moviesToHighlight = currentGrid.slice();
     moviesToHighlight.push(currentMovie);
-    const clusters2Highlight = moviesToLevelID(moviesToHighlight, lvl);
+    // Next line isn't used anymore.
+    // const clusters2Highlight = moviesToLevelID(moviesToHighlight, lvl);
 
     console.log('reset graph', transform);
     // remove current graph
