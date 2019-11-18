@@ -117,7 +117,7 @@ function gridMovies(movieidList) {
             // console.log(dataIndex);
             const divNode = document.createElement('div');
             const imgNode = document.createElement('img');
-
+            const spanNode = document.createElement('span')
             const buttonLike = document.createElement('BUTTON');
             buttonLike.innerText = 'Like';
             buttonLike.onclick = buttonClickLike;
@@ -140,10 +140,16 @@ function gridMovies(movieidList) {
             imgNode.onclick = closurePlotGoTo(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
+
+            spanNode.className = 'likeDislikeSpan';
+            spanNode.appendChild(buttonLike);
+            spanNode.appendChild(buttonDislike);
             grid.appendChild(divNode);
             divNode.appendChild(imgNode);
-            divNode.appendChild(buttonLike);
-            divNode.appendChild(buttonDislike);
+            divNode.appendChild(spanNode);
+
+            // divNode.appendChild(buttonLike);
+            // divNode.appendChild(buttonDislike);
             // divNode.appendChild(buttonShowMe);
             // console.log(movieId);
         }
