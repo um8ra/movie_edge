@@ -90,27 +90,17 @@
             horiz-align: center;
         }
 
-        .topM {
+        .topR {
             background-color: dimgray;
             position: absolute;
             top: 0;
             left: 400px;
             height: 90px;
-            width: calc(100% - 675px);
+            width: calc(100% - 400px);
             vertical-align: center;
             horiz-align: center;
         }
 
-        .topR {
-            background-color: dimgray;
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 90px;
-            width: 275px;
-            vertical-align: center;
-            horiz-align: center;
-        }
 
         .left-half {
             background-color: black;
@@ -170,22 +160,9 @@
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
     </button>
-    <button class="buttonReset" type="button" onclick="resetZoom()">
-        Reset Zoom
-    </button>
 </div>
-<div class="topM" id="title">
+<div class="topR" id="title">
     <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
-</div>
-<div class="topR" id="searchbox">
-    <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
-        <p>
-            <!--            <label>-->
-            <input name="movieRegex" type="text" size="20">
-            <text class="input-label">Movie Name</text>
-            <!--            </label>-->
-        </p>
-    </form>
 </div>
 
 <!--https://gridbyexample.com/examples/code/example18.html-->
