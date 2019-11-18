@@ -12,7 +12,7 @@
         .grid {
             display: grid;
             grid-gap: 10px;
-            grid-template-columns: repeat(5, 17%);
+            grid-template-columns: repeat(5, 300px);
             grid-template-rows: repeat(2, 40%);
             grid-auto-flow: column;
             width: 100%;
@@ -129,7 +129,7 @@
 
         .screen-title {
             /*vertical-align: center;*/
-            text-align: center;
+            text-align: left;
             font-size: 200%;
             color: white;
         }
@@ -138,6 +138,18 @@
             white-space: nowrap;
             font-size: 125%;
         }
+
+        .likeDislikeSpan {
+            display: inline-block;
+        }
+
+        .buttonLike {
+            width: 80px;
+        }
+        .buttonDislike {
+            width: 120px;
+        }
+
 
     </style>
 </head>
@@ -151,7 +163,7 @@
     </button>
 </div>
 <div class="topR" id="title">
-    <h1 class="screen-title">Welcome to Movie Edge - Click a Movie to find it in the Taste Space</h1>
+    <h1 class="screen-title">Welcome to Movie Edge</h1>
 </div>
 
 <!--https://gridbyexample.com/examples/code/example18.html-->
