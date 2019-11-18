@@ -27,21 +27,29 @@
         .buttonSubmit {
             height: 80px;
             width: 150px;
+            position: relative;
+            top: 0%;
         }
 
         .buttonGetRandom {
             height: 80px;
             width: 150px;
+            position: relative;
+            top: 0%;
         }
 
         .buttonReset {
             height: 80px;
             width: 75px;
+            position: relative;
+            top: 0%;
         }
 
         .buttonZoom {
             height: 80px;
-            width: 75px;
+            width: 100px;
+            position: relative;
+            top: 0%;
         }
 
         .searchForm {
@@ -93,18 +101,19 @@
             top: 0;
             left: 0;
             height: 90px;
-            width: 475px;
-            vertical-align: center;
-            horiz-align: center;
+            width: 500px;
+            text-align: center;
+            /*vertical-align: center;*/
+            /*horiz-align: center;*/
         }
 
         .topM {
             background-color: dimgray;
             position: absolute;
             top: 0;
-            left: 475px;
+            left: 500px;
             height: 90px;
-            width: calc(100% - 750px);
+            width: calc(100% - 775px);
             vertical-align: center;
             horiz-align: center;
         }
@@ -171,7 +180,7 @@
     </style>
 </head>
 <body>
-<div class="topL" id="buttons">
+<div class="topL" id="buttons" >
     <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
         Click for recommendations
     </button>
@@ -182,7 +191,7 @@
         Reset Zoom
     </button>
     <button class="buttonZoom" type="button" onclick="highlightAndCenter([currentMovie])">
-        Zoom to movies
+        Zoom To Movies
     </button>
 </div>
 <div class="topM" id="title">
