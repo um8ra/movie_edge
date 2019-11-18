@@ -78,24 +78,6 @@ function closurePlotGoTo(movieID) {
     return plotGoTo;
 }
 
-function closurePlotGoToDeep(movieID) {
-    // movieID isn't actually passed to plotGoTo
-    // but since it's a closure, plotGoTo understands the
-    // scope it was *created* in!
-    function plotGoTo() {
-        console.log('PlotGoTo Current Movie: ', movieID);
-        currentMovie = parseInt(movieID);
-        if (lastZoomLevel === 5) {
-            highlightAndCenterSingle(movieID);
-        } else {
-            lastZoomLevel = 5;
-            highlightAndCenter([movieID]);
-        }
-    }
-
-    return plotGoTo;
-}
-
 function gridMovies(movieidList) {
     // const k = d3.zoomTransform(svg.node()).k;
     // const lvl = zScale(k);
@@ -154,7 +136,6 @@ function gridMovies(movieidList) {
             imgNode.alt = movieTitle;
             imgNode.title = movieTitle;
             imgNode.onclick = closurePlotGoTo(movieId);
-            imgNode.ondblclick = closurePlotGoToDeep(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
             grid.appendChild(divNode);

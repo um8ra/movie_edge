@@ -39,6 +39,11 @@
             width: 75px;
         }
 
+        .buttonZoom {
+            height: 80px;
+            width: 75px;
+        }
+
         .searchForm {
             height: 80px;
             width: 200px;
@@ -88,7 +93,7 @@
             top: 0;
             left: 0;
             height: 90px;
-            width: 400px;
+            width: 475px;
             vertical-align: center;
             horiz-align: center;
         }
@@ -97,9 +102,9 @@
             background-color: dimgray;
             position: absolute;
             top: 0;
-            left: 400px;
+            left: 475px;
             height: 90px;
-            width: calc(100% - 675px);
+            width: calc(100% - 750px);
             vertical-align: center;
             horiz-align: center;
         }
@@ -175,6 +180,9 @@
     </button>
     <button class="buttonReset" type="button" onclick="resetZoom()">
         Reset Zoom
+    </button>
+    <button class="buttonZoom" type="button" onclick="highlightAndCenter([currentMovie])">
+        Zoom to movies
     </button>
 </div>
 <div class="topM" id="title">
