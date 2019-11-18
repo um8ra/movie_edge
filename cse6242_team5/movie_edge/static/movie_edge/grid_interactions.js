@@ -123,12 +123,14 @@ function gridMovies(movieidList) {
             buttonLike.onclick = buttonClickLike;
             buttonLike.value = movieId;
             buttonLike.id = 'LikeBtn_' + movieId;
+            buttonLike.className = 'buttonLike';
 
             const buttonDislike = document.createElement('BUTTON');
             buttonDislike.innerText = 'Dislike';
             buttonDislike.onclick = buttonClickDislike;
             buttonDislike.value = movieId;
             buttonDislike.id = 'DislikeBtn_' + movieId;
+            buttonDislike.className = 'buttonDislike';
 
             const thisMovieData = data[dataIndex];
             const movieTitle = thisMovieData[MOVIE_TITLE];
