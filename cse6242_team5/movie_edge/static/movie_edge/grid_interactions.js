@@ -187,6 +187,7 @@ function buttonClickLike(data) {
         theButton.style('background', 'green');
         theButton.style('color', 'white');
     }
+    highlight([currentMovie]); // selected, uncertain, liked, disliked, vs ingrid
     console.log('Liked: ', moviesLikedSet);
     console.log('Disiked: ', moviesDislikedSet);
 }
@@ -211,6 +212,7 @@ function buttonClickDislike(data) {
         theButton.style('background', 'red');
         theButton.style('color', 'white');
     }
+    highlight([currentMovie]); // selected, uncertain, liked, disliked, vs ingrid
     console.log('Liked: ', moviesLikedSet);
     console.log('Disiked: ', moviesDislikedSet);
 }
