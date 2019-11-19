@@ -505,7 +505,8 @@ function selectHighlight() {//selects node and centers
     d3.event.stopPropagation();
     //d3.selectAll('.scatter').attr('class', 'scatter');
     if (d3.select(this).attr('class').includes('scatter')) {
-        d3.select(this).attr('class', 'scatter selected');
+        highlight([currentMovie]); // reset highlights, otherwise multiple selected2
+        d3.select(this).attr('class', 'scatter selected2');
         const px = d3.select(this).attr("cx");
         const py = d3.select(this).attr("cy");
         const k = getTransform().k;
