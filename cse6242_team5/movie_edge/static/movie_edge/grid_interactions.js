@@ -150,7 +150,14 @@ function gridMovies(movieidList) {
             imgNode.ondblclick = closurePlotGoTo(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
-
+			
+			// Don't know why these classes are getting added but no effect?
+			imgNode.classList.add("poster");
+			if (movieId === currentMovie){
+				imgNode.classList.add("selected");
+			} 
+			//imgNode.style.border='2px solid #FFF';
+			
             spanNode.className = 'likeDislikeSpan';
             spanNode.appendChild(buttonLike);
             spanNode.appendChild(buttonDislike);

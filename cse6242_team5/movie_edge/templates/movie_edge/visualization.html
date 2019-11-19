@@ -83,7 +83,6 @@
 
         .history {
             stroke: orange;
-
         }
 
         body {
@@ -98,9 +97,15 @@
         .selected.scatter {
             stroke: blue;
         }
+		.poster {
+			border: 3px solid steelblue;
+		}
+		.selected.poster {
+			border: 3px solid blue;
+		}
 
         .uncertain.scatter {
-            stroke: orange;
+            stroke: #e34a33;
         }
 
         .liked.scatter {
@@ -112,7 +117,7 @@
         }
 
         .ingrid.scatter {
-            stroke: black;
+            stroke: steelblue;
         }
 
         .selected2.scatter {
@@ -272,8 +277,8 @@
     const y_min = parseFloat(tableData['y__min']);
     const y_max = parseFloat(tableData['y__max']);
     const decoder = tableData['decoder'];
-    const width = window.innerWidth; //0.7 *
-    const height = window.innerHeight;
+    const width = window.innerWidth -230;
+    const height = window.innerHeight-70;
     const data = payload[5].map(inputFormat);
     payload[5] = data;
     payload[0] = payload[0].map(inputFormatCluster);
@@ -339,7 +344,7 @@
     console.log('tip called')*/
     tip.offset(tipoff);
     tip.direction(tipdir);
-
+	drawLegend()	
 </script>
 </body>
 </html>

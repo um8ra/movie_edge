@@ -504,15 +504,26 @@ function selectHighlight() {//selects node and centers
 
     d3.event.stopPropagation();
     //d3.selectAll('.scatter').attr('class', 'scatter');
+	let tmp =  d3.select(this).ID
+	const lvl = zScale(getTransform().k)
+	if (lvl === 5){
+		console.log(d3.select(this).data()[0])
+		currentMovie = d3.select(this).data()[0]['movie_id']
+		tmp = currentMovie
+	}
+	
     if (d3.select(this).attr('class').includes('scatter')) {
-        highlight([currentMovie]); // reset highlights, otherwise multiple selected2
-        d3.select(this).attr('class', 'scatter selected2');
+        highlight([tmp]); // reset highlights, otherwise multiple selected2
+        //d3.select(this).attr('class', 'scatter selected2');
         const px = d3.select(this).attr("cx");
         const py = d3.select(this).attr("cy");
         const k = getTransform().k;
         console.log(px, py, k);
         centerOnElement(px, py, k * 1.3);
     }
+	
+	
+	
     /*
     if ('movie_id' in d3.select(this)) {
         currentMovie = d3.select(this).movie_id;
@@ -542,7 +553,6 @@ function tipoff(d) {
 
     return out;
 }
-
 
 function abstractPathDraw(edge) {
     let dx = xScale(edge.target.x) - xScale(edge.source.x),
@@ -673,3 +683,109 @@ function drawHistory() {
     }
 }
 
+function drawLegend(){ // renders legend
+	const frac = 0.67
+	
+	const canvasW = (width-2*padding)
+	const canvasH = (height-2*padding)
+	const legendW = canvasW * (1-frac)
+	const legendH = canvasH * (1-frac)
+	const leg = svg.append('g')
+				.attr('transform','translate('+canvasW*frac+','+canvasH*frac+')');
+	const legBG = leg.append('rect')
+	.attr('height',legendH)
+	.attr('width',legendW)
+	.style('stroke','grey')
+	.style('fill','white')
+	const boxSize = (legendW-40)/11
+	const legTitle = leg.append('text')
+					.text('IMDB Rating')
+					.attr('alignment-baseline','hanging' )
+					.attr('x',boxSize*0.25)
+					.attr('y',boxSize*0.25)
+					.style('font-size',0.5*boxSize+'px')
+	const legBoxes = [0,10,20,30,40,50,60,70,80,90,100]
+	let i = 0
+	
+	for (i=0; i<11; i++){
+		let x = i*boxSize + 20
+		let y = boxSize
+		leg.append('rect')
+			.attr('height',boxSize)
+			.attr('width',boxSize)
+			.attr('x',x)
+			.attr('y',y)
+			.style('fill',colorScale(legBoxes[i]/10))
+		if (i === 0 || !!(i && !(i%2))){
+			leg.append('text')
+			.attr('x',x)
+			.attr('y',y+boxSize*1.3)
+			.text((legBoxes[i]/10).toFixed(2))
+			.attr('alignment-baseline','hanging' )
+			.style('font-size',0.4*boxSize+'px')
+		}
+	}
+	
+	leg.append('circle')
+		.attr('cx',20+boxSize/2)
+		.attr('cy',boxSize*3.5)
+		.attr('r',boxSize/2)
+		.style('stroke','blue')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*3.5).text('Selected')
+		.attr('x',20+boxSize*1.3)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+	leg.append('circle')
+		.attr('cx',20+boxSize/2)
+		.attr('cy',boxSize*5.0)
+		.attr('r',boxSize/2)
+		.style('stroke','steelblue')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*5.0).text('Recommended')
+		.attr('x',20+boxSize*1.3)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+	leg.append('circle')
+		.attr('cx',legendW/3+20+boxSize/2)
+		.attr('cy',boxSize*3.5)
+		.attr('r',boxSize/2)
+		.style('stroke','darkgreen')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*3.5).text('Liked')
+		.attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+	leg.append('circle')
+		.attr('cx',legendW/3+20+boxSize/2)
+		.attr('cy',boxSize*5)
+		.attr('r',boxSize/2)
+		.style('stroke','red')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*5).text('Disliked')
+		.attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+		
+	leg.append('circle')
+		.attr('cx',2*legendW/3+20+boxSize/2)
+		.attr('cy',boxSize*3.5)
+		.attr('r',boxSize/2)
+		.style('stroke','#e34a33')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*3.5).text('Mixed')
+		.attr('x',20+2*legendW/3+boxSize*0.8+boxSize/2)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+	
+}
