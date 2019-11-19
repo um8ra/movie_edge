@@ -72,7 +72,17 @@ function closurePlotGoTo(movieID) {
     function plotGoTo() {
         console.log('PlotGoTo Current Movie: ', movieID);
         currentMovie = parseInt(movieID);
-        highlightAndCenterSingle(movieID);
+
+        const transform = getTransform();
+        const k = transform.k;
+        const lvl = zScale(k);
+
+        if (lvl === 5) {
+            highlightAndCenterSingle(movieID);
+        }
+        else {
+            highlightAndCenter([movieID]);
+        }
     }
 
     return plotGoTo;
@@ -137,7 +147,7 @@ function gridMovies(movieidList) {
             imgNode.src = thisMovieData[POSTER_URL];
             imgNode.alt = movieTitle;
             imgNode.title = movieTitle;
-            imgNode.onclick = closurePlotGoTo(movieId);
+            imgNode.ondblclick = closurePlotGoTo(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
 
