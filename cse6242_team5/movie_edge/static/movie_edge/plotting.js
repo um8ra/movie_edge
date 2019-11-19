@@ -503,23 +503,25 @@ function toolTipContents(d) { // selects contents of tooltip
 function selectHighlight() {//selects node and centers
 
     d3.event.stopPropagation();
-    //d3.selectAll('.scatter').attr('class', 'scatter');
-	let tmp =  d3.select(this).ID
+	
+	let tmp =  d3.select(this).data()[0].ID
 	const lvl = zScale(getTransform().k)
 	if (lvl === 5){
 		console.log(d3.select(this).data()[0])
 		currentMovie = d3.select(this).data()[0]['movie_id']
 		tmp = currentMovie
 	}
-	
+	console.log(tmp);
     if (d3.select(this).attr('class').includes('scatter')) {
-        highlight([tmp]); // reset highlights, otherwise multiple selected2
+        d3.select(this).attr('class', 'scatter selected2');
+		highlight([tmp]); // reset highlights, otherwise multiple selected2
         //d3.select(this).attr('class', 'scatter selected2');
         const px = d3.select(this).attr("cx");
         const py = d3.select(this).attr("cy");
         const k = getTransform().k;
         console.log(px, py, k);
         centerOnElement(px, py, k * 1.3);
+		console.log(tmp);
     }
 	
 	

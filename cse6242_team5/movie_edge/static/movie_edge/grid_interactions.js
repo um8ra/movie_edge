@@ -150,7 +150,9 @@ function gridMovies(movieidList) {
             imgNode.ondblclick = closurePlotGoTo(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
-			
+			const customID = 'ID'+thisMovieData['ID']
+			imgNode.classList.add(customID);
+			d3.select('.customID').datum(thisMovieData)
 			// Don't know why these classes are getting added but no effect?
 			imgNode.classList.add("poster");
 			if (movieId === currentMovie){
