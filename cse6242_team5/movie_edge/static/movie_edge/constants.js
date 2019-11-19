@@ -1,4 +1,4 @@
-const padding = 25;
+const padding = 25*0;
 const MOVIE_ID = 'movie_id';
 const MOVIE_TITLE = 'movie_title';
 const DIRECTOR = 'director';

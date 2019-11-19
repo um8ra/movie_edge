@@ -189,6 +189,10 @@
             border-radius: 10px;
             color: white;
         }
+		
+		.legendBox {
+			border-radius: 10px;
+		}
 
         .smallImg {
             height: 33%;
@@ -226,10 +230,10 @@
         Random Movies
     </button>
     <button class="buttonFullZoomUp" type="button" onclick="fullZoomUp()">
-        Full Zoom Up
+        Zoom out all the way
     </button>
     <button class="buttonDynamicZoom" type="button" onclick="dynamicZoom()">
-        Show Recommended
+        Center on Recommended
     </button>
     <button class="buttonZoomToMovie" type="button" onclick="highlightAndCenter([currentMovie])">
         Zoom To Selected
@@ -341,6 +345,7 @@
     tip.offset(tipoff);
     tip.direction(tipdir);
 	drawLegend()	
+	addHelpIcon()
 </script>
 </body>
 </html>
