@@ -222,7 +222,7 @@ function findMovie(formBox) {
     if (Array.isArray(stringMatches) && stringMatches.length > 0) {
         movieID = stringMatches[0][MOVIE_ID]
         currentMovie = parseInt(movieID);
-        highlightAndCenterSingle(movieID);
+        highlightAndCenter([movieID]);
     }
     formBox.reset();
 }
