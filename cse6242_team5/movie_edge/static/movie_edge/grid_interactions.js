@@ -224,7 +224,23 @@ function findMovie(formBox) {
     if (Array.isArray(stringMatches) && stringMatches.length > 0) {
         movieID = stringMatches[0][MOVIE_ID]
         currentMovie = parseInt(movieID);
-        highlightAndCenter([movieID]);
+
+        // highlightAndCenter([movieID]);
+
+        // Though highlightAndCenter([movieID]); is visually equivalent
+        // use lvl check as shown below, similar to closurePlotGoTo()
+        // '...Single' method avoids looping through L0 to L5 to find best
+        const transform = getTransform();
+        const k = transform.k;
+        const lvl = zScale(k);
+
+        if (lvl === 5) {
+            highlightAndCenterSingle(movieID);
+        }
+        else {
+            highlightAndCenter([movieID]);
+        }
+
     }
     formBox.reset();
 }
