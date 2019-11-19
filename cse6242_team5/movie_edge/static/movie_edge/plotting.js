@@ -428,7 +428,7 @@ function zoomed() { // apply zoom
 }
 
 function fullZoomUp() { // zoom all the way up to L0
-    centerOnElement(width/2, height/2, 1);
+    centerOnElement(width/2 + 90, height/2 + 60, 1);
 }
 
 function dynamicZoom() {//Resets zoom level and replots
