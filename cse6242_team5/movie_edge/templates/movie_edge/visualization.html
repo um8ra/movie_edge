@@ -39,14 +39,21 @@
             top: 0%;
         }
 
-        .buttonReset {
+        .buttonFullZoomUp {
             height: 60px;
-            width: 75px;
+            width: 90px;
             position: relative;
             top: 0%;
         }
 
-        .buttonZoom {
+        .buttonDynamicZoom {
+            height: 60px;
+            width: 85px;
+            position: relative;
+            top: 0%;
+        }
+
+        .buttonZoomToMovie {
             height: 60px;
             width: 100px;
             position: relative;
@@ -109,7 +116,7 @@
             top: 0;
             left: 0;
             height: 70px;
-            width: 500px;
+            width: 600px;
             text-align: center;
             /*vertical-align: center;*/
             /*horiz-align: center;*/
@@ -119,7 +126,7 @@
             background-color: dimgray;
             position: absolute;
             top: 0;
-            left: 500px;
+            left: 600px;
             height: 70px;
             width: calc(100% - 800px);
             vertical-align: center;
@@ -197,10 +204,13 @@
     <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
         Click for random suggestions
     </button>
-    <button class="buttonReset" type="button" onclick="resetZoom()">
-        Reset Zoom
+    <button class="buttonFullZoomUp" type="button" onclick="zoomToTop()">
+        Full Zoom Up
     </button>
-    <button class="buttonZoom" type="button" onclick="highlightAndCenter([currentMovie])">
+    <button class="buttonDynamicZoom" type="button" onclick="dynamicZoom()">
+        Dynamic Zoom
+    </button>
+    <button class="buttonZoomToMovie" type="button" onclick="highlightAndCenter([currentMovie])">
         Zoom To Movies
     </button>
 </div>

@@ -427,7 +427,10 @@ function zoomed() { // apply zoom
     svg.call(tip);
 }
 
-function resetZoom() {//Resets zoom level and replots
+function fullZoomUp() { // zoom all the way up to L0
+}
+
+function dynamicZoom() {//Resets zoom level and replots
 
     //g.attr("transform",d3.zoomIdentity)
     myzoom.transform(svg, d3.zoomIdentity);
