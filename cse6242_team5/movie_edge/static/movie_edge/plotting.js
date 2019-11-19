@@ -686,7 +686,7 @@ function drawHistory() {
 }
 
 function drawLegend(){ // renders legend
-	const frac = 0.67
+	const frac = 0.75
 	
 	const canvasW = (width-2*padding)
 	const canvasH = (height-2*padding)
@@ -778,7 +778,7 @@ function drawLegend(){ // renders legend
 		.style('font-size',0.4*boxSize+'px')
 		
 	leg.append('circle')
-		.attr('cx',2*legendW/3+20+boxSize/2)
+		.attr('cx',2*legendW/3+20+0*boxSize/2)
 		.attr('cy',boxSize*3.5)
 		.attr('r',boxSize/2)
 		.style('stroke','#e34a33')
@@ -786,7 +786,20 @@ function drawLegend(){ // renders legend
 		.style('stroke-width',3)
 	leg.append('text')
 		.attr('y',boxSize*3.5).text('Mixed')
-		.attr('x',20+2*legendW/3+boxSize*0.8+boxSize/2)
+		.attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
+		.attr('alignment-baseline','middle')
+		.style('font-size',0.4*boxSize+'px')
+		
+	leg.append('circle')
+		.attr('cx',2*legendW/3+20+0*boxSize/2)
+		.attr('cy',boxSize*5)
+		.attr('r',boxSize/2)
+		.style('stroke','yellow')
+		.style('fill','white')
+		.style('stroke-width',3)
+	leg.append('text')
+		.attr('y',boxSize*5).text('Viewing')
+		.attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
 		.attr('alignment-baseline','middle')
 		.style('font-size',0.4*boxSize+'px')
 	

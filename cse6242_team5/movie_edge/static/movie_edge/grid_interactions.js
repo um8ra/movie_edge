@@ -69,7 +69,9 @@ function closurePlotGoTo(movieID) {
     // movieID isn't actually passed to plotGoTo
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
+	
     function plotGoTo() {
+		
         console.log('PlotGoTo Current Movie: ', movieID);
         currentMovie = parseInt(movieID);
 
@@ -83,10 +85,31 @@ function closurePlotGoTo(movieID) {
         else {
             highlightAndCenter([movieID]);
         }
+		refreshGridBorders()
     }
 
     return plotGoTo;
 }
+
+
+function refreshGridBorders(){
+	var nodes = document.querySelectorAll('.poster');
+	let specialID = "ID"+currentMovie
+	for (let i=0; i<nodes.length; i++) {
+		//console.log(nodes[i].classList)
+		nodes[i].classList.remove('selected')
+		if (nodes[i].classList.contains(specialID)) {
+			nodes[i].classList.add('selected')
+		}
+	}
+	
+	
+	
+	
+	
+}
+
+
 
 function gridMovies(movieidList) {
     // const k = d3.zoomTransform(svg.node()).k;
@@ -147,14 +170,16 @@ function gridMovies(movieidList) {
             imgNode.src = thisMovieData[POSTER_URL];
             imgNode.alt = movieTitle;
             imgNode.title = movieTitle;
-            imgNode.ondblclick = closurePlotGoTo(movieId);
+            
             imgNode.height = poster_height;
             imgNode.width = poster_width;
 			const customID = 'ID'+thisMovieData['ID']
 			imgNode.classList.add(customID);
-			d3.select('.customID').datum(thisMovieData)
+			//d3.select('.customID').datum(thisMovieData)
+			
 			// Don't know why these classes are getting added but no effect?
 			imgNode.classList.add("poster");
+			imgNode.ondblclick = closurePlotGoTo(movieId);
 			if (movieId === currentMovie){
 				imgNode.classList.add("selected");
 			} 
