@@ -503,29 +503,29 @@ function toolTipContents(d) { // selects contents of tooltip
 function selectHighlight() {//selects node and centers
 
     d3.event.stopPropagation();
-	
-	let tmp =  d3.select(this).data()[0].ID
-	const lvl = zScale(getTransform().k)
-	if (lvl === 5){
-		console.log(d3.select(this).data()[0])
-		currentMovie = d3.select(this).data()[0]['movie_id']
-		tmp = currentMovie
-	}
-	console.log(tmp);
+    
+    let tmp =  d3.select(this).data()[0].ID
+    const lvl = zScale(getTransform().k)
+    if (lvl === 5){
+        console.log(d3.select(this).data()[0])
+        currentMovie = d3.select(this).data()[0]['movie_id']
+        tmp = currentMovie
+    }
+    console.log(tmp);
     if (d3.select(this).attr('class').includes('scatter')) {
         d3.select(this).attr('class', 'scatter selected2');
-		highlight([tmp]); // reset highlights, otherwise multiple selected2
+        highlight([tmp]); // reset highlights, otherwise multiple selected2
         //d3.select(this).attr('class', 'scatter selected2');
         const px = d3.select(this).attr("cx");
         const py = d3.select(this).attr("cy");
         const k = getTransform().k;
         console.log(px, py, k);
         centerOnElement(px, py, k * 1.3);
-		console.log(tmp);
+        console.log(tmp);
     }
-	
-	
-	
+    
+    
+    
     /*
     if ('movie_id' in d3.select(this)) {
         currentMovie = d3.select(this).movie_id;
@@ -686,259 +686,260 @@ function drawHistory() {
 }
 
 function drawLegend(){ // renders legend
-	const frac = 0.75
-	
-	const canvasW = (width-2*padding)
-	const canvasH = (height-2*padding)
-	const legendW = canvasW * (1-frac)
-	const legendH = canvasH * (1-frac)
-	const leg = svg.append('g')
-				.attr('transform','translate('+canvasW*frac+','+canvasH*frac+')');
-	const legBG = leg.append('rect')
-	.attr('height',legendH)
-	.attr('width',legendW)
-	.style('stroke','grey')
-	.style('fill','white')
-	.attr('class','legendBox');
-	const boxSize = (legendW-40)/11
-	const legTitle = leg.append('text')
-					.text('IMDB Rating')
-					.attr('alignment-baseline','hanging' )
-					.attr('x',boxSize*0.4)
-					.attr('y',boxSize*0.4)
-					.style('font-size',0.5*boxSize+'px')
-	const legBoxes = [0,10,20,30,40,50,60,70,80,90,100]
-	let i = 0
-	
-	for (i=0; i<11; i++){
-		let x = i*boxSize + 20
-		let y = boxSize
-		leg.append('rect')
-			.attr('height',boxSize)
-			.attr('width',boxSize)
-			.attr('x',x)
-			.attr('y',y)
-			.style('fill',colorScale(legBoxes[i]/10))
-		if (i === 0 || !!(i && !(i%2))){
-			leg.append('text')
-			.attr('x',x)
-			.attr('y',y+boxSize*1.3)
-			.text((legBoxes[i]/10).toFixed(2))
-			.attr('alignment-baseline','hanging' )
-			.style('font-size',0.4*boxSize+'px')
-		}
-	}
-	
-	leg.append('circle')
-		.attr('cx',20+boxSize/2)
-		.attr('cy',boxSize*3.5)
-		.attr('r',boxSize/2)
-		.style('stroke','blue')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*3.5).text('Selected')
-		.attr('x',20+boxSize*1.3)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-	leg.append('circle')
-		.attr('cx',20+boxSize/2)
-		.attr('cy',boxSize*5.0)
-		.attr('r',boxSize/2)
-		.style('stroke','steelblue')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*5.0).text('Recommended')
-		.attr('x',20+boxSize*1.3)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-	leg.append('circle')
-		.attr('cx',legendW/3+20+boxSize/2)
-		.attr('cy',boxSize*3.5)
-		.attr('r',boxSize/2)
-		.style('stroke','darkgreen')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*3.5).text('Liked')
-		.attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-	leg.append('circle')
-		.attr('cx',legendW/3+20+boxSize/2)
-		.attr('cy',boxSize*5)
-		.attr('r',boxSize/2)
-		.style('stroke','red')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*5).text('Disliked')
-		.attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-		
-	leg.append('circle')
-		.attr('cx',2*legendW/3+20+0*boxSize/2)
-		.attr('cy',boxSize*3.5)
-		.attr('r',boxSize/2)
-		.style('stroke','#e34a33')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*3.5).text('Mixed')
-		.attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-		
-	leg.append('circle')
-		.attr('cx',2*legendW/3+20+0*boxSize/2)
-		.attr('cy',boxSize*5)
-		.attr('r',boxSize/2)
-		.style('stroke','yellow')
-		.style('fill','white')
-		.style('stroke-width',3)
-	leg.append('text')
-		.attr('y',boxSize*5).text('Viewing')
-		.attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
-		.attr('alignment-baseline','middle')
-		.style('font-size',0.4*boxSize+'px')
-	
+    const frac = 0.75
+    
+    const canvasW = (width-2*padding)
+    const canvasH = (height-2*padding)
+    const legendW = canvasW * (1-frac)
+    const legendH = canvasH * (1-frac)
+    const leg = svg.append('g')
+                .attr('transform','translate('+canvasW*frac+','+canvasH*frac+')');
+    const legBG = leg.append('rect')
+    .attr('height',legendH)
+    .attr('width',legendW)
+    .style('stroke','grey')
+    .style('fill','white')
+    .attr('class','legendBox');
+    const boxSize = (legendW-40)/11
+    const legTitle = leg.append('text')
+                    .text('IMDB Rating')
+                    .attr('alignment-baseline','hanging' )
+                    .attr('x',boxSize*0.4)
+                    .attr('y',boxSize*0.4)
+                    .style('font-size',0.5*boxSize+'px')
+    const legBoxes = [0,10,20,30,40,50,60,70,80,90,100]
+    let i = 0
+    
+    for (i=0; i<11; i++){
+        let x = i*boxSize + 20
+        let y = boxSize
+        leg.append('rect')
+            .attr('height',boxSize)
+            .attr('width',boxSize)
+            .attr('x',x)
+            .attr('y',y)
+            .style('fill',colorScale(legBoxes[i]/10))
+        if (i === 0 || !!(i && !(i%2))){
+            leg.append('text')
+            .attr('x',x)
+            .attr('y',y+boxSize*1.3)
+            .text((legBoxes[i]/10).toFixed(2))
+            .attr('alignment-baseline','hanging' )
+            .style('font-size',0.4*boxSize+'px')
+        }
+    }
+    
+    leg.append('circle')
+        .attr('cx',20+boxSize/2)
+        .attr('cy',boxSize*3.5)
+        .attr('r',boxSize/2)
+        .style('stroke','blue')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*3.5).text('Selected')
+        .attr('x',20+boxSize*1.3)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+    leg.append('circle')
+        .attr('cx',20+boxSize/2)
+        .attr('cy',boxSize*5.0)
+        .attr('r',boxSize/2)
+        .style('stroke','steelblue')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*5.0).text('Recommended')
+        .attr('x',20+boxSize*1.3)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+    leg.append('circle')
+        .attr('cx',legendW/3+20+boxSize/2)
+        .attr('cy',boxSize*3.5)
+        .attr('r',boxSize/2)
+        .style('stroke','darkgreen')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*3.5).text('Liked')
+        .attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+    leg.append('circle')
+        .attr('cx',legendW/3+20+boxSize/2)
+        .attr('cy',boxSize*5)
+        .attr('r',boxSize/2)
+        .style('stroke','red')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*5).text('Disliked')
+        .attr('x',20+legendW/3+boxSize*0.8+boxSize/2)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+        
+    leg.append('circle')
+        .attr('cx',2*legendW/3+20+0*boxSize/2)
+        .attr('cy',boxSize*3.5)
+        .attr('r',boxSize/2)
+        .style('stroke','#e34a33')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*3.5).text('Mixed')
+        .attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+        
+    leg.append('circle')
+        .attr('cx',2*legendW/3+20+0*boxSize/2)
+        .attr('cy',boxSize*5)
+        .attr('r',boxSize/2)
+        .style('stroke','yellow')
+        .style('fill','white')
+        .style('stroke-width',3)
+    leg.append('text')
+        .attr('y',boxSize*5).text('Viewing')
+        .attr('x',20+2*legendW/3+boxSize*0.8+0*boxSize/2)
+        .attr('alignment-baseline','middle')
+        .style('font-size',0.4*boxSize+'px')
+    
 }
 
-function addHelpIcon(){	
-	const frac = 0.1
-	const canvasH = (height-2*padding)
-	let cx = canvasH*frac/2
-	let cy = canvasH*frac/2
-	let r = canvasH*frac/2
-	const info = svg.append('circle')
-	.attr('cx',cx+5)
-	.attr('cy',cy+5)
-	.attr('r',r)
-	.style('stroke-width',5)
-	.style('stroke','black')
-	.style('fill','white')
-	
-	const icon = svg.append('text')
-	.text('i')
-	.attr('x',cx+5)
-	.attr('y',cy+10)
-	.attr('dominant-baseline','middle')
-	.attr('text-anchor','middle')
-	.style('font-size',1.75*cx+'px')
-	.attr('font-style','italic')
-	
-	info.on('mouseover',helpMouseOver)
-	.on('mouseout',helpMouseOut)
-	
+function addHelpIcon(){ 
+    const frac = 0.1
+    const canvasH = (height-2*padding)
+    let cx = canvasH*frac/2
+    let cy = canvasH*frac/2
+    let r = canvasH*frac/2
+    const info = svg.append('circle')
+    .attr('cx',cx+5)
+    .attr('cy',cy+5)
+    .attr('r',r)
+    .style('stroke-width',5)
+    .style('stroke','black')
+    .style('fill','white');
+
+    const icon = svg.append('text')
+    .text('i')
+    .attr('x',cx+5)
+    .attr('y',cy+10)
+    .attr('dominant-baseline','middle')
+    .attr('text-anchor','middle')
+    .style('font-size',1.75*cx+'px')
+    .attr('font-style','italic')
+    .style('pointer-events', 'none');
+
+    info.on('mouseover',helpMouseOver)
+        .on('mouseout',helpMouseOut);
+    
 }
 
 
 
 function helpMouseOver() {
-	
-	const frac = 0.1
-	const canvasH = (height-2*padding)
-	const canvasW = (width-2*padding)
-	const textHeight=canvasH/35
-	svg.append('rect')
-	.attr('class','help')
-	.attr('x',canvasW*0.2)
-	.attr('y',canvasH*0.2)
-	.attr('width',canvasW*0.6)
-	.attr('height',canvasH*0.6)
-	.style('fill','darkgrey')
-	.style('opacity',0.9)
-	let i = 0
-	svg.append('text')
-	.text('- Use the search box or double click on a movie to select and zoom to it')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('- Use the like/dislike buttons to express your preferences')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('- You can pan/zoom the graph. Similar movies are positioned close to each other.')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('- Movies are presented as clusters. As you zoom in, these will break into smalller clusters...')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('- ...and eventually into indvidual movies')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text("- The panel on the left contains our recommendations.")
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text("- We've started you off with random  movies... ")
-	.attr('x',canvasW*0.3)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text("- ..but they will improve as you tell us more about you")
-	.attr('x',canvasW*0.3)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('- Use the buttons to get specific  or random recommendations, zoom in and out.')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	
-	svg.append('text')
-	.text('- The arcs will always lead from the last selected movie to our recommendations: ')
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text('   - Use them to find your way around')
-	.attr('x',canvasW*0.3)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	i+=1
-	svg.append('text')
-	.text("- Try to find your favourite movie and see what's similar. We hope you have fun exploring!")
-	.attr('x',canvasW*0.25)
-	.attr('y',canvasH*0.25+textHeight*i)
-	.attr('class','help')
-	.style('font-size', textHeight)
-	
+    
+    const frac = 0.1
+    const canvasH = (height-2*padding)
+    const canvasW = (width-2*padding)
+    const textHeight=canvasH/35
+    svg.append('rect')
+    .attr('class','help')
+    .attr('x',canvasW*0.2)
+    .attr('y',canvasH*0.2)
+    .attr('width',canvasW*0.6)
+    .attr('height',canvasH*0.6)
+    .style('fill','darkgrey')
+    .style('opacity',0.9)
+    let i = 0
+    svg.append('text')
+    .text('- Use the search box or double click on a movie to select and zoom to it')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('- Use the like/dislike buttons to express your preferences')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('- You can pan/zoom the graph. Similar movies are positioned close to each other.')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('- Movies are presented as clusters. As you zoom in, these will break into smalller clusters...')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('- ...and eventually into indvidual movies')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text("- The panel on the left contains our recommendations.")
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text("- We've started you off with random  movies... ")
+    .attr('x',canvasW*0.3)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text("- ..but they will improve as you tell us more about you")
+    .attr('x',canvasW*0.3)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('- Use the buttons to get specific  or random recommendations, zoom in and out.')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    
+    svg.append('text')
+    .text('- The arcs will always lead from the last selected movie to our recommendations: ')
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text('   - Use them to find your way around')
+    .attr('x',canvasW*0.3)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    i+=1
+    svg.append('text')
+    .text("- Try to find your favourite movie and see what's similar. We hope you have fun exploring!")
+    .attr('x',canvasW*0.25)
+    .attr('y',canvasH*0.25+textHeight*i)
+    .attr('class','help')
+    .style('font-size', textHeight)
+    
 }
 
 function helpMouseOut() {
-	d3.selectAll('.help').remove()
-	
+    d3.selectAll('.help').remove()
+    
 }
