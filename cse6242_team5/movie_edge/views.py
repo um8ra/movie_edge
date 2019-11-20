@@ -11,7 +11,7 @@ import pandas as pd
 import json
 import urllib.parse
 import random
-from typing import List, Set
+from typing import List, Set, Dict
 
 MOVIE_ID = 'movie_id'
 MOVIE_TITLE = 'movie_title'
@@ -49,10 +49,6 @@ base_path = Path(BASE_DIR)
 
 # You will probably need to update this
 gensim_path = base_path / '..' / 'gensim_models2'
-movie_df_path = base_path / '..' / 'ml-20m' / 'movies.csv'
-
-df_movies = pd.read_csv(str(movie_df_path), index_col='movieId', dtype=str)
-df_movies.index.rename(MOVIE_ID, inplace=True)
 
 
 def random_popular_movie_ids(topn: int, movies_shown_int_set: Set[int]) -> List[int]:
@@ -166,7 +162,7 @@ def ridge_regression_movie_ids(topn: int, movies_shown_str_set: Set[str],
     return list(return_val)
 
 
-def index_data() -> str:
+def index_data() -> Dict:
     movies = Movie.objects.filter(embedder=EMBEDDER).values(*db_cols)
 
     for movie in movies:
@@ -225,6 +221,7 @@ def index(request: HttpRequest) -> HttpResponse:
     data_json = json.dumps(data)
     return render(request, 'movie_edge/visualization.html',
                   {'table_data': data_json})
+
 
 def index_no_graphic(request: HttpRequest) -> HttpResponse:
     key = 'index'
