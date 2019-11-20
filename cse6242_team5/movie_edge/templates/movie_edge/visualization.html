@@ -4,40 +4,86 @@
     <meta charset="UTF-8">
     <title>Movie Edge</title>
     {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png"/>
     <script type="text/javascript" src="{% static 'movie_edge/d3.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/grid_interactions.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/constants.js' %}"></script>
     <script type="text/javascript" src="{% static 'movie_edge/plotting.js' %}"></script>
-
-
+    <script type="text/javascript" src="{% static 'movie_edge/d3-tip.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'movie_edge/tooltip.js' %}"></script>
     <style>
         .grid {
             display: grid;
-            grid-gap: 10px;
-            grid-template-columns: repeat(3, 200px);
-            grid-template-rows: repeat(3, 350px);
+            grid-gap: 5px;
+            grid-template-columns: repeat(2, 50%);
+            grid-template-rows: repeat(5, 17%);
             grid-auto-flow: column;
-            width: 30%;
-            background: gray;
+            width: 230px;
+            height: 100%;
             float: left;
+            justify-items: center;
+            position: relative;
         }
 
         .buttonSubmit {
-            height: 64px;
-            width: 128px;
+            height: 60px;
+            width: 100px;
+            position: relative;
+            top: 0%;
         }
 
         .buttonGetRandom {
-            height: 64px;
-            width: 128px;
+            height: 60px;
+            width: 100px;
+            position: relative;
+            top: 0%;
+        }
+
+        .buttonFullZoomUp {
+            height: 60px;
+            width: 70px;
+            position: relative;
+            top: 0%;
+        }
+
+        .buttonDynamicZoom {
+            height: 60px;
+            width: 115px;
+            position: relative;
+            top: 0%;
+        }
+
+        .buttonZoomToMovie {
+            height: 60px;
+            width: 90px;
+            position: relative;
+            top: 0%;
+        }
+
+        .searchForm {
+            height: 60px;
+            width: 200px;
+            color: white;
+        }
+
+        .buttonLike {
+            width: 40px;
+        }
+        .buttonDislike {
+            width: 60px;
         }
 
         .graph {
-            width: 70%;
+            width: calc(100% - 150px);
+            height: 100%;
             float: right;
             background: darkgray;
+            position: relative;
         }
 
+        .history {
+            stroke: orange;
+        }
 
         body {
             overflow-x: hidden;
@@ -48,34 +94,184 @@
             stroke: grey;
         }
 
-        .selected {
+        .selected.scatter {
+            stroke: blue;
+        }
+        .poster {
+            border: 3px solid steelblue;
+        }
+        .selected.poster {
+            border: 3px solid blue;
+        }
+
+        .uncertain.scatter {
+            stroke: #e34a33;
+        }
+
+        .liked.scatter {
+            stroke: darkgreen;
+        }
+
+        .disliked.scatter {
             stroke: red;
+        }
+
+        .ingrid.scatter {
+            stroke: steelblue;
+        }
+
+        .selected2.scatter {
+            stroke: yellow
+        }
+
+        .box {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+            background: red;
+        }
+
+        .topL {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 80px;
+            width: 500px;
+            text-align: center;
+            /*vertical-align: center;*/
+            /*horiz-align: center;*/
+        }
+
+        .topM {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            left: 500px;
+            height: 80px;
+            width: calc(100% - 800px);
+            vertical-align: center;
+            horiz-align: center;
+        }
+
+        .topR {
+            background-color: dimgray;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 80px;
+            width: 300px;
+        }
+
+        .left-half {
+            background-color: black;
+            position: absolute;
+            left: 0;
+            top: 80px;
+            width: 230px;
+            height: 100%;
+        }
+
+        .right-half {
+            /* background-color: rgb(39, 40, 34); */
+            background-color: white;
+            position: absolute;
+            right: 0;
+            top: 80px;
+            width: calc(100% - 230px);
+            height: calc(100% - 80px);
+        }
+
+        .d3-tip {
+            max-width: 300px;
+            max-height: 600px;
+            overflow: hidden;
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .legendBox {
+            border-radius: 10px;
+        }
+
+        .smallImg {
+            height: 33%;
+            width: 33%;
+        }
+
+        button {
+            background-color: white;
+        }
+
+        .screen-title {
+            /*vertical-align: center;*/
+            text-align: center;
+            font-size: 200%;
+            color: white;
+        }
+
+        .input-label {
+            white-space: nowrap;
+            font-size: 125%;
+        }
+
+        .likeDislikeSpan {
+            display: inline-block;
         }
 
     </style>
 </head>
 <body>
-<button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
-    Click me for movie recommendations!
-</button>
-<button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
-    Click on me for some more randomness!
-</button>
-<br>
-<br>
+<div class="topL" id="buttons" >
+    <button class="buttonSubmit" type="button" onclick="buttonClickSubmit(fetchURL)">
+        Recommend Movies
+    </button>
+    <button class="buttonGetRandom" type="button" onclick="buttonClickGetRandom(fetchURL)">
+        Random Movies
+    </button>
+    <button class="buttonFullZoomUp" type="button" onclick="fullZoomUp()">
+        Zoom Out
+    </button>
+    <button class="buttonDynamicZoom" type="button" onclick="dynamicZoom()">
+        Center on Recommended
+    </button>
+    <button class="buttonZoomToMovie" type="button" onclick="highlightAndCenter([currentMovie])">
+        Zoom To Selected
+    </button>
+</div>
+<div class="topM" id="title">
+    <h1 class="screen-title">Welcome to Movie Edge</h1>
+</div>
+<div class="topR" id="searchbox">
+    <form class="searchForm" action="javascript:;" onsubmit="findMovie(this)">
+        <p>
+            <!--            <label>-->
+            <input name="movieRegex" type="text" size="20">
+            <text class="input-label">Movie Name</text>
+            <!--            </label>-->
+        </p>
+    </form>
+</div>
+
 <!--https://gridbyexample.com/examples/code/example18.html-->
 <div class="container">
-    <div class="grid" id="grid"></div>
-    <div class="graph" id="graph"></div>
+    <div class="box">
+        <div class="left-half grid" id="grid"></div>
+        <div class="right-half graph" id="graph"></div>
+    </div>
 </div>
-</body>
+
 {#Begin: super necessary! Else, disable CSRF Protection in views.py #}
 {% csrf_token %}
 {#End: super necessary! Else, disable CSRF Protection in views.py #}
 <script>
+
+    //stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-mobile-device
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        alert('This site is optimized for laptop/desktop computers, we strongly recommend against a mobile device browser')
+    }
+
     // https://stackoverflow.com/questions/38654599/django-best-way-to-pass-data-to-javascript
-
-
     const tableData = JSON.parse('{{ table_data|safe }}');
     const payload = tableData.payload;
 
@@ -85,21 +281,43 @@
     const y_min = parseFloat(tableData['y__min']);
     const y_max = parseFloat(tableData['y__max']);
     const decoder = tableData['decoder'];
-    let nineChoices = tableData['random_nine'];
-    const width = 0.7 * window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth -230;
+    const height = window.innerHeight-70;
     const data = payload[5].map(inputFormat);
-    const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+    payload[5] = data;
+    payload[0] = payload[0].map(inputFormatCluster);
+    payload[1] = payload[1].map(inputFormatCluster);
+    payload[2] = payload[2].map(inputFormatCluster);
+    payload[3] = payload[3].map(inputFormatCluster);
+    payload[4] = payload[4].map(inputFormatCluster);
 
-    gridNine(nineChoices);
+    const fetchURL = "{% url 'movie_edge:query_recommendations' %}";
+    currentGrid = tableData[MOVIE_CHOICES];
+    //var currentMovie;
 
     const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, width]);
     const yScale = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]);
     const zScale = d3.scaleThreshold().domain([3, 6, 12, 24, 48]).range([0, 1, 2, 3, 4, 5]);
-    const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]);
+    //const colorScale = d3.scaleSequential(d3.interpolateCividis).domain([0, 10]); // I don't like the colors?
+
+    const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]);
+
+    const sizeScales = [];
+    for (let i = 0; i < 5; i++) {
+        let sizes = payload[i].map(x => x[CLUSTER_SIZE]);
+        //let tmp = d3.scaleSqrt().domain([d3.min(sizes),d3.max(sizes)]).range([zoomParams[i].r*0.5,zoomParams[i].r*2])
+        let tmp = d3.scaleLinear().domain([d3.min(sizes), d3.max(sizes)]).range([zoomParams[i].r * 0.5, zoomParams[i].r * 2]);
+        sizeScales.push(function (d) {
+            return tmp(d[CLUSTER_SIZE])
+        })
+    }
+    sizeScales.push(function () {
+        return zoomParams[5].r
+    });
 
     //Init
     let currentZoom = 0;
+    //TODO -- setting svg height/width here prevents graph from being dynamic
     const svg = d3.select('#graph').append('svg').attr("width", width - 2 * padding).attr("height", height - 2 * padding);
 
     const g = svg.append("g")
@@ -108,12 +326,26 @@
         .duration(1000)
         .extent([[0, 0], [width, height]])
         .scaleExtent([zoomParams.minZoom, zoomParams.maxZoom])
-        .on("zoom", zoomed);
+        .on("zoom", zoomed)
+        .on("end", zoomEnd);
 
     svg.call(myzoom).on("dblclick.zoom", selectHighlight);
+    tip = d3.tip().attr('class', 'd3-tip').html(toolTipContents).style('background', 'rgba(100, 100, 100, 0.9)');
 
-    drawGraph(payload[0], 0, 0);
-
-
+    currentMovie = currentGrid[0]; //current movie selected
+    //drawGraph(payload[0], 0, 0);
+    // tmp.push(currentMovie);
+    //highlightAndCenter(currentMovie);
+    gridMovies(tableData[MOVIE_CHOICES]); // since this calls highlightAndCenter, much of the setup above needs to be completed first
+    //g.call(tip);
+    /*drawGraph();
+    console.log('g done, calling tt')
+    svg.call(tip);
+    console.log('tip called')*/
+    tip.offset(tipoff);
+    tip.direction(tipdir);
+    drawLegend()    
+    addHelpIcon()
 </script>
+</body>
 </html>

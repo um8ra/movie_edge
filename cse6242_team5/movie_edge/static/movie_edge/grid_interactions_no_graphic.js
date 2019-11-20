@@ -69,52 +69,30 @@ function closurePlotGoTo(movieID) {
     // movieID isn't actually passed to plotGoTo
     // but since it's a closure, plotGoTo understands the
     // scope it was *created* in!
-    
     function plotGoTo() {
-        
         console.log('PlotGoTo Current Movie: ', movieID);
         currentMovie = parseInt(movieID);
-
-        const transform = getTransform();
-        const k = transform.k;
-        const lvl = zScale(k);
-
-        if (lvl === 5) {
-            highlightAndCenterSingle(movieID);
-        }
-        else {
-            highlightAndCenter([movieID]);
-        }
-        refreshGridBorders()
+        highlightAndCenterSingle(movieID);
     }
-
     return plotGoTo;
 }
 
-
-function refreshGridBorders(){
-    var nodes = document.querySelectorAll('.poster');
-    let specialID = "ID"+currentMovie
-    for (let i=0; i<nodes.length; i++) {
-        //console.log(nodes[i].classList)
-        nodes[i].classList.remove('selected')
-        if (nodes[i].classList.contains(specialID)) {
-            nodes[i].classList.add('selected')
-        }
+function closurePlotGoToDeep(movieID) {
+    // movieID isn't actually passed to plotGoTo
+    // but since it's a closure, plotGoTo understands the
+    // scope it was *created* in!
+    function plotGoTo() {
+        console.log('PlotGoTo Current Movie: ', movieID);
+        currentMovie = parseInt(movieID);
+        lastZoomLevel = 5;
+        highlightAndCenter([movieID]);
     }
-    
-    
-    
-    
-    
+    return plotGoTo;
 }
-
-
 
 function gridMovies(movieidList) {
     // const k = d3.zoomTransform(svg.node()).k;
     // const lvl = zScale(k);
-    svg.call(tip);
     // highlightAndCenter(movieidList);
     // highlightAndCenter(movieidList.concat([currentMovie]));
 
@@ -123,7 +101,7 @@ function gridMovies(movieidList) {
     // const divHeightNormalized = (divHeight - 128) / 5 / ratio;
     // const divWidth = document.getElementById("grid").offsetWidth / 2.75;
 
-    let poster_height = Math.min((divHeight / 5) - 50, 150);
+    let poster_height = Math.min((divHeight / 2) - 50, 300);
     let poster_width = (poster_height * 2 / 3);
     // console.log("Thumbnails: ", divHeight, poster_height, poster_width);
     // let poster_width = 100;
@@ -151,6 +129,7 @@ function gridMovies(movieidList) {
             const divNode = document.createElement('div');
             const imgNode = document.createElement('img');
             const spanNode = document.createElement('span')
+
             const buttonLike = document.createElement('BUTTON');
             buttonLike.innerText = 'Like';
             buttonLike.onclick = buttonClickLike;
@@ -170,24 +149,15 @@ function gridMovies(movieidList) {
             imgNode.src = thisMovieData[POSTER_URL];
             imgNode.alt = movieTitle;
             imgNode.title = movieTitle;
-            
+            imgNode.onclick = closurePlotGoTo(movieId);
+            imgNode.ondblclick = closurePlotGoToDeep(movieId);
             imgNode.height = poster_height;
             imgNode.width = poster_width;
-            const customID = 'ID'+thisMovieData['ID']
-            imgNode.classList.add(customID);
-            //d3.select('.customID').datum(thisMovieData)
-            
-            // Don't know why these classes are getting added but no effect?
-            imgNode.classList.add("poster");
-            imgNode.ondblclick = closurePlotGoTo(movieId);
-            if (movieId === currentMovie){
-                imgNode.classList.add("selected");
-            } 
-            //imgNode.style.border='2px solid #FFF';
-            
+
             spanNode.className = 'likeDislikeSpan';
             spanNode.appendChild(buttonLike);
             spanNode.appendChild(buttonDislike);
+
             grid.appendChild(divNode);
             divNode.appendChild(imgNode);
             divNode.appendChild(spanNode);
@@ -198,7 +168,6 @@ function gridMovies(movieidList) {
             // console.log(movieId);
         }
     );
-    drawGraph(true);
 }
 
 function buttonClickLike(data) {
@@ -221,7 +190,6 @@ function buttonClickLike(data) {
         theButton.style('background', 'green');
         theButton.style('color', 'white');
     }
-    highlight([currentMovie]); // selected, uncertain, liked, disliked, vs ingrid
     console.log('Liked: ', moviesLikedSet);
     console.log('Disiked: ', moviesDislikedSet);
 }
@@ -246,7 +214,6 @@ function buttonClickDislike(data) {
         theButton.style('background', 'red');
         theButton.style('color', 'white');
     }
-    highlight([currentMovie]); // selected, uncertain, liked, disliked, vs ingrid
     console.log('Liked: ', moviesLikedSet);
     console.log('Disiked: ', moviesDislikedSet);
 }
@@ -255,26 +222,8 @@ function findMovie(formBox) {
     const matchString = formBox[0].value;
     const re = new RegExp(matchString, 'i');
     const stringMatches = data.filter(x => re.test(x[MOVIE_TITLE]));
-    if (Array.isArray(stringMatches) && stringMatches.length > 0) {
-        movieID = stringMatches[0][MOVIE_ID]
-        currentMovie = parseInt(movieID);
-
-        // highlightAndCenter([movieID]);
-
-        // Though highlightAndCenter([movieID]); is visually equivalent
-        // use lvl check as shown below, similar to closurePlotGoTo()
-        // '...Single' method avoids looping through L0 to L5 to find best
-        const transform = getTransform();
-        const k = transform.k;
-        const lvl = zScale(k);
-
-        if (lvl === 5) {
-            highlightAndCenterSingle(movieID);
-        }
-        else {
-            highlightAndCenter([movieID]);
-        }
-
+    if (Array.isArray(stringMatches) && stringMatches.length > 0){
+        highlightAndCenterSingle(stringMatches[0][MOVIE_ID]);
     }
     formBox.reset();
 }
