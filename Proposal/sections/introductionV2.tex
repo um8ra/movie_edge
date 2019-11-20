@@ -1,9 +1,0 @@
-Recommender Systems (RS) are ubiquitous in modern digital life. A fruitful area of RS research has been movie ratings, where a database of ratings drives Collaborative Filtering (CF) to suggest new movies to watch. Interest in movie CF models peaked in 2007 with \href{https://www.netflixprize.com/}{The Netflix Prize}. However, CF models are complex and hard for users to interpret.
-
-Recently, researchers have introduced MovieExplorer \cite{taijala2018movieexplorer}, which allows users to navigate a latent high (30) dimensional space derived from user preference data (“taste space”) to find movies they may be in the mood to watch. 
-
-\subsection{Innovation}
-
-We introduce MovieEdge, which extends on MovieExplorer in two key ways.  We will augment exploration by visualizing the taste space as the user explores, providing supplemental data drawn from other data sources \cite{openMovieDB} along the way. Interpretability  \cite{Molnar2019interpretable} can assist with user acceptance, detecting bias, and satisfy users’ curiosity. 
-
-We will enhance MovieExplorer’s accuracy  by using a more powerful RS. Specifically, we will use a Word2vec model \cite{mikolov2013distributed} to build the RS. As shown in \cite{ozsoy2016word}, this can increase CF model performance while leading to latent vector representations that are visually intuitive \cite{mikolov2013distributed}. 
