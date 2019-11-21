@@ -6,9 +6,15 @@ Movie Edge is a movie recommendation tool that uses neural network "word" embedd
 ===Installation===
 0. Don't even bother installing (cumbersome) and simply go to: http://rockofmaine4989.pythonanywhere.com/movie_edge/ or http://rockofmaine4989.pythonanywhere.com/movie_edge/no_graphic/ . We like the pretty one with graphics (first one).
 
-1. Install Python 3.7 or higher
-2. Navigate to the folder you find this file in
-2. Activate the python environment (typically via $source activate <YOUR_ENV>/bin/activate) then, $pip install -r requirements.txt
+- Install Python 3.7 or higher
+- Navigate to the folder you find this file in
+- If you want to create a new environment for your python installation, execute $python3.7 -m venv ENV
+- This will create a new environment called "ENV".
+- Activate this environment via $source activate ENV/bin/activate
+- You should probably do $pip install Cython
+	- This is due to the issue noted below
+- Navigate to project root directory, there should be a file called "requirements.txt" in the root.
+- Execute $pip install -r requirements.txt
 	- IF YOU RUN INTO Cython issues: then $pip install Cython and then try $pip install -r requirements.txt again. Cython simply needs to be installed first almost always. Command noted here for Cython: https://pypi.org/project/Cython/
 	- IF YOU RUN INTO ERRORS WITH fitsne, remove the line from the requirements.txt file. It is only needed if you want to rebuild fully from scratch. To run the webapp, it is not needed. It requires manual compilation of FFTW and likely is more than you have any desire to do.
 3. Go to the "cse6242_team5" directory
