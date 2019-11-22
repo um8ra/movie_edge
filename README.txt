@@ -10,7 +10,7 @@ Movie Edge is a movie recommendation tool that uses neural network "word" embedd
 - Navigate to the folder you find this file in
 - If you want to create a new environment for your python installation, execute $python3.7 -m venv ENV
 - This will create a new environment called "ENV".
-- Activate this environment via $source activate ENV/bin/activate
+- Activate this environment via $source ENV/bin/activate
 - You should probably do $pip install Cython
 	- This is due to the issue noted below
 - Navigate to project root directory, there should be a file called "requirements.txt" in the root.
