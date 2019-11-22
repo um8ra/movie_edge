@@ -3,6 +3,9 @@ Team 5 - Movie Edge
 ===Description===
 Movie Edge is a movie recommendation tool that uses neural network "word" embeddings to both render movies in "taste space" as well as provide predictions to users.
 
+===DEMO Video of below Installation section===
+https://youtu.be/-XGvodphhEk
+
 ===Installation===
 0. Don't even bother installing (cumbersome) and simply go to: http://rockofmaine4989.pythonanywhere.com/movie_edge/ or http://rockofmaine4989.pythonanywhere.com/movie_edge/no_graphic/ . We like the pretty one with graphics (first one).
 
@@ -17,11 +20,11 @@ Movie Edge is a movie recommendation tool that uses neural network "word" embedd
 - Execute $pip install -r requirements.txt
 	- IF YOU RUN INTO Cython issues: then $pip install Cython and then try $pip install -r requirements.txt again. Cython simply needs to be installed first almost always. Command noted here for Cython: https://pypi.org/project/Cython/
 	- IF YOU RUN INTO ERRORS WITH fitsne, remove the line from the requirements.txt file. It is only needed if you want to rebuild fully from scratch. To run the webapp, it is not needed. It requires manual compilation of FFTW and likely is more than you have any desire to do.
-3. Go to the "cse6242_team5" directory
-4. Execute $python manage.py runserver. If debug=False in settings, change it to True.
-5. Navigate to 127.0.0.1:8000/movie_edge/ or 127.0.0.1:8000/movie_edge/no_graphic/
-6. Rate some movies!
-7. Things to understand: we've kindly packaged our database with the project to avoid you all needing to build it from scratch. If you want to, please read below.
+- Go to the "cse6242_team5" directory
+- Execute $python manage.py runserver. If debug=False in settings, change it to True.
+- Navigate to 127.0.0.1:8000/movie_edge/ or 127.0.0.1:8000/movie_edge/no_graphic/
+- Rate some movies!
+- Things to understand: we've kindly packaged our database with the project to avoid you all needing to build it from scratch. If you want to, please read below.
 
 
 ==Installation / Full Build Detailed (you probably don't want to do this)==
@@ -66,5 +69,5 @@ To fully rebuild our data from scratch, it is more involved...
 
 ===Execution===
 
-See step 5 and 6 in the "Installation" (not detailed) version. When you navigate to the pages, that's it!
+See step 5 and 6 in the "Installation" (not detailed) version. When you navigate to the pages, that's it! See the demo video if unclear... or just go to the rockofmaine site.
 
