@@ -10,7 +10,7 @@ https://youtu.be/-XGvodphhEk
 0. Don't even bother installing (cumbersome) and simply go to: http://rockofmaine4989.pythonanywhere.com/movie_edge/ or http://rockofmaine4989.pythonanywhere.com/movie_edge/no_graphic/ . We like the pretty one with graphics (first one).
 
 - Install Python 3.7 or higher
-- Navigate to the folder you find this file in
+- Navigate to the CODE folder in the same directory as this file.
 - If you want to create a new environment for your python installation, execute $python3.7 -m venv ENV
 - This will create a new environment called "ENV".
 - Activate this environment via $source ENV/bin/activate
@@ -24,7 +24,7 @@ https://youtu.be/-XGvodphhEk
 - Execute $python manage.py runserver. If debug=False in settings, change it to True.
 - Navigate to 127.0.0.1:8000/movie_edge/ or 127.0.0.1:8000/movie_edge/no_graphic/
 - Rate some movies!
-- Things to understand: we've kindly packaged our database with the project to avoid you all needing to build it from scratch. If you want to, please read below.
+- Things to understand: we've kindly packaged our database and neural network embedding with the project to avoid you needing to build it from scratch. If you want to, please read below.
 
 
 ==Installation / Full Build Detailed (you probably don't want to do this)==
@@ -38,7 +38,7 @@ To fully rebuild our data from scratch, it is more involved...
 - Now you have an empty database. We need to populate it. But first, we must generate a Word2Vec model...
 
 =Acquire data=
-- This was done piecemeal by our team on multiple machines, so bubblegum and duct tape may be needed
+- This was done piecemeal by our team on multiple machines, so bubble gum and duct tape may be needed
 - We've already put the data into the db.sqlite3 for you, but if you're adventerous, you can download the data and make minimal tweaks to the files.
 - Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. Unzip it. This ml-20m folder is expected to be in the root CODE directory of the project for most operations.
 - Metadata for the movies was also downloaded via API from here: https://www.omdbapi.com/. Anywhere you see 'metadata.pkl' referenced in the code, this is OMDB API data.
@@ -55,7 +55,7 @@ To fully rebuild our data from scratch, it is more involved...
 - You should now have both core data (ml-20m/<many_files>), metadata.pkl. It's time to process some data!
 
 =Process data= 
-- Go to the root project directory: "cse6242_project" 
+- Go to the root CODE directory
 - Run $jupyter notebook in the environment you $pip install'd into earlier.
 - Open gensim_word2vec.ipynb and "run all cells". This will generate the gensim Word2vec model.
 - Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook)
