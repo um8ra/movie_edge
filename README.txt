@@ -4,7 +4,7 @@ Team 5 - Movie Edge
 Movie Edge is a movie recommendation tool that uses neural network "word" embeddings to both render movies in "taste space" as well as provide predictions to users.
 
 ===DEMO Video of below Installation section===
-https://youtu.be/-XGvodphhEk
+https://youtu.be/-VUsqzLVf6k
 
 ===Installation===
 0. Don't even bother installing (cumbersome) and simply go to: http://rockofmaine4989.pythonanywhere.com/movie_edge/ or http://rockofmaine4989.pythonanywhere.com/movie_edge/no_graphic/ . We like the pretty one with graphics (first one).
