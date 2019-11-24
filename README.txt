@@ -16,13 +16,14 @@ https://youtu.be/-XGvodphhEk
 - Activate this environment via $source ENV/bin/activate
 - You should probably do $pip install Cython
 	- This is due to the issue noted below
-- Navigate to project root directory, there should be a file called "requirements.txt" in the root.
+- Navigate to CODE directory (if you aren't there already), and there should be a file called "requirements.txt" there.
 - Execute $pip install -r requirements.txt
 	- IF YOU RUN INTO Cython issues: then $pip install Cython and then try $pip install -r requirements.txt again. Cython simply needs to be installed first almost always. Command noted here for Cython: https://pypi.org/project/Cython/
 	- IF YOU RUN INTO ERRORS WITH fitsne, remove the line from the requirements.txt file. It is only needed if you want to rebuild fully from scratch. To run the webapp, it is not needed. It requires manual compilation of FFTW and likely is more than you have any desire to do.
 - Go to the "cse6242_team5" directory
 - Execute $python manage.py runserver. If debug=False in settings, change it to True.
 - Navigate to 127.0.0.1:8000/movie_edge/ or 127.0.0.1:8000/movie_edge/no_graphic/
+- Django sometimes throws "ConnectionResetError: [Errno 54] Connection reset by peer". If the site doesn't load, try again. Make sure you're not going to 127.0.0.1:8000/ You need to go to the movie_edge site within at: 127.0.0.1:8000/movie_edge/ as stated above.
 - Rate some movies!
 - Things to understand: we've kindly packaged our database and neural network embedding with the project to avoid you needing to build it from scratch. If you want to, please read below.
 
