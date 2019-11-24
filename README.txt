@@ -42,17 +42,12 @@ To fully rebuild our data from scratch, it is more involved...
 - We've already put the data into the db.sqlite3 for you, but if you're adventerous, you can download the data and make minimal tweaks to the files.
 - Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the root directory of the project for most operations.
 - Metadata for the movies was also downloaded via API from here: https://www.omdbapi.com/. Anywhere you see 'metadata.pkl' referenced in the code, this is OMDB API data.
-- To download metadata:
-	Links Data File Structure (links.csv in the ml-20m)
-	Identifiers that can be used to link to other sources of movie data are contained in the file links.csv. Each line of this file after the header row represents one movie, and has the following format:
-	movieId,imdbId,tmdbId
-	movieId is an identifier for movies used by https://movielens.org. E.g., the movie Toy Story has the link https://movielens.org/movies/1.
-	imdbId is an identifier for movies used by http://www.imdb.com. E.g., the movie Toy Story has the link http://www.imdb.com/title/tt0114709/.
-	tmdbId is an identifier for movies used by https://www.themoviedb.org. E.g., the movie Toy Story has the link https://www.themoviedb.org/movie/862.
-	See: http://files.grouplens.org/datasets/movielens/ml-20m-README.html
-- With that in mind, the metadata.py script can be tweaked to use the links.csv. A teammate divvied up the file to work with this Python script, so the links.csv file won't work exactly.
-- One of our groupmembers divided the ml-20m/movies.csv into training/test/validation, so scripts may need to be tweaked in order to read from CSV rather than binary blobs. Anywhere in the code you see 'binarized.hdf' this is a reference to OMDB ml-20m data.
-- You should now have both core data (ml-20m/<many_files>), metadata.pkl. It's time to process some data!
+  - To download metadata:
+	- use omdb_scrapper_all_files.py to download the metadata from the Open Movie Database. Note that a patreon API key will be required to do this. 
+- Use convert.py to binarize the data in ratings.csv
+	- this will produce a file "binarized.hdf" 
+- Use split.py to generate the train (trg), validation (val) and test (tst) datasets. 
+
 
 =Process data= 
 - Go to the root project directory: "cse6242_project" 
