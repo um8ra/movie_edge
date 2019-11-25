@@ -8,7 +8,10 @@ Created on Sat Oct 12 21:03:12 2019
 import pandas as pd
 import numpy as np
 import gc,pickle
-ratings = pd.read_csv('ratings.zip',index_col=[0,1],dtype={'userId':np.uint32,'movieId':np.uint32,'rating':np.float32,'timestamp':int})
+
+fname = 'ml-20m/ratings.csv'
+
+ratings = pd.read_csv(fname,index_col=[0,1],dtype={'userId':np.uint32,'movieId':np.uint32,'rating':np.float32,'timestamp':int})
 userMedians = ratings.groupby(level=0)['rating'].median()
 userMedians.name = 'Medians'
 ratings2 = ratings.reset_index().set_index('userId')

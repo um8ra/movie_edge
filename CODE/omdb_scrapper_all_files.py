@@ -10,34 +10,40 @@ import sys
 import pickle
 import json
 
-# fnames = sys.argv[1:]
+fname = 'ml-20m/links.csv'
 
-fnames = ['f{}.csv'.format(str(i+1)) for i in range(28)]
+print("...loading ", fname)
+out = {}
 
-conn  = http.client.HTTPConnection('omdbapi.com',80)
-key = ''    # patreon key allows 100k API calls / day
-            # free key allows only 1k API calls / day
+dat = pd.read_csv(fname, index_col=0)
+dat['idstr'] = dat['imdbId'].apply(lambda x: 'tt'+('0000000'+str(x))[-7:])
+
+dat = dat['idstr'].to_frame()
+# print(dat.tail(10))
+
+# $1/month patreon membership grants 100k API requests / day
+# $5/month patreon membership grants 250k API requests / day
+# Free key only allows only 1k API calls / day
+# There are 138k+ movies. Will need to pay for $5/month patreon membership
+key = ''    
 
 if key == '':
     raise ValueError("Please update API 'key' variable in the python file.")
 
-for fname in fnames:
-    print("...loading ", fname)
-    out  ={}
+conn  = http.client.HTTPConnection('omdbapi.com',80)
 
-    dat = pd.read_csv(fname,index_col=0)['idstr'].to_dict()
-    for i,(movieID,imdbID) in enumerate(dat.items()):
-        req_s = f'/?apikey={key}&i={imdbID}&plot=full'
-        conn.request("GET",req_s)
-        res = conn.getresponse()
+# dat = dat.head(10)    # uncomment to test for just 10 movies
+dat = dat['idstr'].to_dict()
+for i, (movieID, imdbID) in enumerate(dat.items()):
+    req_s = f'/?apikey={key}&i={imdbID}&plot=full'
+    conn.request("GET",req_s)
+    res = conn.getresponse()
 
-        print(res.status, res.reason)
+    print(movieID, imdbID, res.status, res.reason)
 
-        out[movieID] = json.loads(res.read())
-        if i % 50 == 0:
-            print(i)
+    out[movieID] = json.loads(res.read())
 
-    fout = fname.replace('csv','pkl')
+fout = 'metadata.pkl'
 
-    with open(fout,'wb') as f:
-        pickle.dump(out,f)
+with open(fout,'wb') as f:
+    pickle.dump(out,f)
