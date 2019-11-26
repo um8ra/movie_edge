@@ -40,15 +40,16 @@ To fully rebuild our data from scratch, it is more involved...
 
 =Acquire data=
 - This was done piecemeal by our team on multiple machines, so bubble gum and duct tape may be needed
-- We've already put the data into the db.sqlite3 for you, but if you're adventerous, you can download the data and make minimal tweaks to the files.
-- Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. Unzip it. This ml-20m folder is expected to be in the root CODE directory of the project for most operations.
-- Metadata for the movies was also downloaded via API from here: https://www.omdbapi.com/. Anywhere you see 'metadata.pkl' referenced in the code, this is OMDB API data.
-  - To download metadata:
-	- use omdb_scrapper_all_files.py to download the metadata from the Open Movie Database. Note that a patreon API key will be required to do this. 
-- Use convert.py to binarize the data in ratings.csv
+- Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the root directory of the project for most operations.
+- Now we need to get the metadata. Copy the following files into the ml-20m folder: 
+	- code: links2dl.py, omdb_scraper_all_files.py, metadata.py. convert.py, split.py
+- Run links2dl.py. It will generate files f1.csv - f28.csv. 
+- Now you will need to go to http://www.omdbapi.com/ and become a patron. Get your API key and enter it in omdb_scraper_all_files.py at line 18. You can use a free API key, but you will only be able to download 1000 movies a day. Modify the scraper file appropriately if you wish to do this. 
+- Run omdb_scraper_all_files.py. It will generate f1.pkl - f28.pkl
+- Now run metadata.py to generate metadata.pkl. 
+- Run covert.py to binarize the data in ratings.csv
 	- this will produce a file "binarized.hdf" 
 - Use split.py to generate the train (trg), validation (val) and test (tst) datasets. 
-
 
 =Process data= 
 - Go to the root CODE directory
@@ -59,13 +60,17 @@ To fully rebuild our data from scratch, it is more involved...
 	- If you want to run the FFT based t-SNE, you will need to download Flt-SNE from here: https://github.com/KlugerLab/FIt-SNE which also requires downloading FFTW by following the directions on their site: http://fftw.org/. This will require you to keep the variable `fast` = True.
 	- You may also need to download a C compiler to get this to work
 	- If you don't want to install anything this low level, set fast to false (this is moderately untested. We used the FFT method as detailed in the report.)
-	- Now run all cells :)
+	- Now run all cells
 - We recommend executing the cse6242_team5/db_NULL_fix.sql file to fix some nulls in the database.
 - You now have a populated db.sqlite3 file!
 - From here, go ahead and execute $python manage.py runserver using the simple "===Installation===" directions above.
 
 
+= Important =
+- metadata.pkl, and the db.sqlite3 files have already been prepared for you. There is no need to perform the above steps. 
+
+
 ===Execution===
 
-See step 5 and 6 in the "Installation" (not detailed) version. When you navigate to the pages, that's it! See the demo video if unclear... or just go to the rockofmaine site.
+See step 5 and 6 in the "Installation" (not detailed) version. When you navigate to the pages, that's it! See the demo video if unclear... or just go to http://rockofmaine4989.pythonanywhere.com/movie_edge/.
 
