@@ -705,7 +705,7 @@ function drawLegend(){ // renders legend
                     .text('IMDB Rating')
                     .attr('alignment-baseline','hanging' )
                     .attr('x',20)
-                    .attr('y',boxSize*.75)
+                    .attr('y',boxSize*.5)
                     .style('font-size',0.5*boxSize+'px')
     const legBoxes = [0,10,20,30,40,50,60,70,80,90,100]
     let i = 0
