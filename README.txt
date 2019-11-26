@@ -40,12 +40,10 @@ To fully rebuild our data from scratch, it is more involved...
 
 =Acquire data=
 - This was done piecemeal by our team on multiple machines, so bubble gum and duct tape may be needed
-- Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the root directory of the project for most operations.
-- Now we need to get the metadata. Copy the following files into the ml-20m folder: 
-	- code: links2dl.py, omdb_scraper_all_files.py, metadata.py. convert.py, split.py
-- Run links2dl.py. It will generate files f1.csv - f28.csv. 
+- Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the CODE directory.
+- Now we need to get the metadata.
 - Now you will need to go to http://www.omdbapi.com/ and become a patron. Get your API key and enter it in omdb_scraper_all_files.py at line 18. You can use a free API key, but you will only be able to download 1000 movies a day. Modify the scraper file appropriately if you wish to do this. 
-- Run omdb_scraper_all_files.py. It will generate f1.pkl - f28.pkl
+- Run omdb_scraper_all_files.py.
 - Now run metadata.py to generate metadata.pkl. 
 - Run covert.py to binarize the data in ratings.csv
 	- this will produce a file "binarized.hdf" 
