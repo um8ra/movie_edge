@@ -24,7 +24,7 @@ dat = dat['idstr'].to_frame()
 # $1/month patreon membership grants 100k API requests / day
 # $5/month patreon membership grants 250k API requests / day
 # Free key only allows only 1k API calls / day
-# There are 138k+ movies. Will need to pay for $5/month patreon membership
+# There are 27k+ movies. Will need to pay for $5/month patreon membership
 key = ''    
 
 if key == '':
