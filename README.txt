@@ -44,15 +44,20 @@ To fully rebuild our data from scratch, it is more involved...
 - Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the CODE directory.
 - Now we need to get the metadata.
 - Now you will need to go to http://www.omdbapi.com/ and become a patron. Get your API key and enter it in omdb_scraper_all_files.py at line 18. You can use a free API key, but you will only be able to download 1000 movies a day. Modify the scraper file appropriately if you wish to do this. 
-- Run omdb_scraper_all_files.py.
-- Now run metadata.py to generate metadata.pkl. 
-- Run covert.py to binarize the data in ratings.csv
+- Run: $python omdb_scrapper_all_files.py
+	- This file is located in CODE.
+- Run: $python metadata.py
+	- Generates metadata.pkl. 
+- Run: $python covert.py 
+	- Binarize the data in ratings.csv
 	- this will produce a file "binarized.hdf" 
-- Use split.py to generate the train (trg), validation (val) and test (tst) datasets. 
+- Run $python split.py
+	- Generates the train (trg), validation (val) and test (tst) datasets. 
 
 =Process data= 
 - Go to the root CODE directory
-- Run $jupyter notebook in the environment you $pip install'd into earlier.
+- Run $jupyter notebook 
+	- Must be in the environment you $pip install'd into earlier.
 - Open gensim_word2vec.ipynb and "run all cells". This will generate the gensim Word2vec model.
 - Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook)
 - Then you should open the makepayload.ipynb and "run all cells" but first:
