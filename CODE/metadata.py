@@ -8,7 +8,7 @@ Created on Sat Oct 12 19:56:45 2019
 import pandas as pd
 import pickle
 
-links = pd.read_csv('links.csv')
+links = pd.read_csv('./ml-20m/links.csv')
 movies = pd.DataFrame(index=links.movieId,columns = ['len','ok'])
 
 genres = pd.read_csv('movies.csv',index_col=0)['genres']
