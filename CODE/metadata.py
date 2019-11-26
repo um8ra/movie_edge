@@ -11,27 +11,39 @@ import pickle
 links = pd.read_csv('./ml-20m/links.csv')
 movies = pd.DataFrame(index=links.movieId,columns = ['len','ok'])
 
-genres = pd.read_csv('movies.csv',index_col=0)['genres']
-tags = pd.read_csv('genome-tags.csv',index_col=0)
-tagScores = pd.read_csv('genome-scores.csv',index_col=[0,1]).unstack()
+genres = pd.read_csv('./ml-20m/movies.csv',index_col=0)['genres']
+tags = pd.read_csv('./ml-20m/genome-tags.csv',index_col=0)
+tagScores = pd.read_csv('./ml-20m/genome-scores.csv',index_col=[0,1]).unstack()
 tagScores = tagScores.rename(columns = tags['tag'])
 
-
-d = {}
-for n in range(1,29):    
-    with open(f'f{n}.pkl','rb') as f:
-        dat = pickle.load(f)
-        d.update(dat)
-    for k,v in dat.items():        
-        movies.loc[k,'len'] = len(v)
-        movies.loc[k,'ok'] = v['Response'] == 'True'
-        d[k]['MovieLensGenres'] = genres.loc[k]
-        if k in tagScores.index:
-            d[k]['top10Tags'] = tagScores.loc[k].sort_values()['relevance'].tail(10)
-        else:
-            d[k]['top10Tags'] = None        
-        if k % 100 == 0:
-            print(k)
+with open('omdbapi.pkl','rb') as f:
+    d = pickle.load(f)
+for k,v in d.items():
+     movies.loc[k,'len'] = len(v)
+     movies.loc[k,'ok'] = v['Response'] == 'True'
+     d[k]['MovieLensGenres'] = genres.loc[k]
+     if k in tagScores.index:
+        d[k]['top10Tags'] = tagScores.loc[k].sort_values()['relevance'].tail(10)
+     else:
+        d[k]['top10Tags'] = None        
+     if k % 100 == 0:
+        print(k)
+    
+    
+#for n in range(1,29):    
+#    with open(f'f{n}.pkl','rb') as f:
+ #       dat = pickle.load(f)
+ #       d.update(dat)
+#    for k,v in dat.items():        
+#        movies.loc[k,'len'] = len(v)
+  #      movies.loc[k,'ok'] = v['Response'] == 'True'
+#        d[k]['MovieLensGenres'] = genres.loc[k]
+  #      if k in tagScores.index:
+#            d[k]['top10Tags'] = tagScores.loc[k].sort_values()['relevance'].tail(10)
+ #       else:
+  #          d[k]['top10Tags'] = None        
+  #      if k % 100 == 0:
+   #         print(k)
 
 
 
