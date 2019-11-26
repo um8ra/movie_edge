@@ -29,6 +29,7 @@ https://youtu.be/-VUsqzLVf6k
 
 
 ==Installation / Full Build Detailed (you probably don't want to do this)==
+- Ensure you've activated the Python3.7 environment built in the "===Installation===" section and that all the packages have been successfully installed into. fitsne is a pain.
 
 =Build Database=
 To fully rebuild our data from scratch, it is more involved...
