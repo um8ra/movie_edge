@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import gc,pickle
 
-fname = 'ml-20m/ratings.csv'
+fname = './ml-20m/ratings.csv'
 
 ratings = pd.read_csv(fname,index_col=[0,1],dtype={'userId':np.uint32,'movieId':np.uint32,'rating':np.float32,'timestamp':int})
 userMedians = ratings.groupby(level=0)['rating'].median()
