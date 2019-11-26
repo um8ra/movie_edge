@@ -58,8 +58,8 @@ To fully rebuild our data from scratch, it is more involved...
 - Go to the root CODE directory
 - Run $jupyter notebook 
 	- Must be in the environment you $pip install'd into earlier.
-- Open gensim_word2vec.ipynb and "Cells -> Run All". This will generate the gensim Word2vec model.
-- Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook)
+- Open gensim_word2vec.ipynb and "Cells -> Run All". This will generate the gensim Word2vec model, titled: w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim
+- Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook). You will copy over (aka, delete) the existing model in the directory that we've packaged in the ZIP for you.
 - Then you should open the makepayload.ipynb and "Cells -> Run All" but first:
 	- If you want to run the FFT based t-SNE, you will need to download Flt-SNE from here: https://github.com/KlugerLab/FIt-SNE which also requires downloading FFTW by following the directions on their site: http://fftw.org/. This will require you to keep the variable `fast` = True.
 	- You may also need to download a C compiler to get this to work
