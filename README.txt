@@ -67,6 +67,7 @@ To fully rebuild our data from scratch, it is more involved...
 	- Now "Cells -> Run All"
 - We recommend executing the cse6242_team5/db_NULL_fix.sql file to fix some nulls in the database.
 - You now have a populated db.sqlite3 file!
+- Navigate to the cse6242_team5 directory
 - From here, go ahead and execute $python manage.py runserver using the simple "===Installation===" directions above.
 
 
