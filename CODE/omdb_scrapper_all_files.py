@@ -43,7 +43,7 @@ for i, (movieID, imdbID) in enumerate(dat.items()):
 
     out[movieID] = json.loads(res.read())
 
-fout = 'metadata.pkl'
+fout = 'omdbapi.pkl'
 
 with open(fout,'wb') as f:
     pickle.dump(out,f)
