@@ -703,7 +703,7 @@ function drawLegend(){ // renders legend
     const boxSize = (legendW-40)/11
     const legTitle = leg.append('text')
                     .text('IMDB Rating')
-                    .attr('alignment-baseline','hanging' )
+                    .attr('alignment-baseline','middle' )
                     .attr('x',20)
                     .attr('y',boxSize*.5)
                     .style('font-size',0.5*boxSize+'px')
