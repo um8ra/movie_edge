@@ -14,7 +14,9 @@ https://youtu.be/-VUsqzLVf6k
 - If you want to create a new environment for your python installation, execute $python3.7 -m venv ENV
 - This will create a new environment called "ENV".
 - Activate this environment via $source ENV/bin/activate
-- You should probably do $pip install Cython
+- You should probably do 
+	- $pip install Cython
+	- $pip install wheel
 	- This is due to the issue noted below
 - Navigate to CODE directory (if you aren't there already), and there should be files called "requirements.txt" and "requirements-slim.txt" there. The "slim" file is okay to use if you are doing this installation. The non-slim version will be needed if you want to do a full build as detailed in the following section.
 - Execute $pip install -r requirements.txt or $pip install -r requirements-slim.txt
