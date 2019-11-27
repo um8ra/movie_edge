@@ -60,12 +60,13 @@ To fully rebuild our data from scratch, it is more involved...
 	- Must be in the environment you $pip install'd into earlier.
 - Open gensim_word2vec.ipynb and "Cells -> Run All". This will generate the gensim Word2vec model, titled: w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim
 - Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook). You will copy over (aka, delete) the existing model in the directory that we've packaged in the ZIP for you.
-- Then you should open the makepayload.ipynb and "Cells -> Run All" but first:
-	- If you want to run the FFT based t-SNE, you will need to download Flt-SNE from here: https://github.com/KlugerLab/FIt-SNE which also requires downloading FFTW by following the directions on their site: http://fftw.org/. This will require you to keep the variable `fast` = True.
-	- You may also need to download a C compiler to get this to work
-	- If you don't want to install anything this low level, set fast to false (this is moderately untested. We used the FFT method as detailed in the report.)
-	- Now "Cells -> Run All"
-- We recommend executing the cse6242_team5/db_NULL_fix.sql file to fix some nulls in the database.
+- Then you should open the makepayload.ipynb and "Cells -> Run All". This will populate the database.
+	- Running the script requires use of the FFT based t-SNE, so you will need to install Flt-SNE from here: https://github.com/KlugerLab/FIt-SNE which also requires downloading FFTW by following the directions on their site: http://fftw.org/. This will require you to keep the variable `fast` = True.
+	- Installation will require a  C compiler on Linux/Mac. 
+	- On Windows, you will have to find the precompiled binaries here: https://github.com/KlugerLab/FIt-SNE/releases/download/v1.1.0/FItSNE-Windows-1.1.0.zip and follow the PATH setup instructions from https://github.com/KlugerLab/FIt-SNE
+	- If you don't want to install anything this low level, set fast to False (this is moderately untested. We used the FFT method as detailed in the report.)
+- We recommend executing the cse6242_team5/db_NULL_fix.sql on the db.sqlite3 file to fix some nulls in the database.
+	- Execute this via the SQLite shell or your preferred Sqlite DB console.
 - You now have a populated db.sqlite3 file!
 - Navigate to the cse6242_team5 directory
 - From here, go ahead and execute $python manage.py runserver using the simple "===Installation===" directions above.
