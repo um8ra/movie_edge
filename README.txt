@@ -9,7 +9,7 @@ https://youtu.be/-VUsqzLVf6k
 ===Installation===
 0. Don't even bother installing (cumbersome) and simply go to: http://rockofmaine4989.pythonanywhere.com/movie_edge/ or http://rockofmaine4989.pythonanywhere.com/movie_edge/no_graphic/ . We like the pretty one with graphics (first one).
 
-- Install Python 3.7 or higher
+- Install Python 3.7 from python.org
 - Navigate to the CODE folder in the same directory as this file.
 - If you want to create a new environment for your python installation, execute $python3.7 -m venv ENV
 - This will create a new environment called "ENV".
