@@ -16,7 +16,7 @@ https://youtu.be/-VUsqzLVf6k
 - Activate this environment via $source ENV/bin/activate
 - You should probably do $pip install Cython
 	- This is due to the issue noted below
-- Navigate to CODE directory (if you aren't there already), and there should be a file called "requirements.txt" there.
+- Navigate to CODE directory (if you aren't there already), and there should be files called "requirements.txt" and "requirements-slim.txt" there. The "slim" file is okay to use if you are doing this installation. The non-slim version will be needed if you want to do a full build as detailed in the following section.
 - Execute $pip install -r requirements.txt
 	- IF YOU RUN INTO Cython issues: then $pip install Cython and then try $pip install -r requirements.txt again. Cython simply needs to be installed first almost always. Command noted here for Cython: https://pypi.org/project/Cython/
 	- IF YOU RUN INTO ERRORS WITH fitsne, remove the line from the requirements.txt file. It is only needed if you want to rebuild fully from scratch. To run the webapp, it is not needed. It requires manual compilation of FFTW and likely is more than you have any desire to do.
@@ -43,25 +43,34 @@ To fully rebuild our data from scratch, it is more involved...
 - This was done piecemeal by our team on multiple machines, so bubble gum and duct tape may be needed
 - Go to https://grouplens.org/datasets/movielens/ and download the link here: http://files.grouplens.org/datasets/movielens/ml-20m.zip. This ml-20m folder is expected to be in the CODE directory.
 - Now we need to get the metadata.
-- Now you will need to go to http://www.omdbapi.com/ and become a patron. Get your API key and enter it in omdb_scraper_all_files.py at line 18. You can use a free API key, but you will only be able to download 1000 movies a day. Modify the scraper file appropriately if you wish to do this. 
-- Run omdb_scraper_all_files.py.
-- Now run metadata.py to generate metadata.pkl. 
-- Run covert.py to binarize the data in ratings.csv
+- Now you will need to go to http://www.omdbapi.com/ and become a patron. Get your API key and enter it in omdb_scrapper_all_files.py at line 18. You can use a free API key, but you will only be able to download 1000 movies a day. Modify the scraper file appropriately if you wish to do this. 
+- Run: $python omdb_scrapper_all_files.py
+	- This file is located in CODE.
+- Run: $python metadata.py
+	- Generates metadata.pkl. 
+- Run: $python convert.py 
+	- Binarize the data in ratings.csv
 	- this will produce a file "binarized.hdf" 
-- Use split.py to generate the train (trg), validation (val) and test (tst) datasets. 
+- Run $python split.py
+	- Generates the train (trg), validation (val) and test (tst) datasets. 
 
 =Process data= 
 - Go to the root CODE directory
-- Run $jupyter notebook in the environment you $pip install'd into earlier.
-- Open gensim_word2vec.ipynb and "run all cells". This will generate the gensim Word2vec model.
-- Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook)
-- Run makepayload.py. This will populate the database.
+- Run $jupyter notebook 
+	- Must be in the environment you $pip install'd into earlier.
+- Open gensim_word2vec.ipynb and "Cells -> Run All". This will generate the gensim Word2vec model, titled: w2v_vs_64_sg_1_hs_1_mc_1_it_4_wn_32_ng_2_all_data_trg_val_tst.gensim
+- Move the model into the gensim_models2 directory (it will originally be written into the same directory as the Jupyter notebook, CODE). You will copy over (aka, delete) the existing model in the directory that we've packaged in the ZIP for you.
+- Run $python makepayload.py
 	- Running the script requires use of the FFT based t-SNE, so you will need to install Flt-SNE from here: https://github.com/KlugerLab/FIt-SNE which also requires downloading FFTW by following the directions on their site: http://fftw.org/. This will require you to keep the variable `fast` = True.
-	- Installation will require a  C compiler on Linux/Mac. 
+	- Installation will require a  C compiler on Linux/Mac.
 	- On Windows, you will have to find the precompiled binaries here: https://github.com/KlugerLab/FIt-SNE/releases/download/v1.1.0/FItSNE-Windows-1.1.0.zip and follow the PATH setup instructions from https://github.com/KlugerLab/FIt-SNE
 	- If you don't want to install anything this low level, set fast to False (this is moderately untested. We used the FFT method as detailed in the report.)
-- We recommend executing the cse6242_team5/db_NULL_fix.sql file to fix some nulls in the database.
+	- You may need to add the Flt-SNE repo to your system path using a line like so before the import in the code
+		- sys.path.append('/Users/some/path/to/FIt-SNE')
+- We recommend executing the cse6242_team5/db_NULL_fix.sql on the db.sqlite3 file to fix some nulls in the database.
+	- Execute this via the SQLite shell or your preferred Sqlite DB console.
 - You now have a populated db.sqlite3 file!
+- Navigate to the cse6242_team5 directory
 - From here, go ahead and execute $python manage.py runserver using the simple "===Installation===" directions above.
 
 
