@@ -23,7 +23,7 @@ https://youtu.be/-VUsqzLVf6k
 	- IF YOU RUN INTO Cython issues: then $pip install Cython and then try $pip install -r requirements.txt again. Cython simply needs to be installed first almost always. Command noted here for Cython: https://pypi.org/project/Cython/
 	- IF YOU RUN INTO ERRORS WITH fitsne, remove the line from the requirements.txt file. It is only needed if you want to rebuild fully from scratch. To run the webapp, it is not needed. It requires manual compilation of FFTW and likely is more than you have any desire to do.
 - Go to the "cse6242_team5" directory
-- Execute $python manage.py runserver. If debug=False in settings, change it to True.
+- Execute $python manage.py runserver. If in CODE/cse6242_team5/cse6242_team5/settings.py, debug=False (~line 26) change it to True.
 - Navigate to 127.0.0.1:8000/movie_edge/ or 127.0.0.1:8000/movie_edge/no_graphic/
 - Django sometimes throws "ConnectionResetError: [Errno 54] Connection reset by peer". If the site doesn't load, try again. Make sure you're not going to 127.0.0.1:8000/ You need to go to the movie_edge site within at: 127.0.0.1:8000/movie_edge/ as stated above.
 - Rate some movies!
